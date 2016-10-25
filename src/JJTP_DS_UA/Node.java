@@ -7,7 +7,6 @@ public class Node
 {
     String name;
     String ip;
-    int hash;
 
     public Node(String name, String ip)
     {
@@ -15,16 +14,14 @@ public class Node
         this.ip = ip;
     }
 
-    public int getHash()
-    {
-        Integer hash  = name.hashCode();
-        long hashLong = Integer.toUnsignedLong(hash);
-        this.hash = (int)hashLong % 32768;
-        return hash;
-    }
 
     public String getIP()
     {
         return ip;
+    }
+
+    public String getName()
+    {
+        return name;
     }
 }

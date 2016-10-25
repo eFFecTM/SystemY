@@ -5,10 +5,10 @@ public class Main
 
     public static void main(String[] args)
     {
-        // Hello world!
-        String name = "Jonas";
+        Node node = new Node("jonas","192.168.1.2");
+        String nodeName = node.getName();
         NameServer naming = new NameServer();
-        naming.addName(name);
+        naming.addName(nodeName);
 
     }
 }
