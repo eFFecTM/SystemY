@@ -15,3 +15,4 @@ public class Main
 // jonas aanpas test : thomas is homo
 // thomas aanpas test: jonas is een grotere homo
 // Peter aanpas test : Allemaal homo's
+// test1;
