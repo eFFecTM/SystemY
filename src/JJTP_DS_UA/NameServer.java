@@ -26,4 +26,9 @@ public class NameServer
     {
 
     }
+
+    public String getOwner(String fileName)
+    {
+        return "test"
+    }
 }
