@@ -2,28 +2,30 @@ package JJTP_DS_UA;
 
 import java.net.InetAddress;
 import java.util.HashMap;
+import java.util.TreeMap;
 
 /**
  * Created by JJTP on 25/10/2016.
  */
 public class NameServer
 {
-    HashMap<Integer,String> map;
+    TreeMap<Integer,String> nodeMap;
+
 
     public NameServer()
     {
-        map = new HashMap<Integer,String>(); //InetAddress
+        nodeMap = new TreeMap<>(); //InetAddress
     }
 
-    public void addName(String name)
+    public void addName(String name, String IP)
     {
         Integer hashCode = name.hashCode();
         Integer hash = (int) Integer.toUnsignedLong(hashCode) % 32768;
-        map.put(hash,name);
+        nodeMap.put(hash,IP);
     }
 
     public String getOwner(String fileName)
     {
-        return "test";
+        // @TODO opzoek schrijven
     }
 }
