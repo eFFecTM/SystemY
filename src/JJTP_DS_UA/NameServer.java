@@ -22,10 +22,6 @@ public class NameServer
         map.put(hash,name);
     }
 
-    public void printTable()
-    {
-
-    }
 
     public String getOwner(String fileName)
     {
