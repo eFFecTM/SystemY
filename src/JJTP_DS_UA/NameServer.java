@@ -22,9 +22,8 @@ public class NameServer
         map.put(hash,name);
     }
 
-
     public String getOwner(String fileName)
     {
-        return "test"
+        return "test";
     }
 }
