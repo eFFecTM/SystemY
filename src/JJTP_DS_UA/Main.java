@@ -9,7 +9,7 @@ public class Main
         String nodeName = node.getName();
         NameServer naming = new NameServer();
         naming.addName(nodeName);
-
+//
     }
 }
 // jonas aanpas test : thomas is homo
