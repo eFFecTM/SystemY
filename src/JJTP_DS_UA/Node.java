@@ -1,7 +1,7 @@
 package JJTP_DS_UA;
 
 /**
- * Created by jonas on 25-10-2016.
+ * Created by JJTP on 25-10-2016.
  */
 public class Node
 {
