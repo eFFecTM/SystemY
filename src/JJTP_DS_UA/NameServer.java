@@ -1,6 +1,7 @@
 package JJTP_DS_UA;
 
 import java.net.InetAddress;
+import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.TreeMap;
 
@@ -12,9 +13,11 @@ public class NameServer
     TreeMap<Integer,String> nodeMap;
 
 
-    public NameServer()
+    public NameServer() throws RemoteException
     {
         nodeMap = new TreeMap<>(); //InetAddress
+        serverRMIklasse_temp RMIklasse = new serverRMIklasse_temp(this);
+        String filenaam = RMIklasse.getFileNaam();
     }
 
     public void addName(String name, String IP)
@@ -24,9 +27,10 @@ public class NameServer
         nodeMap.put(hash,IP);
     }
 
-    public String getOwner(String fileName)
+    public String lookup(String fileName)
     {
         // @TODO opzoek schrijven
         return "";
     }
+
 }

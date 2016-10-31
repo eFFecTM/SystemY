@@ -11,7 +11,7 @@ public class Node_NameServerComm
     {
         try {
             String name = "//192.168.1.1/FileServer";
-            JJTP_DS_UA.NameServerInterface NSI = (NameServerInterface) Naming.lookup(name);
+            serverRMIinterface_temp NSI = (serverRMIinterface_temp) Naming.lookup(name);
             System.out.println("Give a filename you like to search: ");
             Scanner scan = new Scanner(System.in);
             String fileName = scan.nextLine();
