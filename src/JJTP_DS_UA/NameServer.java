@@ -27,5 +27,6 @@ public class NameServer
     public String getOwner(String fileName)
     {
         // @TODO opzoek schrijven
+        return "";
     }
 }

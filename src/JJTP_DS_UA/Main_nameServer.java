@@ -1,6 +1,6 @@
 package JJTP_DS_UA;
 
-public class Main
+public class Main_nameServer
 {
 
     public static void main(String[] args)
