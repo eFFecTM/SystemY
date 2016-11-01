@@ -1,8 +1,6 @@
 package JJTP_DS_UA;
 
-import java.net.InetAddress;
 import java.rmi.RemoteException;
-import java.util.HashMap;
 import java.util.TreeMap;
 
 /**
@@ -17,7 +15,6 @@ public class NameServer
     {
         nodeMap = new TreeMap<>(); //InetAddress
         serverRMIklasse_temp RMIklasse = new serverRMIklasse_temp(this);
-        String filenaam = RMIklasse.getFileNaam();
     }
 
     public void addName(String name, String IP)
@@ -29,8 +26,11 @@ public class NameServer
 
     public String lookup(String fileName)
     {
-        // @TODO opzoek schrijven
-        return "";
+        Integer fileNameHash = (int) (Integer.toUnsignedLong(fileName.hashCode()) % 32768);
+        if(nodeMap.lowerKey(fileNameHash)==null) // returned key < dan de meegegeven paramater of null als die niet bestaat
+            return nodeMap.get(nodeMap.lastKey()); //returned de grootste key uit de map
+        else
+            return nodeMap.get(nodeMap.lowerKey(fileNameHash));
     }
 
 }

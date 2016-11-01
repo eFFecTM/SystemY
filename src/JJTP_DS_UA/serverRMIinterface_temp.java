@@ -8,5 +8,5 @@ import java.rmi.RemoteException;
  */
 public interface serverRMIinterface_temp extends Remote
 {
-    public String getOwner(String fileName) throws RemoteException;
+    public String findFile(String fileName) throws RemoteException;
 }

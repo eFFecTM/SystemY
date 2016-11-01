@@ -8,8 +8,6 @@ import java.rmi.server.UnicastRemoteObject;
  */
 public class serverRMIklasse_temp extends UnicastRemoteObject implements serverRMIinterface_temp
 {
-    String filename;
-    String returnIP;
     NameServer nameserver;
 
 
@@ -18,18 +16,9 @@ public class serverRMIklasse_temp extends UnicastRemoteObject implements serverR
         nameserver = n;
     }
 
-    public String getOwner(String fileName) throws RemoteException
+    public String findFile(String fileName) throws RemoteException
     {
         return nameserver.lookup(fileName);
     }
 
-    public String getFileNaam()
-    {
-        return filename;
-    }
-
-    public void putIP(String ip)
-    {
-        returnIP = ip;
-    }
 }
