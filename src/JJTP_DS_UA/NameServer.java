@@ -1,6 +1,10 @@
 package JJTP_DS_UA;
 
+import java.net.MalformedURLException;
+import java.rmi.AlreadyBoundException;
+import java.rmi.Naming;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
 import java.util.TreeMap;
 
 /**
@@ -13,8 +17,19 @@ public class NameServer
 
     public NameServer() throws RemoteException
     {
-        nodeMap = new TreeMap<>(); //InetAddress
-        serverRMIklasse_temp RMIklasse = new serverRMIklasse_temp(this);
+        nodeMap = new TreeMap<>(); //Treemap met <(hash)nodeNaam,ip>
+        serverRMI RMIclass = new serverRMI(this); //RMIclass maken + referentie naar zichzelf doorgeven (voor lookup)
+        String bindLocation = "//localhost/FileServer"; //@TODO juiste locatie instellen
+
+        try {
+            LocateRegistry.createRegistry(1099);
+            Naming.bind(bindLocation, RMIclass);
+            System.out.println("FileServer Server is ready at:" + bindLocation);
+            System.out.println("java RMI registry created.");
+        } catch (MalformedURLException | AlreadyBoundException e) {
+            e.printStackTrace();
+            System.out.println("java RMI registry already exists.");
+        }
     }
 
     public void addName(String name, String IP)

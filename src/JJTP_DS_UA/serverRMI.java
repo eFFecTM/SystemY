@@ -6,17 +6,17 @@ import java.rmi.server.UnicastRemoteObject;
 /**
  * Created by jonas on 31-10-2016.
  */
-public class serverRMIklasse_temp extends UnicastRemoteObject implements serverRMIinterface_temp
+public class serverRMI extends UnicastRemoteObject implements serverRMIinterface
 {
     NameServer nameserver;
 
 
-    public serverRMIklasse_temp(NameServer n) throws RemoteException{
+    public serverRMI(NameServer n) throws RemoteException{
         super();
         nameserver = n;
     }
 
-    public String findFile(String fileName) throws RemoteException
+    public String findFile (String fileName) throws RemoteException
     {
         return nameserver.lookup(fileName);
     }
