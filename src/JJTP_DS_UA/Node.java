@@ -1,6 +1,6 @@
 package JJTP_DS_UA;
 
-import java.util.Scanner;
+import java.net.Inet4Address;
 
 /**
  * Created by JJTP on 25-10-2016.
@@ -8,26 +8,17 @@ import java.util.Scanner;
 public class Node
 {
     String name;
-    String ip;
+    Inet4Address ip;
     Node_NameServerCommunication NScommunication;
 
-    public Node(String name, String ip)
+    public Node(String name, Inet4Address ip)
     {
         this.name = name;
         this.ip = ip;
         NScommunication = new Node_NameServerCommunication();
     }
 
-    public String searchFile() //@TODO: deze methode oproepen?
-    {
-        System.out.println("Give a filename you would like to search: ");
-        Scanner s = new Scanner(System.in);
-        String fileName = s.nextLine();
-        return NScommunication.searchFile(fileName); //returnt het ip waar de file zich bevindt
-    }
-
-
-    public String getIP()
+    public Inet4Address getIP()
     {
         return ip;
     }

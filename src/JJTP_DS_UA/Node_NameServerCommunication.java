@@ -1,11 +1,12 @@
 package JJTP_DS_UA;
 
+import java.net.Inet4Address;
 import java.rmi.*;
 
 /**
  * Created by JJTP on 31/10/2016.
  */
-public class Node_NameServerCommunication //@TODO vraag: op welke computer staat deze klasse?
+public class Node_NameServerCommunication
 {
     serverRMIinterface NSI;
 
@@ -22,13 +23,14 @@ public class Node_NameServerCommunication //@TODO vraag: op welke computer staat
         }
     }
 
-    public String searchFile(String fileName)
+    //@TODO: In de main oproepen?
+    public Inet4Address searchFile(String fileName)
     {
         try
         {
-            String ipAddress = NSI.findFile(fileName);
-            System.out.println("File is located at: "+ipAddress);
-            return ipAddress;
+            Inet4Address IP = NSI.findFile(fileName);
+            System.out.println("File is located at: "+IP);
+            return IP;
         } catch(Exception e)
         {
             System.err.println("FileServerexception: " + e.getMessage());

@@ -1,5 +1,6 @@
 package JJTP_DS_UA;
 
+import java.net.Inet4Address;
 import java.net.MalformedURLException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
@@ -12,7 +13,7 @@ import java.util.TreeMap;
  */
 public class NameServer
 {
-    TreeMap<Integer,String> nodeMap;
+    TreeMap<Integer,Inet4Address> nodeMap;
 
 
     public NameServer() throws RemoteException
@@ -33,14 +34,14 @@ public class NameServer
         }
     }
 
-    public void addName(String name, String IP)
+    public void addName(String name, Inet4Address IP)
     {
         Integer hashCode = name.hashCode();
         Integer hash = (int) Integer.toUnsignedLong(hashCode) % 32768;
         nodeMap.put(hash,IP);
     }
 
-    public String lookup(String fileName)
+    public Inet4Address lookup(String fileName)
     {
         Integer fileNameHash = (int) (Integer.toUnsignedLong(fileName.hashCode()) % 32768);
         if(nodeMap.lowerKey(fileNameHash)==null) // returnt key < dan de meegegeven paramater of null als die niet bestaat

@@ -1,5 +1,6 @@
 package JJTP_DS_UA;
 
+import java.net.Inet4Address;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
@@ -8,5 +9,5 @@ import java.rmi.RemoteException;
  */
 public interface serverRMIinterface extends Remote
 {
-    public String findFile(String fileName) throws RemoteException;
+    public Inet4Address findFile(String fileName) throws RemoteException;
 }

@@ -1,5 +1,7 @@
 package JJTP_DS_UA;
 
+import java.net.Inet4Address;
+import java.net.UnknownHostException;
 import java.util.Scanner;
 
 /**
@@ -7,9 +9,11 @@ import java.util.Scanner;
  */
 public class Main_node
 {
-    public static void main(String[] args)
+    public static void main(String[] args) throws UnknownHostException
     {
-        Node node = new Node(textInput(), textInput());
+        Node node = new Node(textInput(), (Inet4Address) Inet4Address.getByName(textInput()));
+        //getByName is een method van InetAddress, maar Inet4Address extends InetAddress
+        //het geeft een inetAddress terug, dus casten naar Inet4Address
     }
 
     public static String textInput()

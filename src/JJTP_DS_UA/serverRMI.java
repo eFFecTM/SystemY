@@ -1,5 +1,6 @@
 package JJTP_DS_UA;
 
+import java.net.Inet4Address;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
@@ -8,17 +9,17 @@ import java.rmi.server.UnicastRemoteObject;
  */
 public class serverRMI extends UnicastRemoteObject implements serverRMIinterface
 {
-    NameServer nameserver;
+    NameServer ns;
 
 
-    public serverRMI(NameServer n) throws RemoteException{
+    public serverRMI(NameServer ns) throws RemoteException{
         super();
-        nameserver = n;
+        this.ns = ns;
     }
 
-    public String findFile (String fileName) throws RemoteException
+    public Inet4Address findFile (String fileName) throws RemoteException
     {
-        return nameserver.lookup(fileName);
+        return ns.lookup(fileName);
     }
 
 }
