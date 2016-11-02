@@ -21,7 +21,7 @@ public class NodeLifeCycle
 
     }
 
-    public int CalcHash()
+    public void CalcHash()
     {
 
     }

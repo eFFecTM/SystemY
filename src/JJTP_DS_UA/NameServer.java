@@ -21,7 +21,8 @@ public class NameServer
         serverRMI RMIclass = new serverRMI(this); //RMIclass maken + referentie naar zichzelf doorgeven (voor lookup)
         String bindLocation = "//localhost/FileServer"; //@TODO juiste locatie instellen
 
-        try {
+        try
+        {
             LocateRegistry.createRegistry(1099);
             Naming.bind(bindLocation, RMIclass);
             System.out.println("FileServer Server is ready at:" + bindLocation);
@@ -42,8 +43,8 @@ public class NameServer
     public String lookup(String fileName)
     {
         Integer fileNameHash = (int) (Integer.toUnsignedLong(fileName.hashCode()) % 32768);
-        if(nodeMap.lowerKey(fileNameHash)==null) // returned key < dan de meegegeven paramater of null als die niet bestaat
-            return nodeMap.get(nodeMap.lastKey()); //returned de grootste key uit de map
+        if(nodeMap.lowerKey(fileNameHash)==null) // returnt key < dan de meegegeven paramater of null als die niet bestaat
+            return nodeMap.get(nodeMap.lastKey()); //returnt de grootste key uit de map
         else
             return nodeMap.get(nodeMap.lowerKey(fileNameHash));
     }

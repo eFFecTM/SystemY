@@ -18,12 +18,12 @@ public class Node
         NScommunication = new Node_NameServerCommunication();
     }
 
-    public String searchFile()
+    public String searchFile() //@TODO: deze methode oproepen?
     {
         System.out.println("Give a filename you would like to search: ");
         Scanner s = new Scanner(System.in);
         String fileName = s.nextLine();
-        return NScommunication.searchFile(fileName); //returned het ip waar de file zich bevindt
+        return NScommunication.searchFile(fileName); //returnt het ip waar de file zich bevindt
     }
 
 
