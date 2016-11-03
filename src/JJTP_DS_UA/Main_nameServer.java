@@ -19,7 +19,7 @@ public class Main_nameServer
     {
         nameServer.addNode("jonas",(Inet4Address) Inet4Address.getByName("192.168.1.3"));
         nameServer.addNode("jonas", (Inet4Address) Inet4Address.getByName("192.168.1.2"));
-        nameServer.deleteNode("jonas");
-        nameServer.deleteNode("jonas");
+        //nameServer.deleteNode("jonas");
+        //nameServer.deleteNode("jonas");
     }
 }

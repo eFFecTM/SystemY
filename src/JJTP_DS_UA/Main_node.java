@@ -15,7 +15,7 @@ public class Main_node
         node = new Node(textInput(), (Inet4Address) Inet4Address.getByName(textInput()));
             //getByName is een method van InetAddress, maar Inet4Address extends InetAddress
             //het geeft een inetAddress terug, dus casten naar Inet4Address
-        testPracticum3();
+        //testPracticum3();
 
 
     }

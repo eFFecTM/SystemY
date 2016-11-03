@@ -4,8 +4,11 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import java.io.File;
+import java.io.IOException;
+import java.net.DatagramPacket;
 import java.net.Inet4Address;
 import java.net.MalformedURLException;
+import java.net.MulticastSocket;
 import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
@@ -18,24 +21,14 @@ import java.util.TreeMap;
 public class NameServer
 {
     TreeMap<Integer,Inet4Address> nodeMap;
+    serverRMI RMIclass;
 
 
     public NameServer() throws RemoteException
     {
         nodeMap = new TreeMap<>(); //Treemap met <(hash)nodeNaam,ip>
-        serverRMI RMIclass = new serverRMI(this); //RMIclass maken + referentie naar zichzelf doorgeven (voor lookup)
-        String bindLocation = "//localhost/FileServer";
-
-        try
-        {
-            LocateRegistry.createRegistry(1099);
-            Naming.bind(bindLocation, RMIclass);
-            System.out.println("FileServer Server is ready at:" + bindLocation);
-            System.out.println("java RMI registry created.");
-        } catch (MalformedURLException | AlreadyBoundException e) {
-            e.printStackTrace();
-            System.err.println("java RMI registry already exists.");
-        }
+        listenMC();
+        bindRMIclass();
     }
 
     public void addNode(String name, Inet4Address IP)
@@ -83,6 +76,51 @@ public class NameServer
         catch (JAXBException e)
         {
             e.printStackTrace();
+        }
+    }
+
+    public void listenMC()
+    {
+        int portMC = 12345;
+        Inet4Address IPMC = null;
+        try
+        {
+            IPMC = (Inet4Address) Inet4Address.getByName("230.0.0.0");
+            MulticastSocket mcSocket;
+            mcSocket = new MulticastSocket(portMC);
+            mcSocket.joinGroup(IPMC);
+
+            DatagramPacket packet = new DatagramPacket(new byte[1024], 1024);
+            System.out.println("Waiting for a  multicast message...");
+            mcSocket.receive(packet);
+            String msg = new String(packet.getData(), packet.getOffset(), packet.getLength());
+            System.out.println("Multicast Received: " + msg);
+            String[] info = msg.split(" "); // het ontvangen bericht splitsen in woorden gescheiden door een spatie
+            System.out.println("Naam: " + info[0]);
+            System.out.println("IP: " + info[1]);
+
+            mcSocket.leaveGroup(IPMC);
+            mcSocket.close();
+            listenMC();
+        } catch(IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public void bindRMIclass()
+    {
+        try
+        {
+            RMIclass = new serverRMI(this); //RMIclass maken + referentie naar zichzelf doorgeven (voor lookup)
+            String bindLocation = "//localhost/FileServer";
+            LocateRegistry.createRegistry(1099);
+            Naming.bind(bindLocation, RMIclass);
+            System.out.println("FileServer Server is ready at:" + bindLocation);
+            System.out.println("java RMI registry created.");
+        } catch (MalformedURLException | AlreadyBoundException | RemoteException e) {
+            e.printStackTrace();
+            System.err.println("java RMI registry already exists.");
         }
     }
 
