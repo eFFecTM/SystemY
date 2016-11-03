@@ -14,7 +14,7 @@ public class Node_NameServerCommunication
     {
         try
         {
-            String location = "//localhost/FileServer"; //@TODO juiste locatie ingeven
+            String location = "//192.168.1.1/FileServer"; //@TODO juiste locatie ingeven
             NSI = (serverRMIinterface) Naming.lookup(location);
         } catch(Exception e)
         {
@@ -23,7 +23,6 @@ public class Node_NameServerCommunication
         }
     }
 
-    //@TODO: In de main oproepen? bij de test
     public Inet4Address searchFile(String fileName)
     {
         try

@@ -24,7 +24,7 @@ public class NameServer
     {
         nodeMap = new TreeMap<>(); //Treemap met <(hash)nodeNaam,ip>
         serverRMI RMIclass = new serverRMI(this); //RMIclass maken + referentie naar zichzelf doorgeven (voor lookup)
-        String bindLocation = "//localhost/FileServer"; //@TODO juiste locatie instellen
+        String bindLocation = "//localhost/FileServer";
 
         try
         {
@@ -34,7 +34,7 @@ public class NameServer
             System.out.println("java RMI registry created.");
         } catch (MalformedURLException | AlreadyBoundException e) {
             e.printStackTrace();
-            System.out.println("java RMI registry already exists.");
+            System.err.println("java RMI registry already exists.");
         }
     }
 
@@ -42,7 +42,21 @@ public class NameServer
     {
         Integer hashCode = name.hashCode();
         Integer hash = (int) Integer.toUnsignedLong(hashCode) % 32768;
-        nodeMap.put(hash,IP);
+        if(nodeMap.containsKey(hash))
+            System.err.println("Node not added, name already taken.");
+        else
+            nodeMap.put(hash,IP);
+    }
+
+    public void deleteNode(String name)
+    {
+        Integer hashCode = name.hashCode();
+        Integer hash = (int) Integer.toUnsignedLong(hashCode) % 32768;
+        if(nodeMap.containsKey(hash))
+            nodeMap.remove(hash);
+        else
+            System.err.println("No such Node.");
+
     }
 
     public Inet4Address lookup(String fileName)
