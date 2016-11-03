@@ -23,7 +23,7 @@ public class Node_NameServerCommunication
         }
     }
 
-    //@TODO: In de main oproepen?
+    //@TODO: In de main oproepen? bij de test
     public Inet4Address searchFile(String fileName)
     {
         try
