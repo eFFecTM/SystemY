@@ -11,7 +11,7 @@ public class Node
     String name;
     Inet4Address ip;
     Node_NameServerCommunication NScommunication;
-    int hash,prevHash,nextHash;
+    int ownHash,prevHash,nextHash;
 
     public Node(String name, Inet4Address ip)
     {
@@ -19,9 +19,9 @@ public class Node
         this.ip = ip;
         NScommunication = new Node_NameServerCommunication();
         Integer hashCode = name.hashCode();
-        Integer hash = (int) Integer.toUnsignedLong(hashCode) % 32768;
-        prevHash = hash;
-        nextHash = hash;
+        Integer ownHash = (int) Integer.toUnsignedLong(hashCode) % 32768;
+        prevHash = ownHash;
+        nextHash = ownHash;
         startUp();
         listenMC();
         System.out.println("test: uit de thread");
@@ -42,20 +42,20 @@ public class Node
         Integer newHashCode = newNodeName.hashCode();
         Integer newHash = (int) Integer.toUnsignedLong(newHashCode) % 32768;
 
-        if(hash == newHash)
-            System.out.println("This is the first node.");
-        else if(hash<newHash && newHash<nextHash)
+
+        if(ownHash<newHash && newHash<nextHash)
         {
             nextHash = newHash;
             //antwoordt met hash en nextHash aan newNode
         }
-        else if(prevHash<newHash && newHash<hash)
+        else if(prevHash<newHash || (prevHash<(newHash+32768) && newHash<ownHash))
         {
             prevHash = newHash;
         }
-        else
+        else if(prevHash==nextHash)
         {
-
+            prevHash=newHash;
+            nextHash=newHash;
         }
     }
 
