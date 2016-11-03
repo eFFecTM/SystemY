@@ -42,7 +42,7 @@ public class Node
         Integer newHashCode = newNodeName.hashCode();
         Integer newHash = (int) Integer.toUnsignedLong(newHashCode) % 32768;
 
-
+//pushing
         if(ownHash<newHash && newHash<nextHash)
         {
             nextHash = newHash;
