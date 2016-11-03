@@ -11,12 +11,17 @@ public class Node
     String name;
     Inet4Address ip;
     Node_NameServerCommunication NScommunication;
+    int hash,prevHash,nextHash;
 
     public Node(String name, Inet4Address ip)
     {
         this.name = name;
         this.ip = ip;
         NScommunication = new Node_NameServerCommunication();
+        Integer hashCode = name.hashCode();
+        Integer hash = (int) Integer.toUnsignedLong(hashCode) % 32768;
+        prevHash = hash;
+        nextHash = hash;
         startUp();
         listenMC();
         System.out.println("test: uit de thread");
@@ -30,6 +35,28 @@ public class Node
     public String getName()
     {
         return name;
+    }
+
+    public void calcPosition(String newNodeName)
+    {
+        Integer newHashCode = newNodeName.hashCode();
+        Integer newHash = (int) Integer.toUnsignedLong(newHashCode) % 32768;
+
+        if(hash == newHash)
+            System.out.println("This is the first node.");
+        else if(hash<newHash && newHash<nextHash)
+        {
+            nextHash = newHash;
+            //antwoordt met hash en nextHash aan newNode
+        }
+        else if(prevHash<newHash && newHash<hash)
+        {
+            prevHash = newHash;
+        }
+        else
+        {
+
+        }
     }
 
     public void startUp()
