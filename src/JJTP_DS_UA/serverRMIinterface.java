@@ -10,4 +10,5 @@ import java.rmi.RemoteException;
 public interface serverRMIinterface extends Remote
 {
     public Inet4Address findFile(String fileName) throws RemoteException;
+    public int checkAmountOfNodes();
 }

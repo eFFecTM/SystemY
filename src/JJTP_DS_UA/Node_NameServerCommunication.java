@@ -37,4 +37,9 @@ public class Node_NameServerCommunication
             return null;
         }
     }
+
+    public int checkAmountOfNodes()
+    {
+        return NSI.checkAmountOfNodes();
+    }
 }

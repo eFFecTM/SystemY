@@ -22,4 +22,9 @@ public class serverRMI extends UnicastRemoteObject implements serverRMIinterface
         return ns.lookup(fileName);
     }
 
+    public int checkAmountOfNodes()
+    {
+        return ns.nodeMap.keySet().size();
+    }
+
 }

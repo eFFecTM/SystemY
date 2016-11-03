@@ -12,6 +12,7 @@ public class Node
     Inet4Address ip;
     Node_NameServerCommunication NScommunication;
     int ownHash,prevHash,nextHash;
+    boolean firstNode;
 
     public Node(String name, Inet4Address ip)
     {
@@ -42,7 +43,6 @@ public class Node
         Integer newHashCode = newNodeName.hashCode();
         Integer newHash = (int) Integer.toUnsignedLong(newHashCode) % 32768;
 
-//pushing
         if(ownHash<newHash && newHash<nextHash)
         {
             nextHash = newHash;
@@ -57,6 +57,11 @@ public class Node
             prevHash=newHash;
             nextHash=newHash;
         }
+    }
+
+    public void receiveNeighbours()
+    {
+
     }
 
     public void startUp()
@@ -76,6 +81,14 @@ public class Node
 
             System.out.println("Multicast message send.");
             socket.close();
+
+            if(NScommunication.checkAmountOfNodes() <= 1)
+            {
+                prevHash = ownHash;
+                nextHash = ownHash;
+            }
+            else
+                receiveNeighbours();
         }
         catch(IOException e)
         {
