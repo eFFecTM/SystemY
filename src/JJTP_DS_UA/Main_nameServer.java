@@ -8,10 +8,12 @@ public class Main_nameServer
 {
     static NameServer nameServer;
 
-    public static void main(String[] args) throws RemoteException, UnknownHostException
+    public static void main(String[] args) throws RemoteException, UnknownHostException, InterruptedException
     {
         nameServer = new NameServer();
         testPracticum3();
+        Thread.sleep(5000);
+        System.out.println("testlalalalala");
 
     }
 

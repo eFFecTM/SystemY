@@ -103,6 +103,8 @@ public class NameServer
                         mcSocket.receive(packet);
                         String msg = new String(packet.getData(), packet.getOffset(), packet.getLength());;
                         String[] info = msg.split(" "); // het ontvangen bericht splitsen in woorden gescheiden door een spatie
+                        addNode(info[0],(Inet4Address) Inet4Address.getByName(info[1]));
+                        //@TODO node moet melding krijgen indien naam al in gebruik is.
                         System.out.println("Naam: " + info[0]);
                         System.out.println("IP: " + info[1]);
                     }

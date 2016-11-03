@@ -16,6 +16,7 @@ public class Main_node
             //getByName is een method van InetAddress, maar Inet4Address extends InetAddress
             //het geeft een inetAddress terug, dus casten naar Inet4Address
         //testPracticum3();
+
     }
 
     public static String textInput()
