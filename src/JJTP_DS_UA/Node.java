@@ -19,7 +19,7 @@ public class Node
         NScommunication = new Node_NameServerCommunication();
         startUp();
         listenMC();
-
+        System.out.println("test: uit de thread");
     }
 
     public Inet4Address getIP()
@@ -39,8 +39,7 @@ public class Node
             int portMC = 12345; // Multicast Port waarop men gaat sturen
             Inet4Address IPMC = (Inet4Address) Inet4Address.getByName("230.0.0.0");
             // Multicast IP range: 224.0.0.0 - 239.255.255.255
-            Inet4Address IP = (Inet4Address) Inet4Address.getByName("192.168.1.10");
-            byte[] msg = (name + " " + IP.getHostAddress()).getBytes(); // naam en adres zijn gescheiden door een spatie
+            byte[] msg = (name + " " + ip.getHostAddress()).getBytes(); // naam en adres zijn gescheiden door een spatie
 
             DatagramSocket socket = new DatagramSocket();
             DatagramPacket packet = new DatagramPacket(msg, msg.length);
@@ -59,31 +58,34 @@ public class Node
 
     public void listenMC()
     {
-        int portMC = 12345;
-        Inet4Address IPMC = null;
-        try
+        new Thread(new Runnable()
         {
-            IPMC = (Inet4Address) Inet4Address.getByName("230.0.0.0");
-            MulticastSocket mcSocket;
-            mcSocket = new MulticastSocket(portMC);
-            mcSocket.joinGroup(IPMC);
+            public void run()
+            {
+                try
+                {
+                    int portMC = 12345;
+                    Inet4Address IPMC = (Inet4Address) Inet4Address.getByName("230.0.0.0");
+                    MulticastSocket mcSocket;
+                    mcSocket = new MulticastSocket(portMC);
+                    mcSocket.joinGroup(IPMC);
+                    DatagramPacket packet;
 
-            DatagramPacket packet = new DatagramPacket(new byte[1024], 1024);
-            System.out.println("Waiting for a  multicast message...");
-            mcSocket.receive(packet);
-            String msg = new String(packet.getData(), packet.getOffset(), packet.getLength());
-            System.out.println("Multicast Received: " + msg);
-            String[] info = msg.split(" "); // het ontvangen bericht splitsen in woorden gescheiden door een spatie
-            System.out.println("Naam: " + info[0]);
-            System.out.println("IP: " + info[1]);
-
-            mcSocket.leaveGroup(IPMC);
-            mcSocket.close();
-            listenMC();
-        } catch(IOException e)
-        {
-            e.printStackTrace();
-        }
-
+                    while(true)
+                    {
+                        packet = new DatagramPacket(new byte[1024], 1024);
+                        System.out.println("Waiting for a  multicast message...");
+                        mcSocket.receive(packet);
+                        String msg = new String(packet.getData(), packet.getOffset(), packet.getLength());;
+                        String[] info = msg.split(" "); // het ontvangen bericht splitsen in woorden gescheiden door een spatie
+                        System.out.println("Naam: " + info[0]);
+                        System.out.println("IP: " + info[1]);
+                    }
+                } catch(IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 }

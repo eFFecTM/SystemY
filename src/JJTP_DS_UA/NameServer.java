@@ -15,6 +15,8 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.util.TreeMap;
 
+import static sun.management.snmp.jvminstr.JvmThreadInstanceEntryImpl.ThreadStateMap.Byte0.runnable;
+
 /**
  * Created by JJTP on 25/10/2016.
  */
@@ -27,8 +29,8 @@ public class NameServer
     public NameServer() throws RemoteException
     {
         nodeMap = new TreeMap<>(); //Treemap met <(hash)nodeNaam,ip>
-        listenMC();
         bindRMIclass();
+        listenMC();
     }
 
     public void addNode(String name, Inet4Address IP)
@@ -81,31 +83,36 @@ public class NameServer
 
     public void listenMC()
     {
-        int portMC = 12345;
-        Inet4Address IPMC = null;
-        try
+        new Thread(new Runnable()
         {
-            IPMC = (Inet4Address) Inet4Address.getByName("230.0.0.0");
-            MulticastSocket mcSocket;
-            mcSocket = new MulticastSocket(portMC);
-            mcSocket.joinGroup(IPMC);
+            public void run()
+            {
+                try
+                {
+                    int portMC = 12345;
+                    Inet4Address IPMC = (Inet4Address) Inet4Address.getByName("230.0.0.0");
+                    MulticastSocket mcSocket;
+                    mcSocket = new MulticastSocket(portMC);
+                    mcSocket.joinGroup(IPMC);
+                    DatagramPacket packet;
 
-            DatagramPacket packet = new DatagramPacket(new byte[1024], 1024);
-            System.out.println("Waiting for a  multicast message...");
-            mcSocket.receive(packet);
-            String msg = new String(packet.getData(), packet.getOffset(), packet.getLength());
-            System.out.println("Multicast Received: " + msg);
-            String[] info = msg.split(" "); // het ontvangen bericht splitsen in woorden gescheiden door een spatie
-            System.out.println("Naam: " + info[0]);
-            System.out.println("IP: " + info[1]);
+                    while(true)
+                    {
+                        packet = new DatagramPacket(new byte[1024], 1024);
+                        System.out.println("Waiting for a  multicast message...");
+                        mcSocket.receive(packet);
+                        String msg = new String(packet.getData(), packet.getOffset(), packet.getLength());;
+                        String[] info = msg.split(" "); // het ontvangen bericht splitsen in woorden gescheiden door een spatie
+                        System.out.println("Naam: " + info[0]);
+                        System.out.println("IP: " + info[1]);
+                    }
+                } catch(IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
 
-            mcSocket.leaveGroup(IPMC);
-            mcSocket.close();
-            listenMC();
-        } catch(IOException e)
-        {
-            e.printStackTrace();
-        }
     }
 
     public void bindRMIclass()
