@@ -19,8 +19,7 @@ public class Node
         this.name = name;
         this.ip = ip;
         NScommunication = new Node_NameServerCommunication();
-        Integer hashCode = name.hashCode();
-        Integer ownHash = (int) Integer.toUnsignedLong(hashCode) % 32768;
+        ownHash = calcHash(name);
         prevHash = ownHash;
         nextHash = ownHash;
         startUp();
@@ -38,30 +37,10 @@ public class Node
         return name;
     }
 
-    public void calcPosition(String newNodeName)
+    public int calcHash(String name)
     {
-        Integer newHashCode = newNodeName.hashCode();
-        Integer newHash = (int) Integer.toUnsignedLong(newHashCode) % 32768;
-
-        if(ownHash<newHash && newHash<nextHash)
-        {
-            nextHash = newHash;
-            //antwoordt met hash en nextHash aan newNode
-        }
-        else if(prevHash<newHash || (prevHash<(newHash+32768) && newHash<ownHash))
-        {
-            prevHash = newHash;
-        }
-        else if(prevHash==nextHash)
-        {
-            prevHash=newHash;
-            nextHash=newHash;
-        }
-    }
-
-    public void receiveNeighbours()
-    {
-
+        Integer hashCode = name.hashCode();
+        return (int) Integer.toUnsignedLong(hashCode) % 32768;
     }
 
     public void startUp()
@@ -129,4 +108,25 @@ public class Node
             }
         }).start();
     }
+
+    /*public void calcPosition(String newNodeName)
+    {
+        Integer newHashCode = newNodeName.hashCode();
+        Integer newHash = (int) Integer.toUnsignedLong(newHashCode) % 32768;
+
+        if(ownHash<newHash && newHash<nextHash)
+        {
+            nextHash = newHash;
+            //antwoordt met hash en nextHash aan newNode
+        }
+        else if(prevHash<newHash || (prevHash<(newHash+32768) && newHash<ownHash))
+        {
+            prevHash = newHash;
+        }
+        else if(prevHash==nextHash)
+        {
+            prevHash=newHash;
+            nextHash=newHash;
+        }
+    }*/
 }
