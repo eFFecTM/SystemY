@@ -68,7 +68,10 @@ public class Node
                 nextHash = ownHash;
             }
             else
-                receiveNeighbours();
+            {
+
+            }
+
         }
         catch(IOException e)
         {
