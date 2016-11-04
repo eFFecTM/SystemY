@@ -7,12 +7,12 @@ import java.rmi.server.UnicastRemoteObject;
 /**
  * Created by jonas on 31-10-2016.
  */
-public class serverRMI extends UnicastRemoteObject implements serverRMIinterface
+public class ServerRMI extends UnicastRemoteObject implements ServerRMIinterface
 {
     NameServer ns;
 
 
-    public serverRMI(NameServer ns) throws RemoteException{
+    public ServerRMI(NameServer ns) throws RemoteException{
         super();
         this.ns = ns;
     }

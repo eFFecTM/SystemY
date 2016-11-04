@@ -15,15 +15,13 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.util.TreeMap;
 
-import static sun.management.snmp.jvminstr.JvmThreadInstanceEntryImpl.ThreadStateMap.Byte0.runnable;
-
 /**
  * Created by JJTP on 25/10/2016.
  */
 public class NameServer
 {
     TreeMap<Integer,Inet4Address> nodeMap;
-    serverRMI RMIclass;
+    ServerRMI RMIclass;
 
 
     public NameServer() throws RemoteException
@@ -121,7 +119,7 @@ public class NameServer
     {
         try
         {
-            RMIclass = new serverRMI(this); //RMIclass maken + referentie naar zichzelf doorgeven (voor lookup)
+            RMIclass = new ServerRMI(this); //RMIclass maken + referentie naar zichzelf doorgeven (voor lookup)
             String bindLocation = "//localhost/FileServer";
             LocateRegistry.createRegistry(1099);
             Naming.bind(bindLocation, RMIclass);

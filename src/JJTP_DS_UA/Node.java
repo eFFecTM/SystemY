@@ -84,6 +84,7 @@ public class Node
 
             if(NScommunication.checkAmountOfNodes() <= 1)
             {
+                firstNode = true;
                 prevHash = ownHash;
                 nextHash = ownHash;
             }

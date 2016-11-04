@@ -8,14 +8,14 @@ import java.rmi.*;
  */
 public class Node_NameServerCommunication
 {
-    serverRMIinterface NSI;
+    ServerRMIinterface NSI;
 
     public Node_NameServerCommunication()
     {
         try
         {
             String location = "//192.168.1.1/FileServer"; //@TODO juiste locatie ingeven
-            NSI = (serverRMIinterface) Naming.lookup(location);
+            NSI = (ServerRMIinterface) Naming.lookup(location);
         } catch(Exception e)
         {
             System.err.println("FileServer exception: "+ e.getMessage());
