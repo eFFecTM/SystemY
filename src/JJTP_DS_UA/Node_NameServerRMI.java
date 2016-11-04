@@ -6,11 +6,11 @@ import java.rmi.*;
 /**
  * Created by JJTP on 31/10/2016.
  */
-public class Node_NameServerCommunication
+public class Node_NameServerRMI
 {
     ServerRMIinterface NSI;
 
-    public Node_NameServerCommunication()
+    public Node_NameServerRMI()
     {
         try
         {
@@ -41,5 +41,15 @@ public class Node_NameServerCommunication
     public int checkAmountOfNodes()
     {
         return NSI.checkAmountOfNodes();
+    }
+
+    public boolean checkIfLeftEdge(int nameHash)
+    {
+        return NSI.checkIfLeftEdge(nameHash);
+    }
+
+    public boolean checkIfRightEdge(int nameHash)
+    {
+        return NSI.checkIfRightEdge(nameHash);
     }
 }

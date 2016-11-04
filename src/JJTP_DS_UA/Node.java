@@ -10,18 +10,17 @@ public class Node
 {
     String name;
     Inet4Address ip;
-    Node_NameServerCommunication NScommunication;
-    int ownHash,prevHash,nextHash;
-    boolean firstNode;
+    Node_NameServerRMI NScommunication;
+    int ownHash,prevHash,nextHash,newHash; //newHash = van nieuwe node opgemerkt uit de multicast
+    boolean firstNode,leftEdge,rightEdge;
 
     public Node(String name, Inet4Address ip)
     {
         this.name = name;
         this.ip = ip;
-        NScommunication = new Node_NameServerCommunication();
+        NScommunication = new Node_NameServerRMI();
         ownHash = calcHash(name);
-        prevHash = ownHash;
-        nextHash = ownHash;
+
         startUp();
         listenMC();
         System.out.println("test: uit de thread");
@@ -43,6 +42,23 @@ public class Node
         return (int) Integer.toUnsignedLong(hashCode) % 32768;
     }
 
+    public void getStartupInfoFromNS()
+    {
+        leftEdge = NScommunication.checkIfLeftEdge(ownHash);
+        rightEdge = NScommunication.checkIfRightEdge(ownHash);
+
+        if(NScommunication.checkAmountOfNodes() <= 1)
+        {
+            firstNode = true;
+            prevHash = ownHash;
+            nextHash = ownHash;
+        }
+        else
+        {
+            //@TODO berekenmethode, ben ik mee bezig (jonas)
+        }
+    }
+
     public void startUp()
     {
         try
@@ -59,18 +75,9 @@ public class Node
             socket.send(packet);
 
             System.out.println("Multicast message send.");
+            getStartupInfoFromNS();
             socket.close();
 
-            if(NScommunication.checkAmountOfNodes() <= 1)
-            {
-                firstNode = true;
-                prevHash = ownHash;
-                nextHash = ownHash;
-            }
-            else
-            {
-
-            }
 
         }
         catch(IOException e)
@@ -101,6 +108,7 @@ public class Node
                         mcSocket.receive(packet);
                         String msg = new String(packet.getData(), packet.getOffset(), packet.getLength());;
                         String[] info = msg.split(" "); // het ontvangen bericht splitsen in woorden gescheiden door een spatie
+                        newHash = calcHash(info[0]);
                         System.out.println("Naam: " + info[0]);
                         System.out.println("IP: " + info[1]);
                     }
