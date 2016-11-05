@@ -14,7 +14,7 @@ public class Node_NameServerRMI
     {
         try
         {
-            String location = "//192.168.1.1/FileServer"; //@TODO juiste locatie ingeven
+            String location = "//192.168.1.1/FileServer";
             NSI = (ServerRMIinterface) Naming.lookup(location);
         } catch(Exception e)
         {

@@ -27,4 +27,20 @@ public class ServerRMI extends UnicastRemoteObject implements ServerRMIinterface
         return ns.nodeMap.keySet().size();
     }
 
+    public boolean checkIfLeftEdge(int nameHash)
+    {
+        if(nameHash<ns.nodeMap.firstKey())
+            return true;
+        else
+            return false;
+    }
+
+    public boolean checkIfRightEdge(int nameHash)
+    {
+        if(nameHash>ns.nodeMap.lastKey())
+            return true;
+        else
+            return false;
+    }
+
 }

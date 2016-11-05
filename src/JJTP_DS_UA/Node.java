@@ -2,6 +2,10 @@ package JJTP_DS_UA;
 
 import java.io.IOException;
 import java.net.*;
+import java.rmi.AlreadyBoundException;
+import java.rmi.Naming;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
 
 /**
  * Created by JJTP on 25-10-2016.
@@ -11,14 +15,19 @@ public class Node
     String name;
     Inet4Address ip;
     Node_NameServerRMI NScommunication;
-    int ownHash,prevHash,nextHash,newHash; //newHash = van nieuwe node opgemerkt uit de multicast
+    Node_nodeRMI_Receive NodeRMIReceive;
+    Node_nodeRMI_Transmit NodeRMITransmit;
+    int ownHash,prevHash,nextHash,newNodeHash; //newHash = van nieuwe node opgemerkt uit de multicast
+    String newNodeIP;
     boolean firstNode,leftEdge,rightEdge;
+
 
     public Node(String name, Inet4Address ip)
     {
         this.name = name;
         this.ip = ip;
         NScommunication = new Node_NameServerRMI();
+        bindNodeRMIReceive();
         ownHash = calcHash(name);
 
         startUp();
@@ -47,19 +56,76 @@ public class Node
         leftEdge = NScommunication.checkIfLeftEdge(ownHash);
         rightEdge = NScommunication.checkIfRightEdge(ownHash);
 
-        if(NScommunication.checkAmountOfNodes() <= 1)
+        if(NScommunication.checkAmountOfNodes() <= 1) //hij is de eerste <1 is normaal niet mogelijk
         {
             firstNode = true;
             prevHash = ownHash;
             nextHash = ownHash;
         }
+    }
+
+    public void recalcPosition()
+    {
+        if(firstNode)
+        {
+            firstNode=false;
+            updateNewNodeNeighbours(newNodeIP);
+            prevHash=newNodeHash;
+            nextHash=newNodeHash;
+        }
         else
         {
-            //@TODO berekenmethode, ben ik mee bezig (jonas)
+            if(leftEdge)
+            {
+                if(newNodeHash<ownHash)
+                {
+                    prevHash=newNodeHash;
+                    leftEdge=false;
+                }
+                else if (newNodeHash>prevHash)
+                {
+                    prevHash=newNodeHash;
+                }
+            }
+            else if(rightEdge)
+            {
+                if(newNodeHash<nextHash)
+                {
+                    updateNewNodeNeighbours(newNodeIP);
+                    nextHash=newNodeHash;
+                }
+                else if(newNodeHash>ownHash)
+                {
+                    updateNewNodeNeighbours(newNodeIP);
+                    nextHash=newNodeHash;
+                    rightEdge=false;
+                }
+            }
+            else if(ownHash<newNodeHash && newNodeHash<nextHash)
+            {
+                updateNewNodeNeighbours(newNodeIP);
+                nextHash=newNodeHash;
+            }
+            else if(ownHash>newNodeHash && newNodeHash>prevHash)
+            {
+                prevHash=newNodeHash;
+            }
         }
     }
 
+    public void updateNewNodeNeighbours(String ipAddr)
+    {
+        NodeRMITransmit = new Node_nodeRMI_Transmit(ipAddr);
+        NodeRMITransmit.updateNewNodeNeighbours(ownHash,nextHash);
+    }
+
     public void startUp()
+    {
+        sendMyMC();
+        getStartupInfoFromNS();
+    }
+
+    public void sendMyMC()
     {
         try
         {
@@ -75,10 +141,7 @@ public class Node
             socket.send(packet);
 
             System.out.println("Multicast message send.");
-            getStartupInfoFromNS();
             socket.close();
-
-
         }
         catch(IOException e)
         {
@@ -108,7 +171,9 @@ public class Node
                         mcSocket.receive(packet);
                         String msg = new String(packet.getData(), packet.getOffset(), packet.getLength());;
                         String[] info = msg.split(" "); // het ontvangen bericht splitsen in woorden gescheiden door een spatie
-                        newHash = calcHash(info[0]);
+                        newNodeHash = calcHash(info[0]);
+                        newNodeIP = info[1];
+                        recalcPosition();
                         System.out.println("Naam: " + info[0]);
                         System.out.println("IP: " + info[1]);
                     }
@@ -120,24 +185,19 @@ public class Node
         }).start();
     }
 
-    /*public void calcPosition(String newNodeName)
+    public void bindNodeRMIReceive()
     {
-        Integer newHashCode = newNodeName.hashCode();
-        Integer newHash = (int) Integer.toUnsignedLong(newHashCode) % 32768;
-
-        if(ownHash<newHash && newHash<nextHash)
+        try
         {
-            nextHash = newHash;
-            //antwoordt met hash en nextHash aan newNode
+            NodeRMIReceive = new Node_nodeRMI_Receive(this); //RMIclass maken + referentie naar zichzelf doorgeven (voor buren te plaatsen)
+            String bindLocation = "//localhost/NodeSet";
+            LocateRegistry.createRegistry(1100);
+            Naming.bind(bindLocation, NodeRMIReceive);
+            System.out.println("Node is reachable at" + bindLocation);
+            System.out.println("java RMI registry created.");
+        } catch (MalformedURLException | AlreadyBoundException | RemoteException e) {
+            e.printStackTrace();
+            System.err.println("java RMI registry already exists.");
         }
-        else if(prevHash<newHash || (prevHash<(newHash+32768) && newHash<ownHash))
-        {
-            prevHash = newHash;
-        }
-        else if(prevHash==nextHash)
-        {
-            prevHash=newHash;
-            nextHash=newHash;
-        }
-    }*/
+    }
 }

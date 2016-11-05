@@ -102,7 +102,7 @@ public class NameServer
                         String msg = new String(packet.getData(), packet.getOffset(), packet.getLength());;
                         String[] info = msg.split(" "); // het ontvangen bericht splitsen in woorden gescheiden door een spatie
                         addNode(info[0],(Inet4Address) Inet4Address.getByName(info[1]));
-                        //@TODO node moet melding krijgen indien de ID al in gebruik is -> andere naam kiezen.
+                        //@TODO node moet melding krijgen indien de ID al in gebruik is OF hash 0 is EN mag geen spatie bevatten -> andere naam kiezen.
                         System.out.println("Naam: " + info[0]);
                         System.out.println("IP: " + info[1]);
                     }
