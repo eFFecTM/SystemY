@@ -1,12 +1,13 @@
+/**
+ * Created by JJTP on 31-10-2016.
+ * This is the class that is used by the nameserver to communicate with a node using RMI.
+ */
 package JJTP_DS_UA;
 
 import java.net.Inet4Address;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
-/**
- * Created by jonas on 31-10-2016.
- */
 public class ServerRMI extends UnicastRemoteObject implements ServerRMIinterface
 {
     NameServer ns;

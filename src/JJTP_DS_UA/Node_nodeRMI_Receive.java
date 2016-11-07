@@ -1,12 +1,12 @@
+/**
+ * Created by JJTP on 04/11/16.
+ * This class is used to communicate between 2 nodes using RMI. This is the receiving info side.
+ */
 package JJTP_DS_UA;
-
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
-/**
- * Created by Jonas on 04/11/16.
- */
 public class Node_nodeRMI_Receive extends UnicastRemoteObject implements Node_nodeRMI_ReceiveInterface
 {
     Node myNode;

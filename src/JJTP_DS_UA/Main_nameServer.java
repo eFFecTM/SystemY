@@ -1,3 +1,7 @@
+/**
+ * Created by JJTP on 25/10/2016.
+ * This class is the Main class on the NameServer (server computer). It initializes a nameserver.
+ */
 package JJTP_DS_UA;
 
 import java.net.Inet4Address;

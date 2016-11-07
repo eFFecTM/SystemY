@@ -1,11 +1,12 @@
+/**
+ * Created by JJTP on 31-10-2016.
+ * This is the class that is used by a node to communicate with the nameserver using RMI.
+ */
 package JJTP_DS_UA;
 
 import java.net.Inet4Address;
 import java.rmi.*;
 
-/**
- * Created by JJTP on 31/10/2016.
- */
 public class Node_NameServerRMI
 {
     ServerRMIinterface NSI;

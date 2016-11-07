@@ -1,3 +1,9 @@
+/**
+ * Created by JJTP on 25-10-2016.
+ * A Node has a node name (that will be hashed) and IP address.
+ * This class contains methods to calculate a node's position in the network and to update it's neighbours
+ * when the network changes.
+ */
 package JJTP_DS_UA;
 
 import java.io.IOException;
@@ -7,9 +13,6 @@ import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 
-/**
- * Created by JJTP on 25-10-2016.
- */
 public class Node
 {
     String name;

@@ -1,3 +1,8 @@
+/**
+ * Created by JJTP on 25/10/2016.
+ * This class represents a nameserver. The name of a node is hashed and put in a TreeMap, together with it's IP-address.
+ * This class has methods to add and delete nodes from the network, and lookup files across the network, using RMI.
+ */
 package JJTP_DS_UA;
 
 import javax.xml.bind.JAXBContext;
@@ -15,9 +20,6 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.util.TreeMap;
 
-/**
- * Created by JJTP on 25/10/2016.
- */
 public class NameServer
 {
     TreeMap<Integer,Inet4Address> nodeMap;
@@ -52,6 +54,10 @@ public class NameServer
 
     }
 
+    /**
+     * When searching for a file, the filename is hashed. Then the algorithm looks for the nearest hash value
+     * in the TreeMap. This value is linked to the IP¨-address of the computer that has the file.
+     **/
     public Inet4Address lookup(String fileName)
     {
         Integer fileNameHash = (int) (Integer.toUnsignedLong(fileName.hashCode()) % 32768);
@@ -61,6 +67,9 @@ public class NameServer
             return nodeMap.get(nodeMap.lowerKey(fileNameHash));
     }
 
+    /**
+     * Save the TreeMap of hashvalues and IP-addresses using XML.
+     */
     public void saveNodeMapXML()
     {
         try
