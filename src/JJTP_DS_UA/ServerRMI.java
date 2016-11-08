@@ -8,46 +8,60 @@ import java.net.Inet4Address;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
+// Boven: NameServer
+// Implementeert Interface ServerRMIinterface
 public class ServerRMI extends UnicastRemoteObject implements ServerRMIinterface
 {
     NameServer ns;
 
-
-    public ServerRMI(NameServer ns) throws RemoteException{
+    // ServerRMI Constructor
+    public ServerRMI(NameServer ns) throws RemoteException
+    {
         super();
         this.ns = ns;
     }
 
+    /**
+     * When searching for a file, the filename is hashed. Then the algorithm looks for the nearest hash value
+     * in the TreeMap. This value is linked to the IP-address of the computer that has the file.
+     **/
     public Inet4Address findFile (String fileName) throws RemoteException
     {
-        return ns.lookup(fileName);
+        int hash = ns.calcHash(fileName);
+        if(ns.nodeMap.lowerKey(hash) == null) // returnt key < dan de meegegeven parameter of null als die niet bestaat
+            return ns.nodeMap.get(ns.nodeMap.lastKey()); // returnt de grootste key uit de map (als er geen kleiner bestaat)
+        else
+            return ns.nodeMap.get(ns.nodeMap.lowerKey(hash));
     }
 
+    // Geeft het aantal nodes in de cirkel terug
     public int checkAmountOfNodes()
     {
         return ns.nodeMap.keySet().size();
     }
 
-    public boolean checkIfLeftEdge(int nameHash)
+    // Node wilt weten of het op de laagste rand zit
+    public boolean checkIfLowEdge(int nameHash)
     {
-        if(nameHash<=ns.nodeMap.firstKey())
+        if(nameHash <= ns.nodeMap.firstKey())
             return true;
         else
             return false;
     }
 
-    public boolean checkIfRightEdge(int nameHash)
+    // Node wilt weten of het op de hoogste rand zit
+    public boolean checkIfHighEdge(int nameHash)
     {
-        if(nameHash>=ns.nodeMap.lastKey())
+        if(nameHash >= ns.nodeMap.lastKey())
             return true;
         else
             return false;
     }
 
+    // Kijkt na of de naam al bestaat
     public boolean checkIfNameExists(String name)
     {
-        int hash = Math.abs(name.hashCode()%32768);
+        int hash = ns.calcHash(name);
         return ns.nodeMap.containsKey(hash);
     }
 }
-

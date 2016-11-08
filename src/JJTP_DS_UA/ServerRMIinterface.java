@@ -12,8 +12,7 @@ public interface ServerRMIinterface extends Remote
 {
     public Inet4Address findFile(String fileName) throws RemoteException;
     public int checkAmountOfNodes() throws RemoteException;
-    public boolean checkIfLeftEdge(int nameHash) throws RemoteException;
-    public boolean checkIfRightEdge(int nameHash) throws RemoteException;
+    public boolean checkIfLowEdge(int nameHash) throws RemoteException;
+    public boolean checkIfHighEdge(int nameHash) throws RemoteException;
     public boolean checkIfNameExists(String name) throws RemoteException;
 }
-//@TODO synctest

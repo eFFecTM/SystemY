@@ -9,6 +9,5 @@ import java.rmi.RemoteException;
 
 public interface Node_nodeRMI_ReceiveInterface extends Remote
 {
-    public void setNeighbours(int leftHash, int rightHash) throws RemoteException;
-
+    public void setNeighbours(int prevHash, int nextHash) throws RemoteException;
 }

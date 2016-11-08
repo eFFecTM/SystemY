@@ -9,139 +9,68 @@ package JJTP_DS_UA;
 import java.io.IOException;
 import java.net.*;
 import java.rmi.AlreadyBoundException;
-import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.Scanner;
 
+// Boven: Main_Node
+// Onder: Node_NameServerRMI, Node_nodeRMI_Receive, Node_nodeRMI_Transmit
 public class Node
 {
-    String name;
+    String name, newNodeIP;
     Inet4Address ip;
     Node_NameServerRMI NScommunication;
-    Node_nodeRMI_Receive NodeRMIReceive;
-    Node_nodeRMI_Transmit NodeRMITransmit;
-    int ownHash,prevHash,nextHash,newNodeHash; //newHash = van nieuwe node opgemerkt uit de multicast
-    String newNodeIP;
-    boolean onlyNode,leftEdge,rightEdge;
+    Node_nodeRMI_Receive nodeRMIReceive;
+    Node_nodeRMI_Transmit nodeRMITransmit;
+    int ownHash, prevHash, nextHash, newNodeHash; //newHash = van nieuwe node opgemerkt uit de multicast
+    boolean onlyNode, lowEdge, highEdge;
 
-
+    // Node constructor
     public Node(Inet4Address ip)
     {
         this.ip = ip;
         NScommunication = new Node_NameServerRMI();
-        bindNodeRMIReceive();
-        startUp();
+        bindNodeRMIReceive(); // RMI Node-Node
+        startUp(); // bevat setName() en sendMC()
         listenMC();
     }
 
+    // Op registerpoort 9876 wordt de Node_nodeRMI_Receive klasse verbonden op een locatie
+    // FIXME: Elke node op een andere poort registreren (Jonas: http://i.imgur.com/XNV1bD1.png)
+    public void bindNodeRMIReceive()
+    {
+        try
+        {
+            nodeRMIReceive = new Node_nodeRMI_Receive(this); //RMIclass maken + referentie naar zichzelf doorgeven (voor buren te plaatsen)
+            String bindLocation = "NodeSet";
+            Registry reg = LocateRegistry.createRegistry(9876);
+            reg.bind(bindLocation, nodeRMIReceive);
+            System.out.println("Node is reachable at" + bindLocation);
+            System.out.println("java RMI registry created.");
+        } catch (AlreadyBoundException | RemoteException e)
+        {
+            e.printStackTrace();
+            System.err.println("java RMI registry already exists.");
+        }
+    }
+
+    // Opstarten van de Node: Naam instellen, zijn eigen MultiCast sturen (anderen laten weten) en startup info ophalen
     public void startUp()
     {
         setName();
-        sendMyMC();
+        sendMC();
         try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
+            Thread.sleep(500); // Belangrijk: Andere Nodes moeten eerst de MC ontvangen
+        } catch (InterruptedException e)
+        {
             e.printStackTrace();
         }
         getStartupInfoFromNS();
-        testBoodStrapDiscovery();
+        testBootstrapDiscovery();
     }
 
-    public void getStartupInfoFromNS()
-    {
-        leftEdge = NScommunication.checkIfLeftEdge(ownHash);
-        rightEdge = NScommunication.checkIfRightEdge(ownHash);
-
-        if(NScommunication.checkAmountOfNodes() <= 1) //Deze check is NA dat de node aan de map is toegevoegd
-        {
-            onlyNode = true;
-            prevHash = ownHash;
-            nextHash = ownHash;
-        }
-        else
-            onlyNode=false;
-    }
-
-    public void recalcPosition()
-    {
-        if(onlyNode)
-        {
-            onlyNode=false;
-            updateNewNodeNeighbours(newNodeIP);
-            prevHash=newNodeHash;
-            nextHash=newNodeHash;
-            if(newNodeHash<ownHash)
-                leftEdge=false;
-            else
-                rightEdge = false;
-        }
-        else
-        {
-            if(newNodeHash>ownHash && newNodeHash<nextHash)
-            {
-                updateNewNodeNeighbours(newNodeIP);
-                nextHash=newNodeHash;
-            }
-            else if(newNodeHash<ownHash && newNodeHash>prevHash)
-            {
-                prevHash=newNodeHash;
-            }
-            else if(leftEdge)
-            {
-                if(newNodeHash<ownHash)
-                {
-                    prevHash=newNodeHash;
-                    leftEdge=false;
-                }
-                else if (newNodeHash>prevHash)
-                {
-                    prevHash=newNodeHash;
-                }
-                else if (newNodeHash>ownHash && newNodeHash<nextHash)
-                {
-
-                }
-            }
-            else if(rightEdge)
-            {
-                if(newNodeHash<nextHash)
-                {
-                    updateNewNodeNeighbours(newNodeIP);
-                    nextHash=newNodeHash;
-                }
-                else if(newNodeHash>ownHash)
-                {
-                    updateNewNodeNeighbours(newNodeIP);
-                    nextHash=newNodeHash;
-                    rightEdge=false;
-                }
-            }
-        }
-    }
-
-    public void updateNewNodeNeighbours(String ipAddr)
-    {
-        NodeRMITransmit = new Node_nodeRMI_Transmit(ipAddr);
-        NodeRMITransmit.updateNewNodeNeighbours(ownHash,nextHash);
-    }
-
-    public Inet4Address getIP()
-    {
-        return ip;
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public int calcHash(String name)
-    {
-        return Math.abs(name.hashCode()%32768);
-    }
-
+    // Initialisatie: Een naam kan men kiezen voor de Node
     public void setName()
     {
         System.out.println("Choose a name for the node and press enter, fill in the correct ip-address and press enter.");
@@ -155,7 +84,30 @@ public class Node
         ownHash = calcHash(name);
     }
 
-    public void sendMyMC()
+    // Nakijken of de Node op de laagste en/of hoogste rand zit en is Node de eerste Node in de cirkel?
+    public void getStartupInfoFromNS()
+    {
+        lowEdge = NScommunication.checkIfLowEdge(ownHash);
+        highEdge = NScommunication.checkIfHighEdge(ownHash);
+
+        if(NScommunication.checkAmountOfNodes() <= 1) //Deze check is NA dat de node aan de map is toegevoegd
+        {
+            onlyNode = true;
+            prevHash = ownHash;
+            nextHash = ownHash;
+        }
+        else
+            onlyNode = false;
+    }
+
+    // Berekenen van een hash van een naam (of filenaam)
+    public int calcHash(String name)
+    {
+        return Math.abs(name.hashCode()%32768);
+    }
+
+    // Sturen van een MultiCast
+    public void sendMC()
     {
         try
         {
@@ -179,6 +131,7 @@ public class Node
         }
     }
 
+    // Luisteren naar / Ontvangen van een MultiCast
     public void listenMC()
     {
         new Thread(new Runnable()
@@ -204,7 +157,7 @@ public class Node
                         newNodeHash = calcHash(info[0]);
                         newNodeIP = info[1];
                         recalcPosition();
-                        testBoodStrapDiscovery();
+                        testBootstrapDiscovery();
                         System.out.println("Naam: " + info[0]);
                         System.out.println("IP: " + info[1]);
                     }
@@ -216,29 +169,76 @@ public class Node
         }).start();
     }
 
-    public void bindNodeRMIReceive()
+    // Positie (buren) wordt gehercalculeerd door volgend algoritme
+    public void recalcPosition()
     {
-        try
+        if(onlyNode) // Enigste Node in de cirkel
         {
-            NodeRMIReceive = new Node_nodeRMI_Receive(this); //RMIclass maken + referentie naar zichzelf doorgeven (voor buren te plaatsen)
-            String bindLocation = "NodeSet";
-            Registry reg = LocateRegistry.createRegistry(9876);
-            reg.bind(bindLocation, NodeRMIReceive);
-            System.out.println("Node is reachable at" + bindLocation);
-            System.out.println("java RMI registry created.");
-        } catch (AlreadyBoundException | RemoteException e) {
-            e.printStackTrace();
-            System.err.println("java RMI registry already exists.");
+            onlyNode = false;
+            updateNewNodeNeighbours(newNodeIP);
+            prevHash = newNodeHash;
+            nextHash = newNodeHash;
+            if(newNodeHash < ownHash)
+                lowEdge = false;
+            else
+                highEdge = false;
+        }
+        else
+        {
+            if(newNodeHash > ownHash && newNodeHash < nextHash)
+            {
+                updateNewNodeNeighbours(newNodeIP);
+                nextHash = newNodeHash;
+            }
+            else if(newNodeHash < ownHash && newNodeHash > prevHash)
+            {
+                prevHash = newNodeHash;
+            }
+            else if(lowEdge)
+            {
+                if(newNodeHash < ownHash)
+                {
+                    prevHash = newNodeHash;
+                    lowEdge = false;
+                }
+                else if (newNodeHash > prevHash)
+                {
+                    prevHash = newNodeHash;
+                }
+            }
+            else if(highEdge)
+            {
+                if(newNodeHash < nextHash)
+                {
+                    updateNewNodeNeighbours(newNodeIP);
+                    nextHash = newNodeHash;
+                }
+                else if(newNodeHash > ownHash)
+                {
+                    updateNewNodeNeighbours(newNodeIP);
+                    nextHash = newNodeHash;
+                    highEdge = false;
+                }
+            }
         }
     }
 
-    public void testBoodStrapDiscovery()
+
+    // Buren van de Nieuwe Node updaten
+    public void updateNewNodeNeighbours(String ipAddr)
+    {
+        nodeRMITransmit = new Node_nodeRMI_Transmit(ipAddr);
+        nodeRMITransmit.setNeighbours(ownHash,nextHash);
+    }
+
+    // TEST: gegevens weergeven van de Node
+    public void testBootstrapDiscovery()
     {
         System.out.println("PrevHash: " + prevHash);
         System.out.println("NextHash: " + nextHash);
         System.out.println("ownHash: " + ownHash);
         System.out.println("FirstNode: " + onlyNode);
-        System.out.println("leftEdge: " + leftEdge);
-        System.out.println("rightEdge: " + rightEdge);
+        System.out.println("lowEdge: " + lowEdge);
+        System.out.println("highEdge: " + highEdge);
     }
 }

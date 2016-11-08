@@ -12,35 +12,54 @@ import java.io.File;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.Inet4Address;
-import java.net.MalformedURLException;
 import java.net.MulticastSocket;
 import java.rmi.AlreadyBoundException;
-import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+// Boven: Main_NameServer
+// Onder: ServerRMI
 public class NameServer
 {
     TreeMap<Integer,Inet4Address> nodeMap;
     ServerRMI RMIclass;
 
 
-    public NameServer() throws RemoteException
+    // NameServer constructor
+    public NameServer()
     {
         nodeMap = new TreeMap<>(); //Treemap met <(hash)nodeNaam,ip>
         bindRMIclass();
         listenMC();
     }
 
+    // Op registerpoort 1099 wordt de serverRMI klasse verbonden op een locatie
+    public void bindRMIclass()
+    {
+        try
+        {
+            RMIclass = new ServerRMI(this); // RMIclass maken + referentie naar zichzelf doorgeven (voor lookup)
+            String bindLocation = "FileServer";
+            Registry reg = LocateRegistry.createRegistry(1099);
+            reg.bind(bindLocation, RMIclass);
+            System.out.println("FileServer Server is ready at:" + bindLocation);
+            System.out.println("java RMI registry created.");
+        } catch (AlreadyBoundException | RemoteException e)
+        {
+            System.err.println("java RMI registry already exists.");
+        }
+    }
+
+    // Berekenen van een hash van een naam (of filenaam)
     public int calcHash(String name)
     {
         return Math.abs(name.hashCode()%32768);
     }
 
+    // Toevoegen van een node
     public void addNode(String name, Inet4Address IP)
     {
         int hash = calcHash(name);
@@ -50,6 +69,7 @@ public class NameServer
             nodeMap.put(hash,IP);
     }
 
+    // Verwijderen van een node
     public void deleteNode(String name)
     {
         int hash = calcHash(name);
@@ -58,19 +78,6 @@ public class NameServer
         else
             System.err.println("No such Node.");
 
-    }
-
-    /**
-     * When searching for a file, the filename is hashed. Then the algorithm looks for the nearest hash value
-     * in the TreeMap. This value is linked to the IP¨-address of the computer that has the file.
-     **/
-    public Inet4Address lookup(String fileName)
-    {
-        int hash = Math.abs(fileName.hashCode()%32768);
-        if(nodeMap.lowerKey(hash)==null) // returnt key < dan de meegegeven paramater of null als die niet bestaat
-            return nodeMap.get(nodeMap.lastKey()); //returnt de grootste key uit de map
-        else
-            return nodeMap.get(nodeMap.lowerKey(hash));
     }
 
     /**
@@ -94,9 +101,10 @@ public class NameServer
         }
     }
 
+    // Luisteren naar / Ontvangen van een MultiCast
     public void listenMC()
     {
-        new Thread(new Runnable()
+        new Thread(new Runnable() // Draait in een aparte thread
         {
             public void run()
             {
@@ -118,9 +126,7 @@ public class NameServer
                         String[] info = msg.split(" "); // het ontvangen bericht splitsen in woorden gescheiden door een spatie
                         addNode(info[0],(Inet4Address) Inet4Address.getByName(info[1]));
                         testPrintTreemap();
-                        //@TODO XML Marshaller fixen: @XmlRootElement
-                        System.out.println("Naam: " + info[0]);
-                        System.out.println("IP: " + info[1]);
+                        //@FIXME: XML Marshaller fixen: @XmlRootElement
                     }
                 } catch(IOException e)
                 {
@@ -131,6 +137,7 @@ public class NameServer
 
     }
 
+    // TEST: Afprinten van de treemap na het ontvangen van een packet
     public void testPrintTreemap()
     {
         Set<Integer> keyset = nodeMap.keySet();
@@ -139,21 +146,4 @@ public class NameServer
             System.out.println("ID: " + k + " - ip: " + nodeMap.get(k));
         }
     }
-
-    public void bindRMIclass()
-    {
-        try
-        {
-            RMIclass = new ServerRMI(this); //RMIclass maken + referentie naar zichzelf doorgeven (voor lookup)
-            String bindLocation = "FileServer";
-            Registry reg = LocateRegistry.createRegistry(1099);
-            reg.bind(bindLocation, RMIclass);
-            System.out.println("FileServer Server is ready at:" + bindLocation);
-            System.out.println("java RMI registry created.");
-        } catch (AlreadyBoundException | RemoteException e) {
-            e.printStackTrace();
-            System.err.println("java RMI registry already exists.");
-        }
-    }
-
 }

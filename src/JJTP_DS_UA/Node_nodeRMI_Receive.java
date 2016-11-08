@@ -11,17 +11,18 @@ public class Node_nodeRMI_Receive extends UnicastRemoteObject implements Node_no
 {
     Node myNode;
 
+    // Node_nodeRMI_Receive constructor
     public Node_nodeRMI_Receive(Node n) throws RemoteException
         {
             super();
             myNode = n;
         }
 
-    @Override
-    public void setNeighbours(int leftHash, int rightHash)
+    // Buren van Node instellen
+    public void setNeighbours(int prevHash, int nextHash)
     {
-        myNode.prevHash=leftHash;
-        myNode.nextHash=rightHash;
+        myNode.prevHash=prevHash;
+        myNode.nextHash=nextHash;
     }
 
 }

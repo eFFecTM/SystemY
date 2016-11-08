@@ -5,26 +5,30 @@
 package JJTP_DS_UA;
 
 import java.net.Inet4Address;
-import java.rmi.*;
+import java.rmi.Naming;
+import java.rmi.RemoteException;
 
+// Boven: Node
+// Implementeert Interface ServerRMI
 public class Node_NameServerRMI
 {
     ServerRMIinterface NSI;
 
+    //Node_NameServerRMI Constructor
     public Node_NameServerRMI()
     {
         try
         {
-            String location = "//192.168.1.1/FileServer";
+            String location = "//192.168.1.1/FileServer"; // 192.168.1.1 is de Name Server
             NSI = (ServerRMIinterface) Naming.lookup(location);
         } catch(Exception e)
         {
             System.err.println("FileServer exception: "+ e.getMessage());
-            e.printStackTrace();
         }
     }
 
-    public Inet4Address searchFile(String fileName)
+    // Zoek op welke node deze file staat -> Wordt later in gebruik gesteld
+    public Inet4Address findFile(String fileName)
     {
         try
         {
@@ -39,6 +43,7 @@ public class Node_NameServerRMI
         }
     }
 
+    // Geeft het aantal nodes in de cirkel terug
     public int checkAmountOfNodes()
     {
         try
@@ -52,11 +57,12 @@ public class Node_NameServerRMI
 
     }
 
-    public boolean checkIfLeftEdge(int nameHash)
+    // Node wilt weten of het op de laagste rand zit
+    public boolean checkIfLowEdge(int nameHash)
     {
         try
         {
-            return NSI.checkIfLeftEdge(nameHash);
+            return NSI.checkIfLowEdge(nameHash);
         } catch (RemoteException e)
         {
             e.printStackTrace();
@@ -64,11 +70,12 @@ public class Node_NameServerRMI
         }
     }
 
-    public boolean checkIfRightEdge(int nameHash)
+    // Node wilt weten of het op de hoogste rand zit
+    public boolean checkIfHighEdge(int nameHash)
     {
         try
         {
-            return NSI.checkIfRightEdge(nameHash);
+            return NSI.checkIfHighEdge(nameHash);
         } catch (RemoteException e)
         {
             e.printStackTrace();
@@ -76,6 +83,7 @@ public class Node_NameServerRMI
         }
     }
 
+    // Kijkt na of de naam al bestaat
     public boolean checkIfNameExists(String name)
     {
         try

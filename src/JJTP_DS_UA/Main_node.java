@@ -6,12 +6,13 @@ package JJTP_DS_UA;
 
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
-import java.util.Scanner;
 import java.lang.String;
 
 /**
  * Created by JJTP on 31/10/2016.
  */
+
+// Onder: Node
 public class Main_node
 {
     static Node node;
@@ -20,11 +21,5 @@ public class Main_node
         node = new Node((Inet4Address) Inet4Address.getLocalHost());
             //getByName is een method van InetAddress, maar Inet4Address extends InetAddress
             //het geeft een inetAddress terug, dus casten naar Inet4Address
-        //testPracticum3();
-    }
-
-    public static void testPracticum3()
-    {
-       // node.NScommunication.searchFile(textInput()); //vraagt om naam en ip, maar filenaam+extensie
     }
 }

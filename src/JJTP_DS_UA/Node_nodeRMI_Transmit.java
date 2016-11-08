@@ -8,14 +8,15 @@ import java.rmi.RemoteException;
  */
 public class Node_nodeRMI_Transmit
 {
-    Node_nodeRMI_ReceiveInterface NodeRMIReceive;
+    Node_nodeRMI_ReceiveInterface nodeRMIReceive;
 
+    // Node_nodeRMI_Transmit constructor
     public Node_nodeRMI_Transmit(String ipAddr)
     {
         try
         {
             String location = ("//"+ ipAddr + "/NodeSet"); //  voorbeeld: "//192.168.1.1/FileServer"
-            NodeRMIReceive = (Node_nodeRMI_ReceiveInterface) Naming.lookup(location);
+            nodeRMIReceive = (Node_nodeRMI_ReceiveInterface) Naming.lookup(location);
         } catch(Exception e)
         {
             System.err.println("NodeSet exception: "+ e.getMessage());
@@ -23,11 +24,12 @@ public class Node_nodeRMI_Transmit
         }
     }
 
-    public void updateNewNodeNeighbours(int leftHash,int rightHash)
+    // Buren van Node instellen
+    public void setNeighbours(int prevHash,int nextHash)
     {
         try
         {
-            NodeRMIReceive.setNeighbours(leftHash,rightHash);
+            nodeRMIReceive.setNeighbours(prevHash,nextHash);
         } catch (RemoteException e)
         {
             e.printStackTrace();
