@@ -14,4 +14,5 @@ public interface ServerRMIinterface extends Remote
     public int checkAmountOfNodes();
     public boolean checkIfLeftEdge(int nameHash);
     public boolean checkIfRightEdge(int nameHash);
+    public boolean checkIfNameExists(String name);
 }

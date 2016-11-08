@@ -12,6 +12,7 @@ import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
+import java.util.Scanner;
 
 public class Node
 {
@@ -25,14 +26,11 @@ public class Node
     boolean firstNode,leftEdge,rightEdge;
 
 
-    public Node(String name, Inet4Address ip)
+    public Node(Inet4Address ip)
     {
-        this.name = name;
         this.ip = ip;
         NScommunication = new Node_NameServerRMI();
         bindNodeRMIReceive();
-        ownHash = calcHash(name);
-
         startUp();
         listenMC();
         System.out.println("test: uit de thread");
@@ -123,9 +121,23 @@ public class Node
 
     public void startUp()
     {
+        setName();
+        sendMyMC();
         getStartupInfoFromNS();
         testBoodStrapDiscovery();
         sendMyMC();
+    }
+
+    public void setName()
+    {
+        System.out.println("Choose a name for the node and press enter, fill in the correct ip-address and press enter.");
+        Scanner s = new Scanner(System.in);
+        name = s.nextLine();
+        while(name.contains(" ") || NScommunication.checkIfNameExists(name))
+        {
+            System.out.println("Your name contains a white space or already exists, please choose another name.");
+            name = s.nextLine();
+        }
     }
 
     public void sendMyMC()

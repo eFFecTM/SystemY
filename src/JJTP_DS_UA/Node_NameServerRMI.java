@@ -53,4 +53,9 @@ public class Node_NameServerRMI
     {
         return NSI.checkIfRightEdge(nameHash);
     }
+
+    public boolean checkIfNameExists(String name)
+    {
+        return NSI.checkIfNameExists(name);
+    }
 }

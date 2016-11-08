@@ -44,4 +44,10 @@ public class ServerRMI extends UnicastRemoteObject implements ServerRMIinterface
             return false;
     }
 
+    public boolean checkIfNameExists(String name)
+    {
+        int hash = Math.abs(name.hashCode()%32768);
+        return ns.nodeMap.containsKey(hash);
+    }
+
 }
