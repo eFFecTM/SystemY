@@ -32,8 +32,8 @@ public class Node
         this.ip = ip;
         NScommunication = new Node_NameServerRMI();
         bindNodeRMIReceive();
-        startUp();
-        listenMC();
+        //startUp();
+        //listenMC();
     }
 
     public void startUp()
@@ -124,7 +124,7 @@ public class Node
     public void updateNewNodeNeighbours(String ipAddr)
     {
         NodeRMITransmit = new Node_nodeRMI_Transmit(ipAddr);
-        NodeRMITransmit.updateNewNodeNeighbours(ownHash,nextHash);
+        NodeRMITransmit.updateNewNodeNeighbours(35,723);
     }
 
     public Inet4Address getIP()

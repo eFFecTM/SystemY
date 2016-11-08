@@ -17,10 +17,11 @@ public class Main_node
     static Node node;
     public static void main(String[] args) throws UnknownHostException
     {
-        node = new Node((Inet4Address) Inet4Address.getLocalHost());
+        node = new Node((Inet4Address) Inet4Address.getByName("192.168.1.5"));
             //getByName is een method van InetAddress, maar Inet4Address extends InetAddress
             //het geeft een inetAddress terug, dus casten naar Inet4Address
         //testPracticum3();
+        node.updateNewNodeNeighbours("192.168.1.1");
     }
 
     public static void testPracticum3()
