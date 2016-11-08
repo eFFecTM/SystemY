@@ -49,5 +49,5 @@ public class ServerRMI extends UnicastRemoteObject implements ServerRMIinterface
         int hash = Math.abs(name.hashCode()%32768);
         return ns.nodeMap.containsKey(hash);
     }
-
 }
+

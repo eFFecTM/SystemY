@@ -1,6 +1,7 @@
 package JJTP_DS_UA;
 
 import java.rmi.Naming;
+import java.rmi.RemoteException;
 
 /**
  * Created by jonas on 5-11-2016.
@@ -24,6 +25,12 @@ public class Node_nodeRMI_Transmit
 
     public void updateNewNodeNeighbours(int leftHash,int rightHash)
     {
-        NodeRMIReceive.setNeighbours(leftHash,rightHash);
+        try
+        {
+            NodeRMIReceive.setNeighbours(leftHash,rightHash);
+        } catch (RemoteException e)
+        {
+            e.printStackTrace();
+        }
     }
 }

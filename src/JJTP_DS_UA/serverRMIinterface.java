@@ -16,3 +16,4 @@ public interface ServerRMIinterface extends Remote
     public boolean checkIfRightEdge(int nameHash) throws RemoteException;
     public boolean checkIfNameExists(String name) throws RemoteException;
 }
+//@TODO synctest
