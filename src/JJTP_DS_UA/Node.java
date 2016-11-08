@@ -33,7 +33,6 @@ public class Node
         bindNodeRMIReceive();
         startUp();
         listenMC();
-        System.out.println("test: uit de thread");
     }
 
     public Inet4Address getIP()
