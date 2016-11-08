@@ -30,7 +30,7 @@ public class ServerRMI extends UnicastRemoteObject implements ServerRMIinterface
 
     public boolean checkIfLeftEdge(int nameHash)
     {
-        if(nameHash<ns.nodeMap.firstKey())
+        if(nameHash<=ns.nodeMap.firstKey())
             return true;
         else
             return false;
@@ -38,7 +38,7 @@ public class ServerRMI extends UnicastRemoteObject implements ServerRMIinterface
 
     public boolean checkIfRightEdge(int nameHash)
     {
-        if(nameHash>ns.nodeMap.lastKey())
+        if(nameHash>=ns.nodeMap.lastKey())
             return true;
         else
             return false;
