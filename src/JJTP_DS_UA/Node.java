@@ -12,6 +12,7 @@ import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.util.Scanner;
 
 public class Node
@@ -205,12 +206,12 @@ public class Node
         try
         {
             NodeRMIReceive = new Node_nodeRMI_Receive(this); //RMIclass maken + referentie naar zichzelf doorgeven (voor buren te plaatsen)
-            String bindLocation = "//localhost/NodeSet";
-            LocateRegistry.createRegistry(1100);
-            Naming.bind(bindLocation, NodeRMIReceive);
+            String bindLocation = "NodeSet";
+            Registry reg = LocateRegistry.createRegistry(1100);
+            reg.bind(bindLocation, NodeRMIReceive);
             System.out.println("Node is reachable at" + bindLocation);
             System.out.println("java RMI registry created.");
-        } catch (MalformedURLException | AlreadyBoundException | RemoteException e) {
+        } catch (AlreadyBoundException | RemoteException e) {
             e.printStackTrace();
             System.err.println("java RMI registry already exists.");
         }

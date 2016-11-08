@@ -18,6 +18,7 @@ import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -144,12 +145,12 @@ public class NameServer
         try
         {
             RMIclass = new ServerRMI(this); //RMIclass maken + referentie naar zichzelf doorgeven (voor lookup)
-            String bindLocation = "//localhost/FileServer";
-            LocateRegistry.createRegistry(1099);
-            Naming.bind(bindLocation, RMIclass);
+            String bindLocation = "FileServer";
+            Registry reg = LocateRegistry.createRegistry(1099);
+            reg.bind(bindLocation, RMIclass);
             System.out.println("FileServer Server is ready at:" + bindLocation);
             System.out.println("java RMI registry created.");
-        } catch (MalformedURLException | AlreadyBoundException | RemoteException e) {
+        } catch (AlreadyBoundException | RemoteException e) {
             e.printStackTrace();
             System.err.println("java RMI registry already exists.");
         }
