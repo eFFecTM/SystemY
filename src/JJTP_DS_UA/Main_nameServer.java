@@ -15,10 +15,6 @@ public class Main_nameServer
     public static void main(String[] args) throws RemoteException, UnknownHostException, InterruptedException
     {
         nameServer = new NameServer();
-        testPracticum3();
-        Thread.sleep(5000);
-        System.out.println("testlalalalala");
-
     }
 
     public static void testPracticum3() throws UnknownHostException
