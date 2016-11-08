@@ -146,7 +146,7 @@ public class NameServer
         {
             RMIclass = new ServerRMI(this); //RMIclass maken + referentie naar zichzelf doorgeven (voor lookup)
             String bindLocation = "FileServer";
-            Registry reg = LocateRegistry.createRegistry(1099);
+            Registry reg = LocateRegistry.createRegistry(9875);
             reg.bind(bindLocation, RMIclass);
             System.out.println("FileServer Server is ready at:" + bindLocation);
             System.out.println("java RMI registry created.");

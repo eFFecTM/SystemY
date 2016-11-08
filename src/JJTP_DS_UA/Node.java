@@ -137,6 +137,7 @@ public class Node
             System.out.println("Your name contains a white space or already exists, please choose another name.");
             name = s.nextLine();
         }
+        ownHash = calcHash(name);
     }
 
     public void sendMyMC()
@@ -206,7 +207,7 @@ public class Node
         {
             NodeRMIReceive = new Node_nodeRMI_Receive(this); //RMIclass maken + referentie naar zichzelf doorgeven (voor buren te plaatsen)
             String bindLocation = "NodeSet";
-            Registry reg = LocateRegistry.createRegistry(1100);
+            Registry reg = LocateRegistry.createRegistry(9876);
             reg.bind(bindLocation, NodeRMIReceive);
             System.out.println("Node is reachable at" + bindLocation);
             System.out.println("java RMI registry created.");
