@@ -24,7 +24,7 @@ public class Node
     Node_nodeRMI_Transmit NodeRMITransmit;
     int ownHash,prevHash,nextHash,newNodeHash; //newHash = van nieuwe node opgemerkt uit de multicast
     String newNodeIP;
-    boolean firstNode,leftEdge,rightEdge;
+    boolean onlyNode,leftEdge,rightEdge;
 
 
     public Node(Inet4Address ip)
@@ -49,46 +49,46 @@ public class Node
         testBoodStrapDiscovery();
     }
 
-    public Inet4Address getIP()
-    {
-        return ip;
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public int calcHash(String name)
-    {
-        return Math.abs(name.hashCode()%32768);
-    }
-
     public void getStartupInfoFromNS()
     {
         leftEdge = NScommunication.checkIfLeftEdge(ownHash);
         rightEdge = NScommunication.checkIfRightEdge(ownHash);
 
-        if(NScommunication.checkAmountOfNodes() <= 1) //hij is de eerste <1 is normaal niet mogelijk
+        if(NScommunication.checkAmountOfNodes() <= 1) //Deze check is NA dat de node aan de map is toegevoegd
         {
-            firstNode = true;
+            onlyNode = true;
             prevHash = ownHash;
             nextHash = ownHash;
         }
+        else
+            onlyNode=false;
     }
 
     public void recalcPosition()
     {
-        if(firstNode)
+        if(onlyNode)
         {
-            firstNode=false;
+            onlyNode=false;
             updateNewNodeNeighbours(newNodeIP);
             prevHash=newNodeHash;
             nextHash=newNodeHash;
+            if(newNodeHash<ownHash)
+                leftEdge=false;
+            else
+                rightEdge = false;
         }
         else
         {
-            if(leftEdge)
+            if(newNodeHash>ownHash && newNodeHash<nextHash)
+            {
+                updateNewNodeNeighbours(newNodeIP);
+                nextHash=newNodeHash;
+            }
+            else if(newNodeHash<ownHash && newNodeHash>prevHash)
+            {
+                prevHash=newNodeHash;
+            }
+            else if(leftEdge)
             {
                 if(newNodeHash<ownHash)
                 {
@@ -99,8 +99,12 @@ public class Node
                 {
                     prevHash=newNodeHash;
                 }
+                else if (newNodeHash>ownHash && newNodeHash<nextHash)
+                {
+
+                }
             }
-            else if(rightEdge) //@TODO check voorbeeld: eerst 5, dan 10, dan 7
+            else if(rightEdge)
             {
                 if(newNodeHash<nextHash)
                 {
@@ -114,15 +118,6 @@ public class Node
                     rightEdge=false;
                 }
             }
-            else if(ownHash<newNodeHash && newNodeHash<nextHash)
-            {
-                updateNewNodeNeighbours(newNodeIP);
-                nextHash=newNodeHash;
-            }
-            else if(ownHash>newNodeHash && newNodeHash>prevHash)
-            {
-                prevHash=newNodeHash;
-            }
         }
     }
 
@@ -130,6 +125,21 @@ public class Node
     {
         NodeRMITransmit = new Node_nodeRMI_Transmit(ipAddr);
         NodeRMITransmit.updateNewNodeNeighbours(ownHash,nextHash);
+    }
+
+    public Inet4Address getIP()
+    {
+        return ip;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public int calcHash(String name)
+    {
+        return Math.abs(name.hashCode()%32768);
     }
 
     public void setName()
@@ -227,7 +237,7 @@ public class Node
         System.out.println("PrevHash: " + prevHash);
         System.out.println("NextHash: " + nextHash);
         System.out.println("ownHash: " + ownHash);
-        System.out.println("FirstNode: " + firstNode);
+        System.out.println("FirstNode: " + onlyNode);
         System.out.println("leftEdge: " + leftEdge);
         System.out.println("rightEdge: " + rightEdge);
     }
