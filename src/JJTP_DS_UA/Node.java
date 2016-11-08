@@ -13,7 +13,6 @@ import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.Scanner;
 
 public class Node
@@ -21,7 +20,7 @@ public class Node
     String name;
     Inet4Address ip;
     Node_NameServerRMI NScommunication;
-    Node_nodeRMI_ReceiveInterface NodeRMIReceive;
+    Node_nodeRMI_Receive NodeRMIReceive;
     Node_nodeRMI_Transmit NodeRMITransmit;
     int ownHash,prevHash,nextHash,newNodeHash; //newHash = van nieuwe node opgemerkt uit de multicast
     String newNodeIP;
@@ -31,7 +30,7 @@ public class Node
     public Node(Inet4Address ip)
     {
         this.ip = ip;
-        //NScommunication = new Node_NameServerRMI();
+        NScommunication = new Node_NameServerRMI();
         bindNodeRMIReceive();
         //startUp();
         //listenMC();
@@ -217,18 +216,19 @@ public class Node
         }).start();
     }
 
-    public void bindNodeRMIReceive() {
-        try {
-            String name = "NodeSet";
-            NodeRMIReceive = new Node_nodeRMI_Receive(this);
-            Node_nodeRMI_ReceiveInterface stub =
-                    (Node_nodeRMI_ReceiveInterface) UnicastRemoteObject.exportObject(NodeRMIReceive, 0);
-            Registry registry = LocateRegistry.getRegistry();
-            registry.rebind(name, stub);
-            System.out.println("ComputeEngine bound");
-        } catch (Exception e) {
-            System.err.println("ComputeEngine exception:");
+    public void bindNodeRMIReceive()
+    {
+        try
+        {
+            NodeRMIReceive = new Node_nodeRMI_Receive(this); //RMIclass maken + referentie naar zichzelf doorgeven (voor buren te plaatsen)
+            String bindLocation = "NodeSet";
+            Registry reg = LocateRegistry.createRegistry(9876);
+            reg.bind(bindLocation, NodeRMIReceive);
+            System.out.println("Node is reachable at" + bindLocation);
+            System.out.println("java RMI registry created.");
+        } catch (AlreadyBoundException | RemoteException e) {
             e.printStackTrace();
+            System.err.println("java RMI registry already exists.");
         }
     }
 
