@@ -100,7 +100,7 @@ public class Node
                     prevHash=newNodeHash;
                 }
             }
-            else if(rightEdge)
+            else if(rightEdge) //@TODO check voorbeeld: eerst 5, dan 10, dan 7
             {
                 if(newNodeHash<nextHash)
                 {
