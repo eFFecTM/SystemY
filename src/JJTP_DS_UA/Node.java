@@ -50,8 +50,7 @@ public class Node
 
     public int calcHash(String name)
     {
-        Integer hashCode = name.hashCode();
-        return (int) Integer.toUnsignedLong(hashCode) % 32768;
+        return Math.abs(name.hashCode()%32768);
     }
 
     public void getStartupInfoFromNS()
@@ -124,8 +123,9 @@ public class Node
 
     public void startUp()
     {
-        sendMyMC();
         getStartupInfoFromNS();
+        testBoodStrapDiscovery();
+        sendMyMC();
     }
 
     public void sendMyMC()
@@ -177,6 +177,7 @@ public class Node
                         newNodeHash = calcHash(info[0]);
                         newNodeIP = info[1];
                         recalcPosition();
+                        testBoodStrapDiscovery();
                         System.out.println("Naam: " + info[0]);
                         System.out.println("IP: " + info[1]);
                     }
@@ -202,5 +203,15 @@ public class Node
             e.printStackTrace();
             System.err.println("java RMI registry already exists.");
         }
+    }
+
+    public void testBoodStrapDiscovery()
+    {
+        System.out.println("PrevHash: " + prevHash);
+        System.out.println("NextHash: " + nextHash);
+        System.out.println("ownHash: " + ownHash);
+        System.out.println("FirstNode: " + firstNode);
+        System.out.println("leftEdge: " + leftEdge);
+        System.out.println("rightEdge: " + rightEdge);
     }
 }

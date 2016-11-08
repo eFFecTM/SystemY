@@ -18,6 +18,8 @@ import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
+import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 public class NameServer
@@ -33,10 +35,14 @@ public class NameServer
         listenMC();
     }
 
+    public int calcHash(String name)
+    {
+        return Math.abs(name.hashCode()%32768);
+    }
+
     public void addNode(String name, Inet4Address IP)
     {
-        Integer hashCode = name.hashCode();
-        Integer hash = (int) Integer.toUnsignedLong(hashCode) % 32768;
+        int hash = calcHash(name);
         if(nodeMap.containsKey(hash))
             System.err.println("Node not added, name already taken.");
         else
@@ -45,8 +51,7 @@ public class NameServer
 
     public void deleteNode(String name)
     {
-        Integer hashCode = name.hashCode();
-        Integer hash = (int) Integer.toUnsignedLong(hashCode) % 32768;
+        int hash = calcHash(name);
         if(nodeMap.containsKey(hash))
             nodeMap.remove(hash);
         else
@@ -60,11 +65,11 @@ public class NameServer
      **/
     public Inet4Address lookup(String fileName)
     {
-        Integer fileNameHash = (int) (Integer.toUnsignedLong(fileName.hashCode()) % 32768);
-        if(nodeMap.lowerKey(fileNameHash)==null) // returnt key < dan de meegegeven paramater of null als die niet bestaat
+        int hash = Math.abs(fileName.hashCode()%32768);
+        if(nodeMap.lowerKey(hash)==null) // returnt key < dan de meegegeven paramater of null als die niet bestaat
             return nodeMap.get(nodeMap.lastKey()); //returnt de grootste key uit de map
         else
-            return nodeMap.get(nodeMap.lowerKey(fileNameHash));
+            return nodeMap.get(nodeMap.lowerKey(hash));
     }
 
     /**
@@ -111,7 +116,8 @@ public class NameServer
                         String msg = new String(packet.getData(), packet.getOffset(), packet.getLength());;
                         String[] info = msg.split(" "); // het ontvangen bericht splitsen in woorden gescheiden door een spatie
                         addNode(info[0],(Inet4Address) Inet4Address.getByName(info[1]));
-                        //@TODO node moet melding krijgen indien de ID al in gebruik is OF hash 0 is EN mag geen spatie bevatten -> andere naam kiezen.
+                        testPrintTreemap();
+                        saveNodeMapXML();
                         System.out.println("Naam: " + info[0]);
                         System.out.println("IP: " + info[1]);
                     }
@@ -122,6 +128,15 @@ public class NameServer
             }
         }).start();
 
+    }
+
+    public void testPrintTreemap()
+    {
+        Set<Integer> keyset = nodeMap.keySet();
+        for(int k : keyset)
+        {
+            System.out.println("ID: " + k + " - ip: " + nodeMap.get(k));
+        }
     }
 
     public void bindRMIclass()
