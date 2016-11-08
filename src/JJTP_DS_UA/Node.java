@@ -36,6 +36,14 @@ public class Node
         listenMC();
     }
 
+    public void startUp()
+    {
+        setName();
+        sendMyMC();
+        getStartupInfoFromNS();
+        testBoodStrapDiscovery();
+    }
+
     public Inet4Address getIP()
     {
         return ip;
@@ -117,15 +125,6 @@ public class Node
     {
         NodeRMITransmit = new Node_nodeRMI_Transmit(ipAddr);
         NodeRMITransmit.updateNewNodeNeighbours(ownHash,nextHash);
-    }
-
-    public void startUp()
-    {
-        setName();
-        sendMyMC();
-        getStartupInfoFromNS();
-        testBoodStrapDiscovery();
-        sendMyMC();
     }
 
     public void setName()
