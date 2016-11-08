@@ -28,3 +28,4 @@ public class Main_node
        // node.NScommunication.searchFile(textInput()); //vraagt om naam en ip, maar filenaam+extensie
     }
 }
+//

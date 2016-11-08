@@ -25,3 +25,4 @@ public class Node_nodeRMI_Receive extends UnicastRemoteObject implements Node_no
     }
 
 }
+//

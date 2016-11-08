@@ -17,3 +17,4 @@ public class HASHCALDTEST
         return Math.abs(name.hashCode()%32768);
     }
 }
+//
