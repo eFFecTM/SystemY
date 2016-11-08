@@ -40,6 +40,11 @@ public class Node
     {
         setName();
         sendMyMC();
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         getStartupInfoFromNS();
         testBoodStrapDiscovery();
     }
