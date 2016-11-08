@@ -25,6 +25,6 @@ public class Main_node
 
     public static void testPracticum3()
     {
-        node.NScommunication.searchFile(textInput()); //vraagt om naam en ip, maar filenaam+extensie
+       // node.NScommunication.searchFile(textInput()); //vraagt om naam en ip, maar filenaam+extensie
     }
 }

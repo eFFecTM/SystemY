@@ -41,21 +41,50 @@ public class Node_NameServerRMI
 
     public int checkAmountOfNodes()
     {
-        return NSI.checkAmountOfNodes();
+        try
+        {
+            return NSI.checkAmountOfNodes();
+        } catch(RemoteException e)
+        {
+            e.printStackTrace();
+            return -1;
+        }
+
     }
 
     public boolean checkIfLeftEdge(int nameHash)
     {
-        return NSI.checkIfLeftEdge(nameHash);
+        try
+        {
+            return NSI.checkIfLeftEdge(nameHash);
+        } catch (RemoteException e)
+        {
+            e.printStackTrace();
+            return false;  //@TODO nakijken/vragen over return statement
+        }
     }
 
     public boolean checkIfRightEdge(int nameHash)
     {
-        return NSI.checkIfRightEdge(nameHash);
+        try
+        {
+            return NSI.checkIfRightEdge(nameHash);
+        } catch (RemoteException e)
+        {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     public boolean checkIfNameExists(String name)
     {
-        return NSI.checkIfNameExists(name);
+        try
+        {
+            return NSI.checkIfNameExists(name);
+        } catch (RemoteException e)
+        {
+            e.printStackTrace();
+            return false;
+        }
     }
 }
