@@ -15,12 +15,13 @@ public class Node_nodeRMI_Transmit
 
     public Node_nodeRMI_Transmit(String ipAddr)
     {
-        try {
-            String name = "NodeSet";
-            Registry registry = LocateRegistry.getRegistry();
-            NodeRMIReceive = (Node_nodeRMI_ReceiveInterface) registry.lookup(name);
-        } catch (Exception e) {
-            System.err.println("ComputePi exception:");
+        try
+        {
+            String location = ("//"+ ipAddr + "/NodeSet"); //  voorbeeld: "//192.168.1.1/FileServer"
+            NodeRMIReceive = (Node_nodeRMI_ReceiveInterface) Naming.lookup(location);
+        } catch(Exception e)
+        {
+            System.err.println("NodeSet exception: "+ e.getMessage());
             e.printStackTrace();
         }
     }

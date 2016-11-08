@@ -30,7 +30,7 @@ public class Node
     public Node(Inet4Address ip)
     {
         this.ip = ip;
-        NScommunication = new Node_NameServerRMI();
+        //NScommunication = new Node_NameServerRMI();
         bindNodeRMIReceive();
         //startUp();
         //listenMC();

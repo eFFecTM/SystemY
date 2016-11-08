@@ -21,14 +21,17 @@ public class Main_node
             //getByName is een method van InetAddress, maar Inet4Address extends InetAddress
             //het geeft een inetAddress terug, dus casten naar Inet4Address
         //testPracticum3();
-        //node.updateNewNodeNeighbours("192.168.1.1");
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        for(int i=0;i<10000000;i++)
+        {
+            try {
+                Thread.sleep(7000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.println(node.prevHash +" en " + node.nextHash);
         }
-        //System.out.println(node.prevHash +" en " + node.nextHash);
-        node.updateNewNodeNeighbours("192.168.1.1");
+
+        //node.updateNewNodeNeighbours("192.168.1.1");
     }
 
     public static void testPracticum3()
