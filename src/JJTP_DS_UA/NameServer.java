@@ -74,7 +74,6 @@ public class NameServer
             nodeMap.remove(hash);
         else
             System.err.println("No such Node.");
-
     }
 
     /**
@@ -121,11 +120,7 @@ public class NameServer
                         mcSocket.receive(packet);
                         String msg = new String(packet.getData(), packet.getOffset(), packet.getLength());;
                         String[] info = msg.split(" "); // het ontvangen bericht splitsen in woorden gescheiden door een spatie
-
-                        if(nodeMap.containsKey(calcHash(info[0])))   //MC met node naam die al bestaat wordt doorgegeven als die node moet verwijderd worden.
-                            deleteNode(info[0]);
-                        else
-                            addNode(info[0],(Inet4Address) Inet4Address.getByName(info[1]));
+                        addNode(info[0],(Inet4Address) Inet4Address.getByName(info[1]));
 
                         testPrintTreemap();
                         //@FIXME: XML Marshaller fixen: @XmlRootElement

@@ -19,10 +19,22 @@ public class Node_nodeRMI_Receive extends UnicastRemoteObject implements Node_no
         }
 
     // Buren van Node instellen
+    @Override
     public void setNeighbours(int prevHash, int nextHash)
     {
         myNode.prevHash=prevHash;
         myNode.nextHash=nextHash;
     }
 
+    @Override
+    public void updateLeftNeighbour(int hash)
+    {
+        myNode.prevHash=hash;
+    }
+
+    @Override
+    public void updateRightNeighbour(int hash) throws RemoteException
+    {
+        myNode.nextHash=hash; //rechterbuur van de node wordt geupdate door de huidige rechterbuur die weggaat
+    }
 }

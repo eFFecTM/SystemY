@@ -15,4 +15,6 @@ public interface ServerRMIinterface extends Remote
     public boolean checkIfLowEdge(int nameHash) throws RemoteException;
     public boolean checkIfHighEdge(int nameHash) throws RemoteException;
     public boolean checkIfNameExists(String name) throws RemoteException;
+    public String getIP(int hash)throws RemoteException;
+    public void deleteNode(int hash) throws RemoteException;
 }

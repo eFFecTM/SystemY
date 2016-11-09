@@ -95,4 +95,27 @@ public class Node_NameServerRMI
             return false;
         }
     }
+
+    public String getIP(int hash)
+    {
+        try
+        {
+            return NSI.getIP(hash);
+        } catch (RemoteException e)
+        {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public void deleteNode(int hash)
+    {
+        try
+        {
+            NSI.deleteNode(hash);
+        } catch (RemoteException e)
+        {
+            e.printStackTrace();
+        }
+    }
 }

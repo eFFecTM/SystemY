@@ -75,8 +75,11 @@ public class Node
 
     public void shutDown()
     {
-        //Delete from server
-        //recalc neighbors
+        shutdown = true;
+        updateLeftNeighbour(); //geef zijn linkerbuur aan de rechterbuur
+        updateRightNeighbour(); //geeft zijn rechterbuur aan de linkerbuur
+        NScommunication.deleteNode(ownHash); //delete eigen node uit de map van de server
+        System.exit(0); //terminate JVM
     }
 
     // Initialisatie: Een naam kan men kiezen voor de Node
@@ -109,11 +112,7 @@ public class Node
             onlyNode = false;
     }
 
-    // Berekenen van een hash van een naam (of filenaam)
-    public int calcHash(String name)
-    {
-        return Math.abs(name.hashCode()%32768);
-    }
+
 
     // Sturen van een MultiCast
     public void sendMC()
@@ -241,6 +240,18 @@ public class Node
         nodeRMITransmit.setNeighbours(ownHash,nextHash);
     }
 
+    public void updateLeftNeighbour()
+    {
+        nodeRMITransmit = new Node_nodeRMI_Transmit(NScommunication.getIP(prevHash));
+        nodeRMITransmit.updateLeftNeighbour(nextHash); //maak connectie met de linkerbuur en geef rechterbuur door
+    }
+
+    public void updateRightNeighbour()
+    {
+        nodeRMITransmit = new Node_nodeRMI_Transmit(NScommunication.getIP(nextHash));
+        nodeRMITransmit.updateRightNeighbour(prevHash);
+    }
+
     // TEST: gegevens weergeven van de Node
     public void testBootstrapDiscovery()
     {
@@ -267,5 +278,11 @@ public class Node
             }
         }).start();
 
+    }
+
+    // Berekenen van een hash van een naam (of filenaam)
+    public int calcHash(String name)
+    {
+        return Math.abs(name.hashCode()%32768);
     }
 }

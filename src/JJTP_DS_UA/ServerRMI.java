@@ -25,6 +25,8 @@ public class ServerRMI extends UnicastRemoteObject implements ServerRMIinterface
      * When searching for a file, the filename is hashed. Then the algorithm looks for the nearest hash value
      * in the TreeMap. This value is linked to the IP-address of the computer that has the file.
      **/
+
+    @Override
     public Inet4Address findFile (String fileName) throws RemoteException
     {
         int hash = ns.calcHash(fileName);
@@ -35,12 +37,14 @@ public class ServerRMI extends UnicastRemoteObject implements ServerRMIinterface
     }
 
     // Geeft het aantal nodes in de cirkel terug
+    @Override
     public int checkAmountOfNodes()
     {
         return ns.nodeMap.keySet().size();
     }
 
     // Node wilt weten of het op de laagste rand zit
+    @Override
     public boolean checkIfLowEdge(int nameHash)
     {
         if(nameHash <= ns.nodeMap.firstKey())
@@ -50,6 +54,7 @@ public class ServerRMI extends UnicastRemoteObject implements ServerRMIinterface
     }
 
     // Node wilt weten of het op de hoogste rand zit
+    @Override
     public boolean checkIfHighEdge(int nameHash)
     {
         if(nameHash >= ns.nodeMap.lastKey())
@@ -59,9 +64,26 @@ public class ServerRMI extends UnicastRemoteObject implements ServerRMIinterface
     }
 
     // Kijkt na of de naam al bestaat
+    @Override
     public boolean checkIfNameExists(String name)
     {
         int hash = ns.calcHash(name);
         return ns.nodeMap.containsKey(hash);
+    }
+
+    @Override
+    public String getIP(int nodeHash)
+    {
+        return ns.nodeMap.get(nodeHash).toString(); //returned : /192.168.1.xxx
+    }
+
+    // Verwijderen van een node
+    @Override
+    public void deleteNode(int hash)
+    {
+        if(ns.nodeMap.containsKey(hash))
+            ns.nodeMap.remove(hash);
+        else
+            System.err.println("No such Node.");
     }
 }

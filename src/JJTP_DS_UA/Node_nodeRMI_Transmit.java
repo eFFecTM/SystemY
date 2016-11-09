@@ -36,4 +36,26 @@ public class Node_nodeRMI_Transmit
             e.printStackTrace();
         }
     }
+
+    public void updateRightNeighbour(int hash)
+    {
+        try
+        {
+            nodeRMIReceive.updateLeftNeighbour(hash);
+        } catch (RemoteException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateLeftNeighbour(int hash)
+    {
+        try
+        {
+            nodeRMIReceive.updateRightNeighbour(hash); //update de rechterbuur van de linker waarmee de shutdown node geconnecteerd is
+        } catch (RemoteException e)
+        {
+            e.printStackTrace();
+        }
+    }
 }
