@@ -63,10 +63,7 @@ public class NameServer
     public void addNode(String name, Inet4Address IP)
     {
         int hash = calcHash(name);
-        if()
-            System.err.println("Node not added, name already taken.");
-        else
-            nodeMap.put(hash,IP);
+        nodeMap.put(hash,IP);
     }
 
     // Verwijderen van een node
