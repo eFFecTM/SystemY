@@ -5,10 +5,10 @@
  */
 package JJTP_DS_UA;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.Inet4Address;
@@ -83,18 +83,21 @@ public class NameServer
     {
         try
         {
+            XStream xStream = new XStream(new DomDriver());
+            xStream.alias("map", java.util.Map.class);
+            String xml = xStream.toXML(nodeMap);
             File file = new File("NodeMap.xml");
-            //Marshalling
-            JAXBContext context = JAXBContext.newInstance(TreeMap.class);
-            Marshaller m = context.createMarshaller();
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            m.marshal(nodeMap,file);
-            System.out.println("Converted to XML.");
-        }
-        catch (JAXBException e)
+            FileWriter fileWriter = new FileWriter(file);
+            fileWriter.write(xml);
+        } catch (IOException e)
         {
             e.printStackTrace();
         }
+
+        // Unmarshall: XML naar TreeMap (als het ooit nodig is)
+        //TreeMap<Integer,Inet4Address> map = (TreeMap<Integer,Inet4Address>) xStream.fromXML(xml);
+
+        System.out.println("Converted to XML.");
     }
 
     // Luisteren naar / Ontvangen van een MultiCast
@@ -121,9 +124,8 @@ public class NameServer
                         String msg = new String(packet.getData(), packet.getOffset(), packet.getLength());;
                         String[] info = msg.split(" "); // het ontvangen bericht splitsen in woorden gescheiden door een spatie
                         addNode(info[0],(Inet4Address) Inet4Address.getByName(info[1]));
-
+                        saveNodeMapXML();
                         testPrintTreemap();
-                        //@FIXME: XML Marshaller fixen: @XmlRootElement
                     }
                 } catch(IOException e)
                 {
