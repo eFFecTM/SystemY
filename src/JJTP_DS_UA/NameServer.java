@@ -63,7 +63,7 @@ public class NameServer
     public void addNode(String name, Inet4Address IP)
     {
         int hash = calcHash(name);
-        if(nodeMap.containsKey(hash))
+        if()
             System.err.println("Node not added, name already taken.");
         else
             nodeMap.put(hash,IP);
@@ -124,7 +124,12 @@ public class NameServer
                         mcSocket.receive(packet);
                         String msg = new String(packet.getData(), packet.getOffset(), packet.getLength());;
                         String[] info = msg.split(" "); // het ontvangen bericht splitsen in woorden gescheiden door een spatie
-                        addNode(info[0],(Inet4Address) Inet4Address.getByName(info[1]));
+
+                        if(nodeMap.containsKey(calcHash(info[0])))   //MC met node naam die al bestaat wordt doorgegeven als die node moet verwijderd worden.
+                            deleteNode(info[0]);
+                        else
+                            addNode(info[0],(Inet4Address) Inet4Address.getByName(info[1]));
+
                         testPrintTreemap();
                         //@FIXME: XML Marshaller fixen: @XmlRootElement
                     }

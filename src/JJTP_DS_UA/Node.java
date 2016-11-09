@@ -12,6 +12,7 @@ import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.Objects;
 import java.util.Scanner;
 
 // Boven: Main_Node
@@ -24,7 +25,7 @@ public class Node
     Node_nodeRMI_Receive nodeRMIReceive;
     Node_nodeRMI_Transmit nodeRMITransmit;
     int ownHash, prevHash, nextHash, newNodeHash; //newHash = van nieuwe node opgemerkt uit de multicast
-    boolean onlyNode, lowEdge, highEdge;
+    boolean onlyNode, lowEdge, highEdge, shutdown = false;
 
     // Node constructor
     public Node(Inet4Address ip)
@@ -34,6 +35,7 @@ public class Node
         bindNodeRMIReceive(); // RMI Node-Node
         startUp(); // bevat setName() en sendMC()
         listenMC();
+//      checkForShutdown();
     }
 
     // Op registerpoort 9876 wordt de Node_nodeRMI_Receive klasse verbonden op een locatie
@@ -68,6 +70,13 @@ public class Node
         }
         getStartupInfoFromNS();
         testBootstrapDiscovery();
+        System.out.println("Type 0 if you want to shutdown Node.");
+    }
+
+    public void shutDown()
+    {
+        //Delete from server
+        //recalc neighbors
     }
 
     // Initialisatie: Een naam kan men kiezen voor de Node
@@ -147,7 +156,7 @@ public class Node
                     mcSocket.joinGroup(IPMC);
                     DatagramPacket packet;
 
-                    while(true)
+                    while(!shutdown)
                     {
                         packet = new DatagramPacket(new byte[1024], 1024);
                         System.out.println("Waiting for a  multicast message...");
@@ -161,6 +170,7 @@ public class Node
                         System.out.println("Naam: " + info[0]);
                         System.out.println("IP: " + info[1]);
                     }
+                    //shutDown();
                 } catch(IOException e)
                 {
                     e.printStackTrace();
@@ -240,5 +250,22 @@ public class Node
         System.out.println("FirstNode: " + onlyNode);
         System.out.println("lowEdge: " + lowEdge);
         System.out.println("highEdge: " + highEdge);
+    }
+
+    public void checkForShutdown()
+    {
+        new Thread(new Runnable() {
+            @Override
+            public void run()
+            {
+                while(true) {
+                    Scanner s = new Scanner(System.in);
+                    if (Objects.equals(s.nextLine(), "0")) {
+                        shutdown = true;
+                    }
+                }
+            }
+        }).start();
+
     }
 }
