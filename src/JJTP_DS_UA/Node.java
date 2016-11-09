@@ -222,7 +222,7 @@ public class Node
         {
             NodeRMIReceive = new Node_nodeRMI_Receive(this); //RMIclass maken + referentie naar zichzelf doorgeven (voor buren te plaatsen)
             String bindLocation = "NodeSet";
-            Registry reg = LocateRegistry.createRegistry(9876);
+            Registry reg = LocateRegistry.createRegistry(1099);
             reg.bind(bindLocation, NodeRMIReceive);
             System.out.println("Node is reachable at" + bindLocation);
             System.out.println("java RMI registry created.");

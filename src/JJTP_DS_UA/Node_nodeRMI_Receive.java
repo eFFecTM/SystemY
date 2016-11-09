@@ -7,7 +7,7 @@ package JJTP_DS_UA;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
-public class Node_nodeRMI_Receive implements Node_nodeRMI_ReceiveInterface
+public class Node_nodeRMI_Receive extends UnicastRemoteObject implements Node_nodeRMI_ReceiveInterface
 {
     Node myNode;
 

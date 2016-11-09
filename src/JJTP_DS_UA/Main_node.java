@@ -17,20 +17,20 @@ public class Main_node
     static Node node;
     public static void main(String[] args) throws UnknownHostException
     {
-        node = new Node((Inet4Address) Inet4Address.getByName("192.168.1.1"));
+        node = new Node((Inet4Address) Inet4Address.getByName("192.168.1.3"));
             //getByName is een method van InetAddress, maar Inet4Address extends InetAddress
             //het geeft een inetAddress terug, dus casten naar Inet4Address
         //testPracticum3();
-        try
-        {
-            Thread.sleep(5000);
-        } catch (InterruptedException e)
-        {
-            e.printStackTrace();
-        }
-        node.updateNewNodeNeighbours("192.168.1.5");
+//        try
+//        {
+//            Thread.sleep(5000);
+//        } catch (InterruptedException e)
+//        {
+//            e.printStackTrace();
+//        }
+//        node.updateNewNodeNeighbours("192.168.1.1");
 
-        /*
+
         for(int i=0;i<1000000;i++)
         {
             System.out.println(node.nextHash + " en " + node.prevHash);
@@ -42,7 +42,7 @@ public class Main_node
                 e.printStackTrace();
             }
         }
-        */
+
 
     }
 
