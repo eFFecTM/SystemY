@@ -58,12 +58,13 @@ public class Node
     }
 
     // Opstarten van de Node: Naam instellen, zijn eigen MultiCast sturen (anderen laten weten) en startup info ophalen
-    public void startUp()
+    public void startUp(String name)
     {
-        setName();
+        this.name = name;
+        setName(name);
         sendMC();
         try {
-            Thread.sleep(500); // Belangrijk: Andere Nodes moeten eerst de MC ontvangen
+            Thread.sleep(1000); // Belangrijk: Andere Nodes moeten eerst de MC ontvangen
         } catch (InterruptedException e)
         {
             e.printStackTrace();
@@ -83,15 +84,16 @@ public class Node
     }
 
     // Initialisatie: Een naam kan men kiezen voor de Node
-    public void setName()
+    public void setName(String name)
     {
-        System.out.println("Choose a name for the node and press enter, fill in the correct ip-address and press enter.");
-        Scanner s = new Scanner(System.in);
-        name = s.nextLine();
+        this.name = name;
+        //System.out.println("Choose a name for the node and press enter, fill in the correct ip-address and press enter.");
+        //Scanner s = new Scanner(System.in);
+        //name = s.nextLine();
         while(name.contains(" ") || NScommunication.checkIfNameExists(name))
         {
             System.out.println("Your name contains a white space or already exists, please choose another name.");
-            name = s.nextLine();
+            //name = s.nextLine();
         }
         ownHash = calcHash(name);
     }
