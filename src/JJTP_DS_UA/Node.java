@@ -271,9 +271,11 @@ public class Node
             @Override
             public void run()
             {
-                while(true) {
+                while(true)
+                {
                     Scanner s = new Scanner(System.in);
-                    if (Objects.equals(s.nextLine(), "0")) {
+                    if (Objects.equals(s.nextLine(), "0"))
+                    {
                         shutdown = true;
                     }
                 }

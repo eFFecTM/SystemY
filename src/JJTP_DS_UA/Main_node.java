@@ -52,6 +52,7 @@ public class Main_node
     {
 
 
+        GUI gui = new GUI();
         boolean hasIP = false;
 
         for (NetworkInterface netint : Collections.list(NetworkInterface.getNetworkInterfaces()))
