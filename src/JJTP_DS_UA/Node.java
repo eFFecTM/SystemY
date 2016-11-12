@@ -23,7 +23,7 @@ public class Node
     Inet4Address ip;
     Node_NameServerRMI NScommunication;
     Node_nodeRMI_Receive nodeRMIReceive;
-    Node_nodeRMI_Transmit nodeRMITransmit;
+    //Node_nodeRMI_Transmit nodeRMITransmit;
     int ownHash, prevHash, nextHash, newNodeHash; //newHash = van nieuwe node opgemerkt uit de multicast
     boolean onlyNode, lowEdge, highEdge, shutdown = false;
 
@@ -33,7 +33,8 @@ public class Node
         this.ip = ip;
         NScommunication = new Node_NameServerRMI();
         bindNodeRMIReceive(); // RMI Node-Node
-        startUp(); // bevat setName() en sendMC()
+        startUp(); //@FIXME startup moet name krijgen maar de setname method ook? klopt ergens iets niet
+        // bevat setName(), sendMC(), getStartupInfoFromNS() en testBootstrapDiscovery()
         listenMC();
 //      checkForShutdown();
     }
@@ -71,7 +72,7 @@ public class Node
         }
         getStartupInfoFromNS();
         testBootstrapDiscovery();
-        System.out.println("Type 0 if you want to shutdown Node.");
+        //System.out.println("Type 0 if you want to shutdown Node.");
     }
 
     public void shutDown()
@@ -238,20 +239,33 @@ public class Node
     // Buren van de Nieuwe Node updaten
     public void updateNewNodeNeighbours(String ipAddr)
     {
-        nodeRMITransmit = new Node_nodeRMI_Transmit(ipAddr);
+        Node_nodeRMI_Transmit nodeRMITransmit = new Node_nodeRMI_Transmit(ipAddr,this);
         nodeRMITransmit.setNeighbours(ownHash,nextHash);
     }
 
     public void updateLeftNeighbour()
     {
-        nodeRMITransmit = new Node_nodeRMI_Transmit(NScommunication.getIP(prevHash));
+        Node_nodeRMI_Transmit nodeRMITransmit = new Node_nodeRMI_Transmit(NScommunication.getIP(prevHash),this);
         nodeRMITransmit.updateLeftNeighbour(nextHash); //maak connectie met de linkerbuur en geef rechterbuur door
     }
 
     public void updateRightNeighbour()
     {
-        nodeRMITransmit = new Node_nodeRMI_Transmit(NScommunication.getIP(nextHash));
+        Node_nodeRMI_Transmit nodeRMITransmit = new Node_nodeRMI_Transmit(NScommunication.getIP(nextHash),this);
         nodeRMITransmit.updateRightNeighbour(prevHash);
+    }
+
+    public void failureOtherNode(String IP) //ip adrr van falende node
+    {
+        int[] neighbours = NScommunication.getIDs(IP); //in [0] zit de linkse buur, in [1] zit de rechtse buur
+
+        Node_nodeRMI_Transmit nodeRMITransmitL = new Node_nodeRMI_Transmit(NScommunication.getIP(neighbours[0]),this);
+        nodeRMITransmitL.updateRightNeighbour(neighbours[1]); //update buur
+
+        Node_nodeRMI_Transmit nodeRMITransmitR = new Node_nodeRMI_Transmit(NScommunication.getIP(neighbours[1]),this);
+        nodeRMITransmitR.updateLeftNeighbour(neighbours[0]); //update buur
+
+        NScommunication.deleteNode(NScommunication.getID(IP));
     }
 
     // TEST: gegevens weergeven van de Node
@@ -265,7 +279,18 @@ public class Node
         System.out.println("highEdge: " + highEdge);
     }
 
-    public void checkForShutdown()
+    // Berekenen van een hash van een naam (of filenaam)
+    public int calcHash(String name)
+    {
+        return Math.abs(name.hashCode()%32768);
+    }
+}
+
+
+
+
+
+    /*public void checkForShutdown()
     {
         new Thread(new Runnable() {
             @Override
@@ -280,11 +305,4 @@ public class Node
             }
         }).start();
 
-    }
-
-    // Berekenen van een hash van een naam (of filenaam)
-    public int calcHash(String name)
-    {
-        return Math.abs(name.hashCode()%32768);
-    }
-}
+    }*/

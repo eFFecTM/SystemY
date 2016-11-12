@@ -7,6 +7,8 @@ package JJTP_DS_UA;
 import java.net.Inet4Address;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Map;
+import java.util.Objects;
 
 // Boven: NameServer
 // Implementeert Interface ServerRMIinterface
@@ -75,6 +77,43 @@ public class ServerRMI extends UnicastRemoteObject implements ServerRMIinterface
     public String getIP(int nodeHash)
     {
         return ns.nodeMap.get(nodeHash).toString(); //returned : /192.168.1.xxx
+    }
+
+    @Override
+    public int[] getIDs(String ipAddr) throws RemoteException //itereert over de map tot de ID gevonden is (kan beter bv binair zoeken, of google API gebruiken)
+    {
+        int ID = -1;
+        int[] neighbours = new int[2];
+        for(Map.Entry<Integer, Inet4Address> entry : ns.nodeMap.entrySet())
+        {
+            if(entry.getValue().equals(ipAddr))
+                ID = entry.getKey();
+        }
+        if(ID != -1)
+        {
+            if(ns.nodeMap.higherKey(ID) == null)
+                neighbours[1] = ns.nodeMap.firstKey();//is er geen rechtse (node was grootste, return dan kleinste = rechtse buur)
+            else
+                neighbours[1] = ns.nodeMap.higherKey(ID);//rechtse buur (groter)
+
+            if(ns.nodeMap.lowerKey(ID) == null)
+                neighbours[0] = ns.nodeMap.lastKey();//is er geen linkse (node was kleinste), return de grootse = linkse buur
+            else
+                neighbours[0] = ns.nodeMap.lowerKey(ID); //linkse buur (kleiner)
+        }
+        return neighbours;
+    }
+
+    @Override
+    public int getID(String ipAddr) throws RemoteException
+    {
+        int ID = -1;
+        for(Map.Entry<Integer, Inet4Address> entry : ns.nodeMap.entrySet())
+        {
+            if(entry.getValue().equals(ipAddr))
+                ID = entry.getKey();
+        }
+        return ID;
     }
 
     // Verwijderen van een node
