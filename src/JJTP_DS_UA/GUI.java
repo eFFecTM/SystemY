@@ -1,18 +1,40 @@
 package JJTP_DS_UA;
 
 import javax.swing.*;
+import java.awt.*;
 
 /**
- * Created by Thomas on 11/11/2016.
+ * Created by JJTP on 11/11/2016.
  */
-public class GUI
+public class GUI extends JFrame
 {
-    private JTextArea welcomeToSystemYTextArea;
-    private JTextField loginName;
-    private JTextArea file1;
-    private JTextArea file2;
-    private JTextArea file5;
-    private JTextArea file3;
-    private JTextArea file4;
-    private JButton button1;
+    private JPanel viewTab,searchTab;
+    private JTextArea file1,file2,file3,file4,file5;
+    private JButton openButton,removeButton;
+    private JTabbedPane tabbedPane1;
+    private JButton logOutButton;
+    private JPanel mainPanel;
+
+    public GUI()
+    {
+        super("System Y");
+        try
+        {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setVisible(true);
+        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+        setLocation(dim.width/2 - getSize().width/2, dim.height/2 - getSize().height/2); // set frame in the middle of the screen
+        createUIComponents();
+    }
+
+    private void createUIComponents()
+    {
+        // TODO: place custom component creation code here
+    }
 }
