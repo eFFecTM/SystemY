@@ -12,16 +12,20 @@
     </properties>
     <border type="none"/>
     <children>
-      <tabbedpane id="127ba" binding="tabbedPane1" default-binding="true">
+      <tabbedpane id="127ba" binding="tabbedPane">
         <constraints>
-          <grid row="0" column="0" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
+          <grid row="0" column="0" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="0" fill="2" indent="0" use-parent-layout="false">
             <preferred-size width="200" height="200"/>
           </grid>
           <gridbag weightx="0.0" weighty="0.0"/>
         </constraints>
         <properties>
+          <alignmentX value="0.5"/>
           <minimumSize width="230" height="233"/>
           <preferredSize width="430" height="383"/>
+          <requestFocusEnabled value="false"/>
+          <tabLayoutPolicy value="0"/>
+          <tabPlacement value="1"/>
         </properties>
         <border type="none">
           <font/>
@@ -213,7 +217,38 @@
             </constraints>
             <properties/>
             <border type="none"/>
-            <children/>
+            <children>
+              <component id="1201c" class="javax.swing.JLabel" binding="serachLabel">
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <gridbag weightx="0.0" weighty="0.0"/>
+                </constraints>
+                <properties>
+                  <requestFocusEnabled value="false"/>
+                  <text value="Type the name of the file you are looking for:"/>
+                </properties>
+              </component>
+              <component id="3d842" class="javax.swing.JTextField" binding="filenameTextField" default-binding="true">
+                <constraints>
+                  <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                    <preferred-size width="150" height="-1"/>
+                  </grid>
+                  <gridbag weightx="0.0" weighty="0.0"/>
+                </constraints>
+                <properties>
+                  <text value="&lt;filename&gt;"/>
+                </properties>
+              </component>
+              <component id="30b7f" class="javax.swing.JButton" binding="searchButton" default-binding="true">
+                <constraints>
+                  <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <gridbag weightx="0.0" weighty="0.0"/>
+                </constraints>
+                <properties>
+                  <text value="Search"/>
+                </properties>
+              </component>
+            </children>
           </grid>
         </children>
       </tabbedpane>
