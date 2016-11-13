@@ -108,6 +108,26 @@ public class Node_NameServerRMI
         }
     }
 
+    public int[] getIDs(String ipAddr)
+    {
+        try {
+            return NSI.getIDs(ipAddr);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public int getID(String ipAddr)
+    {
+        try {
+            return NSI.getID(ipAddr);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
     public void deleteNode(int hash)
     {
         try

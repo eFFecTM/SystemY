@@ -23,7 +23,7 @@ public class Node
     Inet4Address ip;
     Node_NameServerRMI NScommunication;
     Node_nodeRMI_Receive nodeRMIReceive;
-    Node_nodeRMI_Transmit nodeRMITransmit;
+    //Node_nodeRMI_Transmit nodeRMITransmit;
     int ownHash, prevHash, nextHash, newNodeHash; //newHash = van nieuwe node opgemerkt uit de multicast
     boolean onlyNode, lowEdge, highEdge, shutdown = false;
 
@@ -33,13 +33,12 @@ public class Node
         this.ip = ip;
         NScommunication = new Node_NameServerRMI();
         bindNodeRMIReceive(); // RMI Node-Node
-        startUp(); // bevat setName() en sendMC()
+        startUp(); // bevat setName(), sendMC(), getStartupInfoFromNS() en testBootstrapDiscovery()
         listenMC();
-//      checkForShutdown();
+        // checkForShutdown();
     }
 
     // Op registerpoort 9876 wordt de Node_nodeRMI_Receive klasse verbonden op een locatie
-    // FIXME: Elke node op een andere poort registreren (Jonas: http://i.imgur.com/XNV1bD1.png)
     public void bindNodeRMIReceive()
     {
         try
@@ -58,10 +57,9 @@ public class Node
     }
 
     // Opstarten van de Node: Naam instellen, zijn eigen MultiCast sturen (anderen laten weten) en startup info ophalen
-    public void startUp(String name)
+    public void startUp()
     {
-        this.name = name;
-        setName(name);
+        setName();
         sendMC();
         try {
             Thread.sleep(1000); // Belangrijk: Andere Nodes moeten eerst de MC ontvangen
@@ -71,7 +69,7 @@ public class Node
         }
         getStartupInfoFromNS();
         testBootstrapDiscovery();
-        System.out.println("Type 0 if you want to shutdown Node.");
+        //System.out.println("Type 0 if you want to shutdown Node.");
     }
 
     public void shutDown()
@@ -83,17 +81,16 @@ public class Node
         System.exit(0); //terminate JVM
     }
 
-    // Initialisatie: Een naam kan men kiezen voor de Node
-    public void setName(String name)
+    // Initialisatie: Een naam
+    public void setName()
     {
-        this.name = name;
-        //System.out.println("Choose a name for the node and press enter, fill in the correct ip-address and press enter.");
-        //Scanner s = new Scanner(System.in);
-        //name = s.nextLine();
+        System.out.println("Choose a name for the node and press enter.");
+        Scanner s = new Scanner(System.in);
+        name = s.nextLine();
         while(name.contains(" ") || NScommunication.checkIfNameExists(name))
         {
             System.out.println("Your name contains a white space or already exists, please choose another name.");
-            //name = s.nextLine();
+            name = s.nextLine();
         }
         ownHash = calcHash(name);
     }
@@ -234,24 +231,36 @@ public class Node
         }
     }
 
-
     // Buren van de Nieuwe Node updaten
     public void updateNewNodeNeighbours(String ipAddr)
     {
-        nodeRMITransmit = new Node_nodeRMI_Transmit(ipAddr);
+        Node_nodeRMI_Transmit nodeRMITransmit = new Node_nodeRMI_Transmit(ipAddr,this);
         nodeRMITransmit.setNeighbours(ownHash,nextHash);
     }
 
     public void updateLeftNeighbour()
     {
-        nodeRMITransmit = new Node_nodeRMI_Transmit(NScommunication.getIP(prevHash));
+        Node_nodeRMI_Transmit nodeRMITransmit = new Node_nodeRMI_Transmit(NScommunication.getIP(prevHash),this);
         nodeRMITransmit.updateLeftNeighbour(nextHash); //maak connectie met de linkerbuur en geef rechterbuur door
     }
 
     public void updateRightNeighbour()
     {
-        nodeRMITransmit = new Node_nodeRMI_Transmit(NScommunication.getIP(nextHash));
+        Node_nodeRMI_Transmit nodeRMITransmit = new Node_nodeRMI_Transmit(NScommunication.getIP(nextHash),this);
         nodeRMITransmit.updateRightNeighbour(prevHash);
+    }
+
+    public void failureOtherNode(String IP) //ip adrr van falende node
+    {
+        int[] neighbours = NScommunication.getIDs(IP); //in [0] zit de linkse buur, in [1] zit de rechtse buur
+
+        Node_nodeRMI_Transmit nodeRMITransmitL = new Node_nodeRMI_Transmit(NScommunication.getIP(neighbours[0]),this);
+        nodeRMITransmitL.updateRightNeighbour(neighbours[1]); //update buur
+
+        Node_nodeRMI_Transmit nodeRMITransmitR = new Node_nodeRMI_Transmit(NScommunication.getIP(neighbours[1]),this);
+        nodeRMITransmitR.updateLeftNeighbour(neighbours[0]); //update buur
+
+        NScommunication.deleteNode(NScommunication.getID(IP));
     }
 
     // TEST: gegevens weergeven van de Node
@@ -265,6 +274,7 @@ public class Node
         System.out.println("highEdge: " + highEdge);
     }
 
+    /*
     public void checkForShutdown()
     {
         new Thread(new Runnable() {
@@ -281,9 +291,8 @@ public class Node
                 }
             }
         }).start();
-
     }
-
+*/
     // Berekenen van een hash van een naam (of filenaam)
     public int calcHash(String name)
     {
