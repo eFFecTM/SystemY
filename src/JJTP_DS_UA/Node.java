@@ -33,14 +33,12 @@ public class Node
         this.ip = ip;
         NScommunication = new Node_NameServerRMI();
         bindNodeRMIReceive(); // RMI Node-Node
-        startUp(); //@FIXME startup moet name krijgen maar de setname method ook? klopt ergens iets niet
-        // bevat setName(), sendMC(), getStartupInfoFromNS() en testBootstrapDiscovery()
+        startUp(); // bevat setName(), sendMC(), getStartupInfoFromNS() en testBootstrapDiscovery()
         listenMC();
-//      checkForShutdown();
+        // checkForShutdown();
     }
 
     // Op registerpoort 9876 wordt de Node_nodeRMI_Receive klasse verbonden op een locatie
-    // FIXME: Elke node op een andere poort registreren (Jonas: http://i.imgur.com/XNV1bD1.png)
     public void bindNodeRMIReceive()
     {
         try
@@ -59,10 +57,9 @@ public class Node
     }
 
     // Opstarten van de Node: Naam instellen, zijn eigen MultiCast sturen (anderen laten weten) en startup info ophalen
-    public void startUp(String name)
+    public void startUp()
     {
-        this.name = name;
-        setName(name);
+        setName();
         sendMC();
         try {
             Thread.sleep(1000); // Belangrijk: Andere Nodes moeten eerst de MC ontvangen
@@ -84,17 +81,16 @@ public class Node
         System.exit(0); //terminate JVM
     }
 
-    // Initialisatie: Een naam kan men kiezen voor de Node
-    public void setName(String name)
+    // Initialisatie: Een naam
+    public void setName()
     {
-        this.name = name;
-        //System.out.println("Choose a name for the node and press enter, fill in the correct ip-address and press enter.");
-        //Scanner s = new Scanner(System.in);
-        //name = s.nextLine();
+        System.out.println("Choose a name for the node and press enter.");
+        Scanner s = new Scanner(System.in);
+        name = s.nextLine();
         while(name.contains(" ") || NScommunication.checkIfNameExists(name))
         {
             System.out.println("Your name contains a white space or already exists, please choose another name.");
-            //name = s.nextLine();
+            name = s.nextLine();
         }
         ownHash = calcHash(name);
     }
@@ -234,7 +230,6 @@ public class Node
             }
         }
     }
-
 
     // Buren van de Nieuwe Node updaten
     public void updateNewNodeNeighbours(String ipAddr)
