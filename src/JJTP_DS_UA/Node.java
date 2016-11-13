@@ -85,7 +85,7 @@ public class Node
     // Initialisatie: Een naam kan men kiezen voor de Node
     public void setName()
     {
-        System.out.println("Choose a name for the node and press enter, fill in the correct ip-address and press enter.");
+        System.out.println("Choose a name for the node and press enter.");
         Scanner s = new Scanner(System.in);
         name = s.nextLine();
         while(name.contains(" ") || NScommunication.checkIfNameExists(name))

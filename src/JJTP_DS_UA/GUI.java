@@ -17,19 +17,15 @@ public class GUI
     private JTextField filenameTextField;
     private JButton searchButton;
 
-
-    public static void main(String[] args)
+    public GUI()
     {
         JFrame frame = new JFrame("System Y");
-        frame.setContentPane(new GUI().mainPanel);
+        $$$setupUI$$$(); // generated code bij IntelliJ GUI form (don't edit please!)
+        frame.setContentPane(mainPanel);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setLocation(700, 300);
         frame.pack();
         frame.setVisible(true);
-    }
-
-    public GUI()
-    {
 
         try
         {
@@ -38,7 +34,6 @@ public class GUI
         {
             e.printStackTrace();
         }
-        $$$setupUI$$$(); // generated code bij IntelliJ GUI form (don't edit please!)
     }
 
     /**
