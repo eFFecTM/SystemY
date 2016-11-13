@@ -279,18 +279,8 @@ public class Node
         System.out.println("highEdge: " + highEdge);
     }
 
-    // Berekenen van een hash van een naam (of filenaam)
-    public int calcHash(String name)
-    {
-        return Math.abs(name.hashCode()%32768);
-    }
-}
-
-
-
-
-
-    /*public void checkForShutdown()
+    /*
+    public void checkForShutdown()
     {
         new Thread(new Runnable() {
             @Override
@@ -304,5 +294,11 @@ public class Node
                 }
             }
         }).start();
-
-    }*/
+    }
+*/
+    // Berekenen van een hash van een naam (of filenaam)
+    public int calcHash(String name)
+    {
+        return Math.abs(name.hashCode()%32768);
+    }
+}

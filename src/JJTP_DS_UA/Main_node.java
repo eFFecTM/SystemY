@@ -54,6 +54,8 @@ public class Main_node
 
         boolean hasIP = false;
 
+        GUI gui = new GUI(); // Zet dit in commentaar als men de GUI tijdelijk niet nodig heeft
+
         for (NetworkInterface netint : Collections.list(NetworkInterface.getNetworkInterfaces()))
         {
             for (InetAddress inetAddress : Collections.list(netint.getInetAddresses()))
