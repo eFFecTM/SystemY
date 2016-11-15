@@ -23,6 +23,7 @@ public class Main_node
     public static void main(String[] args) throws UnknownHostException, SocketException
     {
         boolean hasIP = false;
+        Inet4Address IP = null;
 
         GUI gui = new GUI(); // Zet dit in commentaar als men de GUI tijdelijk niet nodig heeft
 
@@ -35,12 +36,16 @@ public class Main_node
                 {
                     hasIP = true;
                     System.out.println("IP Adres: "+ inetAddress);
-                    node = new Node((Inet4Address) inetAddress);
+                    IP = (Inet4Address) inetAddress;
                 }
             }
         }
 
-        if(!hasIP)
+        if(hasIP)
+        {
+            node = new Node(IP);
+        }
+        else
         {
             System.out.println("IP not found! Type your local IP manually:");
             Scanner s = new Scanner(System.in);
