@@ -90,6 +90,7 @@ public class NameServer
             File file = new File("NodeMap.xml");
             FileWriter fileWriter = new FileWriter(file);
             fileWriter.write(xml);
+            fileWriter.close();
         } catch (IOException e)
         {
             e.printStackTrace();
