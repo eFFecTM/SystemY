@@ -23,12 +23,28 @@ public class Main_node
 
     public static void main(String[] args) throws SocketException, UnknownHostException
     {
+        node = new Node();
         gui = new GUI(); // Zet dit in commentaar als men de GUI tijdelijk niet nodig heeft
         addActionListeners();
-        getIP();
-
+        setNodeName();
+        node.getIP();
+        node.listenMC();
     }
 
+    private static void setNodeName()
+    {
+        String name;
+        name = gui.setNodeName();
+        node.checkName(name);
+        while(node.wrongName)
+        {
+            name = gui.setNodeNameAgain();
+            node.checkName(name);
+        }
+        node.startUp(name);
+        gui.openPanel();
+    }
+/*
     public static void getIP() throws UnknownHostException, SocketException
     {
         boolean hasIP = false;
@@ -57,6 +73,7 @@ public class Main_node
             node = new Node((Inet4Address) Inet4Address.getByName(s.nextLine()));
         }
     }
+    */
     //getByName is een method van InetAddress, maar Inet4Address extends InetAddress
     //het geeft een inetAddress terug, dus casten naar Inet4Address
 

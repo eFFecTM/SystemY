@@ -21,7 +21,7 @@ public class GUI
 
     public GUI()
     {
-        name = JOptionPane.showInputDialog("Welcome to System Y! Please enter your name.");
+        /*name = JOptionPane.showInputDialog("Welcome to System Y! Please enter your name.");
         if (!name.equals(""))
         {
             JFrame frame = new JFrame("System Y");
@@ -40,11 +40,28 @@ public class GUI
         {
             e.printStackTrace();
         }
+        */
     }
 
-    public String getName()
+    public String setNodeName()
     {
-        return name;
+        return name = JOptionPane.showInputDialog("Welcome to System Y! Please enter your name.");
+    }
+
+    public String setNodeNameAgain()
+    {
+        return name = JOptionPane.showInputDialog("Your name contains a white space or already exists, please choose another name.");
+    }
+
+    public void openPanel()
+    {
+        JFrame frame = new JFrame("System Y");
+        $$$setupUI$$$(); // generated code bij IntelliJ GUI form (don't edit please!)
+        frame.setContentPane(mainPanel);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        frame.setLocation(700, 300);
+        frame.pack();
+        frame.setVisible(true);
     }
 
     void logOutButtonActionListener(ActionListener al)
@@ -262,4 +279,5 @@ public class GUI
     {
         return mainPanel;
     }
+
 }

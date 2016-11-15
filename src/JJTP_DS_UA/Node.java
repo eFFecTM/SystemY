@@ -12,6 +12,7 @@ import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.Collections;
 import java.util.Scanner;
 
 // Boven: Main_Node
@@ -24,17 +25,17 @@ public class Node
     Node_nodeRMI_Receive nodeRMIReceive;
     //Node_nodeRMI_Transmit nodeRMITransmit;
     int ownHash, prevHash, nextHash, newNodeHash; //newHash = van nieuwe node opgemerkt uit de multicast
-    boolean onlyNode, lowEdge, highEdge, shutdown = false;
+    boolean onlyNode, lowEdge, highEdge, shutdown = false, wrongName;
 
     // Node constructor
-    public Node(Inet4Address ip)
+    public Node() throws SocketException, UnknownHostException
     {
-        this.ip = ip;
+        getIP();
         NScommunication = new Node_NameServerRMI();
         bindNodeRMIReceive(); // RMI Node-Node
-        startUp(); // bevat setName(), sendMC(), getStartupInfoFromNS() en testBootstrapDiscovery()
-        listenMC();
-        testBootstrapDiscovery();
+        //startUp(); // bevat setName(), sendMC(), getStartupInfoFromNS() en testBootstrapDiscovery()
+        //listenMC();
+        //testBootstrapDiscovery();
     }
 
     // Op registerpoort 9876 wordt de Node_nodeRMI_Receive klasse verbonden op een locatie
@@ -56,19 +57,19 @@ public class Node
     }
 
     // Opstarten van de Node: Naam instellen, zijn eigen MultiCast sturen (anderen laten weten) en startup info ophalen
-    public void startUp()
+    public void startUp(String name)
     {
-        setName();
+        this.name = name;
+        ownHash = calcHash(name);
         sendMC();
         try {
-            Thread.sleep(1000); // Belangrijk: Andere Nodes moeten eerst de MC ontvangen
+            Thread.sleep(2000); // Belangrijk: Andere Nodes moeten eerst de MC ontvangen
         } catch (InterruptedException e)
         {
             e.printStackTrace();
         }
         getStartupInfoFromNS();
         testBootstrapDiscovery();
-        //System.out.println("Type 0 if you want to shutdown Node.");
     }
 
     public void shutDown()
@@ -81,17 +82,22 @@ public class Node
     }
 
     // Initialisatie: Een naam
-    public void setName()
+    public void checkName(String name)
     {
-        System.out.println("Choose a name for the node and press enter.");
-        Scanner s = new Scanner(System.in);
-        name = s.nextLine();
-        while(name.contains(" ") || NScommunication.checkIfNameExists(name))
+        String tempName = name;
+        //System.out.println("Choose a name for the node and press enter.");
+        //Scanner s = new Scanner(System.in);
+        //name = s.nextLine();
+        if (tempName.contains(" ") || NScommunication.checkIfNameExists(tempName))
         {
-            System.out.println("Your name contains a white space or already exists, please choose another name.");
-            name = s.nextLine();
+            wrongName = true;
+            //System.out.println("Your name contains a white space or already exists, please choose another name.");
+            //name = s.nextLine();
         }
-        ownHash = calcHash(name);
+        else
+        {
+            wrongName = false;
+        }
     }
 
     // Nakijken of de Node op de laagste en/of hoogste rand zit en is Node de eerste Node in de cirkel?
@@ -239,7 +245,7 @@ public class Node
     public void updateLeftNeighbour()
     {
         String ip = NScommunication.getIP(prevHash);
-        ip = ip.substring(1);
+        ip = ip.substring(1); // ipaddress = "/192.168.1.4" so delete first character
         Node_nodeRMI_Transmit nodeRMITransmit = new Node_nodeRMI_Transmit(ip,this);
         nodeRMITransmit.updateLeftNeighbour(nextHash); //maak connectie met de linkerbuur en geef rechterbuur door
     }
@@ -299,5 +305,35 @@ public class Node
     public int calcHash(String name)
     {
         return Math.abs(name.hashCode()%32768);
+    }
+
+    public void getIP() throws UnknownHostException, SocketException
+    {
+        boolean hasIP = false;
+        Inet4Address IP = null;
+        for (NetworkInterface netint : Collections.list(NetworkInterface.getNetworkInterfaces()))
+        {
+            for (InetAddress inetAddress : Collections.list(netint.getInetAddresses()))
+            {
+                System.out.println("Found IP's: " + inetAddress);
+                if (inetAddress.toString().contains("192.168.1."))
+                {
+                    hasIP = true;
+                    System.out.println("IP Adres: " + inetAddress);
+                    IP = (Inet4Address) inetAddress;
+                }
+            }
+        }
+        if (hasIP)
+        {
+            ip = IP;
+
+        } else
+        {
+            System.out.println("IP not found! Type your local IP manually:");
+            //Scanner s = new Scanner(System.in);
+            //String ipString = s.nextLine();
+            //ip = (Inet4Address) ipString;
+        }
     }
 }
