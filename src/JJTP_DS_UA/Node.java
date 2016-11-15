@@ -12,7 +12,6 @@ import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.Objects;
 import java.util.Scanner;
 
 // Boven: Main_Node
@@ -273,7 +272,7 @@ public class Node
                 {
                     try
                     {
-                        Thread.sleep(3000);
+                        Thread.sleep(10000);
                     } catch (InterruptedException e)
                     {
                         e.printStackTrace();
