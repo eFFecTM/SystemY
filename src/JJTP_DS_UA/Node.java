@@ -239,7 +239,8 @@ public class Node
 
     public void updateLeftNeighbour()
     {
-        Node_nodeRMI_Transmit nodeRMITransmit = new Node_nodeRMI_Transmit(NScommunication.getIP(prevHash),this);
+        String ip = NScommunication.getIP(prevHash);
+        Node_nodeRMI_Transmit nodeRMITransmit = new Node_nodeRMI_Transmit(ip,this);
         nodeRMITransmit.updateLeftNeighbour(nextHash); //maak connectie met de linkerbuur en geef rechterbuur door
     }
 
