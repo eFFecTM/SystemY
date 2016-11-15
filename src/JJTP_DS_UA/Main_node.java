@@ -4,6 +4,8 @@
  */
 package JJTP_DS_UA;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.net.*;
 import java.lang.String;
 import java.util.Collections;
@@ -47,5 +49,17 @@ public class Main_node
 
         //getByName is een method van InetAddress, maar Inet4Address extends InetAddress
         //het geeft een inetAddress terug, dus casten naar Inet4Address
+
+        // logOutButton shutdowns the node
+        gui.logOutButtonActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                node.shutDown();
+            }
+        });
     }
+
+
 }

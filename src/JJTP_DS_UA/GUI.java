@@ -2,6 +2,7 @@ package JJTP_DS_UA;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
 
 /**
  * Created by JJTP on 11/11/2016.
@@ -34,6 +35,11 @@ public class GUI
         {
             e.printStackTrace();
         }
+    }
+
+    void logOutButtonActionListener(ActionListener al)
+    {
+        logOutButton.addActionListener(al);
     }
 
     /**
