@@ -34,6 +34,7 @@ public class NameServer
         nodeMap = new TreeMap<>(); //Treemap met <(hash)nodeNaam,ip>
         bindRMIclass();
         listenMC();
+                testPrintTreemap(); //Test
     }
 
     // Op registerpoort 1099 wordt de serverRMI klasse verbonden op een locatie
@@ -125,7 +126,6 @@ public class NameServer
                         String[] info = msg.split(" "); // het ontvangen bericht splitsen in woorden gescheiden door een spatie
                         addNode(info[0],(Inet4Address) Inet4Address.getByName(info[1]));
                         saveNodeMapXML();
-                        testPrintTreemap();
                     }
                 } catch(IOException e)
                 {
@@ -139,10 +139,27 @@ public class NameServer
     // TEST: Afprinten van de treemap na het ontvangen van een packet
     public void testPrintTreemap()
     {
-        Set<Integer> keyset = nodeMap.keySet();
-        for(int k : keyset)
+        new Thread(new Runnable() // Draait in een aparte thread
         {
-            System.out.println("ID: " + k + " - ip: " + nodeMap.get(k));
-        }
+            public void run()
+            {
+                while(true)
+                {
+                    try
+                    {
+                        Thread.sleep(3000);
+                    } catch (InterruptedException e)
+                    {
+                        e.printStackTrace();
+                    }
+                    Set<Integer> keyset = nodeMap.keySet();
+                    for (int k : keyset)
+                    {
+                        System.out.println("ID: " + k + " - ip: " + nodeMap.get(k));
+                    }
+                }
+
+            }
+        }).start();
     }
 }

@@ -35,7 +35,7 @@ public class Node
         bindNodeRMIReceive(); // RMI Node-Node
         startUp(); // bevat setName(), sendMC(), getStartupInfoFromNS() en testBootstrapDiscovery()
         listenMC();
-        // checkForShutdown();
+        testBootstrapDiscovery();
     }
 
     // Op registerpoort 9876 wordt de Node_nodeRMI_Receive klasse verbonden op een locatie
@@ -164,7 +164,6 @@ public class Node
                         newNodeHash = calcHash(info[0]);
                         newNodeIP = info[1];
                         recalcPosition();
-                        testBootstrapDiscovery();
                         System.out.println("Naam: " + info[0]);
                         System.out.println("IP: " + info[1]);
                     }
@@ -266,33 +265,33 @@ public class Node
     // TEST: gegevens weergeven van de Node
     public void testBootstrapDiscovery()
     {
-        System.out.println("PrevHash: " + prevHash);
-        System.out.println("NextHash: " + nextHash);
-        System.out.println("ownHash: " + ownHash);
-        System.out.println("FirstNode: " + onlyNode);
-        System.out.println("lowEdge: " + lowEdge);
-        System.out.println("highEdge: " + highEdge);
-    }
-
-    /*
-    public void checkForShutdown()
-    {
         new Thread(new Runnable() {
-            @Override
+
             public void run()
             {
                 while(true)
                 {
-                    Scanner s = new Scanner(System.in);
-                    if (Objects.equals(s.nextLine(), "0"))
+                    try
                     {
-                        shutdown = true;
+                        Thread.sleep(3000);
+                    } catch (InterruptedException e)
+                    {
+                        e.printStackTrace();
                     }
+                    System.out.println("PrevHash: " + prevHash);
+                    System.out.println("NextHash: " + nextHash);
+                    System.out.println("ownHash: " + ownHash);
+                    System.out.println("FirstNode: " + onlyNode);
+                    System.out.println("lowEdge: " + lowEdge);
+                    System.out.println("highEdge: " + highEdge);
                 }
+
             }
+
         }).start();
+
     }
-*/
+
     // Berekenen van een hash van een naam (of filenaam)
     public int calcHash(String name)
     {
