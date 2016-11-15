@@ -239,13 +239,16 @@ public class Node
     public void updateLeftNeighbour()
     {
         String ip = NScommunication.getIP(prevHash);
+        ip = ip.substring(1);
         Node_nodeRMI_Transmit nodeRMITransmit = new Node_nodeRMI_Transmit(ip,this);
         nodeRMITransmit.updateLeftNeighbour(nextHash); //maak connectie met de linkerbuur en geef rechterbuur door
     }
 
     public void updateRightNeighbour()
     {
-        Node_nodeRMI_Transmit nodeRMITransmit = new Node_nodeRMI_Transmit(NScommunication.getIP(nextHash),this);
+        String ip = NScommunication.getIP(nextHash);
+        ip = ip.substring(1);
+        Node_nodeRMI_Transmit nodeRMITransmit = new Node_nodeRMI_Transmit(ip,this);
         nodeRMITransmit.updateRightNeighbour(prevHash);
     }
 
