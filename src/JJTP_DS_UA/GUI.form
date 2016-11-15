@@ -21,6 +21,7 @@
         </constraints>
         <properties>
           <alignmentX value="0.5"/>
+          <font name="Microsoft Tai Le" size="20"/>
           <minimumSize width="230" height="233"/>
           <preferredSize width="430" height="383"/>
           <requestFocusEnabled value="false"/>
@@ -258,6 +259,7 @@
           <gridbag weightx="0.0" weighty="0.0"/>
         </constraints>
         <properties>
+          <font size="18"/>
           <margin top="3" left="18" bottom="3" right="18"/>
           <minimumSize width="50" height="41"/>
           <text value="Log out"/>

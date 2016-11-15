@@ -19,43 +19,50 @@ import java.util.Scanner;
 public class Main_node
 {
     static Node node;
+    static GUI gui;
 
-    public static void main(String[] args) throws UnknownHostException, SocketException
+    public static void main(String[] args) throws SocketException, UnknownHostException
+    {
+        gui = new GUI(); // Zet dit in commentaar als men de GUI tijdelijk niet nodig heeft
+        addActionListeners();
+        getIP();
+
+    }
+
+    public static void getIP() throws UnknownHostException, SocketException
     {
         boolean hasIP = false;
         Inet4Address IP = null;
-
-        GUI gui = new GUI(); // Zet dit in commentaar als men de GUI tijdelijk niet nodig heeft
-
         for (NetworkInterface netint : Collections.list(NetworkInterface.getNetworkInterfaces()))
         {
             for (InetAddress inetAddress : Collections.list(netint.getInetAddresses()))
             {
                 System.out.println("Found IP's: " + inetAddress);
-                if(inetAddress.toString().contains("192.168.1."))
+                if (inetAddress.toString().contains("192.168.1."))
                 {
                     hasIP = true;
-                    System.out.println("IP Adres: "+ inetAddress);
+                    System.out.println("IP Adres: " + inetAddress);
                     IP = (Inet4Address) inetAddress;
                 }
             }
         }
-
-        if(hasIP)
+        if (hasIP)
         {
             node = new Node(IP);
-        }
-        else
+
+        } else
         {
             System.out.println("IP not found! Type your local IP manually:");
             Scanner s = new Scanner(System.in);
-            node = new Node ((Inet4Address) Inet4Address.getByName(s.nextLine()));
+            node = new Node((Inet4Address) Inet4Address.getByName(s.nextLine()));
         }
+    }
+    //getByName is een method van InetAddress, maar Inet4Address extends InetAddress
+    //het geeft een inetAddress terug, dus casten naar Inet4Address
 
-        //getByName is een method van InetAddress, maar Inet4Address extends InetAddress
-        //het geeft een inetAddress terug, dus casten naar Inet4Address
 
-        // logOutButton shutdowns the node
+    public static void addActionListeners()
+    {
         gui.logOutButtonActionListener(new ActionListener()
         {
             @Override
@@ -64,6 +71,8 @@ public class Main_node
                 node.shutDown();
             }
         });
+
+
     }
 
 

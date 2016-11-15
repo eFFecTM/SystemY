@@ -17,16 +17,21 @@ public class GUI
     private JLabel serachLabel;
     private JTextField filenameTextField;
     private JButton searchButton;
+    String name;
 
     public GUI()
     {
-        JFrame frame = new JFrame("System Y");
-        $$$setupUI$$$(); // generated code bij IntelliJ GUI form (don't edit please!)
-        frame.setContentPane(mainPanel);
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.setLocation(700, 300);
-        frame.pack();
-        frame.setVisible(true);
+        name = JOptionPane.showInputDialog("Welcome to System Y! Please enter your name.");
+        if (!name.equals(""))
+        {
+            JFrame frame = new JFrame("System Y");
+            $$$setupUI$$$(); // generated code bij IntelliJ GUI form (don't edit please!)
+            frame.setContentPane(mainPanel);
+            frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+            frame.setLocation(700, 300);
+            frame.pack();
+            frame.setVisible(true);
+        }
 
         try
         {
@@ -35,6 +40,11 @@ public class GUI
         {
             e.printStackTrace();
         }
+    }
+
+    public String getName()
+    {
+        return name;
     }
 
     void logOutButtonActionListener(ActionListener al)
@@ -59,6 +69,7 @@ public class GUI
         mainPanel.setPreferredSize(new Dimension(450, 450));
         tabbedPane = new JTabbedPane();
         tabbedPane.setAlignmentX(0.5f);
+        tabbedPane.setFont(new Font("Microsoft Tai Le", tabbedPane.getFont().getStyle(), 20));
         tabbedPane.setMinimumSize(new Dimension(230, 233));
         tabbedPane.setPreferredSize(new Dimension(430, 383));
         tabbedPane.setRequestFocusEnabled(false);
@@ -233,6 +244,7 @@ public class GUI
         gbc.fill = GridBagConstraints.HORIZONTAL;
         searchTab.add(searchButton, gbc);
         logOutButton = new JButton();
+        logOutButton.setFont(new Font(logOutButton.getFont().getName(), logOutButton.getFont().getStyle(), 18));
         logOutButton.setMargin(new Insets(3, 18, 3, 18));
         logOutButton.setMinimumSize(new Dimension(50, 41));
         logOutButton.setText("Log out");
