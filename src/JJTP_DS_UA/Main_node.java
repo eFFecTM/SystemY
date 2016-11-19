@@ -25,10 +25,20 @@ public class Main_node
     {
         node = new Node();
         gui = new GUI(); // Zet dit in commentaar als men de GUI tijdelijk niet nodig heeft
-        addActionListeners();
         setNodeName();
         node.getIP();
         node.listenMC();
+
+        gui.logOutButtonActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                System.out.println("kom ik hier?");
+                node.shutDown();
+
+            }
+        });
     }
 
     private static void setNodeName()
@@ -76,21 +86,4 @@ public class Main_node
     */
     //getByName is een method van InetAddress, maar Inet4Address extends InetAddress
     //het geeft een inetAddress terug, dus casten naar Inet4Address
-
-
-    public static void addActionListeners()
-    {
-        gui.logOutButtonActionListener(new ActionListener()
-        {
-            @Override
-            public void actionPerformed(ActionEvent e)
-            {
-                node.shutDown();
-            }
-        });
-
-
-    }
-
-
 }
