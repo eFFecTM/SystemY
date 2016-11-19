@@ -1,12 +1,12 @@
+/**
+ * Created by jonas on 5-11-2016.
+ */
 package JJTP_DS_UA;
 
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
 
-/**
- * Created by jonas on 5-11-2016.
- */
 public class Node_nodeRMI_Transmit
 {
     Node node;

@@ -6,14 +6,16 @@
  */
 package JJTP_DS_UA;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.*;
 import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Scanner;
+import java.util.HashMap;
 
 // Boven: Main_Node
 // Onder: Node_NameServerRMI, Node_nodeRMI_Receive, Node_nodeRMI_Transmit
@@ -26,6 +28,7 @@ public class Node
     //Node_nodeRMI_Transmit nodeRMITransmit;
     int ownHash, prevHash, nextHash, newNodeHash; //newHash = van nieuwe node opgemerkt uit de multicast
     boolean onlyNode, lowEdge, highEdge, shutdown = false, wrongName;
+    HashMap<String,FileMarker> fileMarkers;
 
     // Node constructor
     public Node() throws SocketException, UnknownHostException
@@ -74,10 +77,16 @@ public class Node
 
     public void shutDown()
     {
-        shutdown = true;
-        updateLeftNeighbour(); //geef zijn linkerbuur aan de rechterbuur
-        updateRightNeighbour(); //geeft zijn rechterbuur aan de linkerbuur
-        NScommunication.deleteNode(ownHash); //delete eigen node uit de map van de server
+        shutdown = true; //overbodig
+
+        if(prevHash == ownHash && nextHash==ownHash)
+            NScommunication.deleteNode(ownHash); //delete eigen node uit de map van de server
+        else
+        {
+            updateLeftNeighbour(); //geef zijn linkerbuur aan de rechterbuur
+            updateRightNeighbour(); //geeft zijn rechterbuur aan de linkerbuur
+            NScommunication.deleteNode(ownHash); //delete eigen node uit de map van de server
+        }
         System.exit(0); //terminate JVM
     }
 
@@ -271,36 +280,6 @@ public class Node
         NScommunication.deleteNode(NScommunication.getID(IP));
     }
 
-    // TEST: gegevens weergeven van de Node
-    public void testBootstrapDiscovery()
-    {
-        new Thread(new Runnable() {
-
-            public void run()
-            {
-                while(true)
-                {
-                    try
-                    {
-                        Thread.sleep(10000);
-                    } catch (InterruptedException e)
-                    {
-                        e.printStackTrace();
-                    }
-                    System.out.println("PrevHash: " + prevHash);
-                    System.out.println("NextHash: " + nextHash);
-                    System.out.println("ownHash: " + ownHash);
-                    System.out.println("FirstNode: " + onlyNode);
-                    System.out.println("lowEdge: " + lowEdge);
-                    System.out.println("highEdge: " + highEdge);
-                }
-
-            }
-
-        }).start();
-
-    }
-
     // Berekenen van een hash van een naam (of filenaam)
     public int calcHash(String name)
     {
@@ -335,5 +314,52 @@ public class Node
             //String ipString = s.nextLine();
             //ip = (Inet4Address) ipString;
         }
+    }
+
+    public void loadFiles()
+    {
+        File fileMap = new File("\\Files"); // gaat naar de "Files" directory in de locale projectmap
+        File[] fileList = fileMap.listFiles(); //maakt een array van alle files in de directory  !! enkel files geen directories zelf
+        for(int i=0; i<fileList.length ;i++)
+        {
+            String fileName = fileList[i].getName();
+            int fileNameHash = calcHash(fileList[i].getName());
+            fileMarkers.put(fileName, new FileMarker(fileName,fileNameHash,ownHash)); //maak bestandfiche aan en zet in de hashmap
+        }
+    }
+
+    public void replicateFile()
+    {
+        //@TODO hier begin ik woensdag
+    }
+
+    // TEST: gegevens weergeven van de Node
+    public void testBootstrapDiscovery()
+    {
+        new Thread(new Runnable() {
+
+            public void run()
+            {
+                while(true)
+                {
+                    try
+                    {
+                        Thread.sleep(10000);
+                    } catch (InterruptedException e)
+                    {
+                        e.printStackTrace();
+                    }
+                    System.out.println("PrevHash: " + prevHash);
+                    System.out.println("NextHash: " + nextHash);
+                    System.out.println("ownHash: " + ownHash);
+                    System.out.println("FirstNode: " + onlyNode);
+                    System.out.println("lowEdge: " + lowEdge);
+                    System.out.println("highEdge: " + highEdge);
+                }
+
+            }
+
+        }).start();
+
     }
 }

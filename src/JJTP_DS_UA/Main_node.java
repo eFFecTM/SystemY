@@ -11,9 +11,6 @@ import java.lang.String;
 import java.util.Collections;
 import java.util.Scanner;
 
-/**
- * Created by JJTP on 31/10/2016.
- */
 
 // Onder: Node
 public class Main_node
@@ -34,7 +31,6 @@ public class Main_node
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                System.out.println("kom ik hier?");
                 node.shutDown();
 
             }
