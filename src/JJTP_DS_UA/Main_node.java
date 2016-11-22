@@ -25,6 +25,7 @@ public class Main_node
         setNodeName();
         node.getIP();
         node.listenMC();
+        //node.updateFiles();
 
         gui.logOutButtonActionListener(new ActionListener()
         {
@@ -32,9 +33,19 @@ public class Main_node
             public void actionPerformed(ActionEvent e)
             {
                 node.shutDown();
+
             }
         });
 
+        try
+        {
+            Thread.sleep(5000);
+        } catch (InterruptedException e)
+        {
+            e.printStackTrace();
+        }
+
+        node.testFailure("192.168.1.2");
 
     }
 
@@ -45,10 +56,11 @@ public class Main_node
         node.checkName(name);
         while(node.wrongName)
         {
-            name = gui.setNodeNameAgain();
-            node.checkName(name);
+                name = gui.setNodeNameAgain();
+                node.checkName(name);
         }
-        node.startUp(name);
+
+        node.startUp(name); // bevat sendMC(), getStartupInfoFromNS() en testBootstrapDiscovery()
         gui.openPanel();
     }
 }

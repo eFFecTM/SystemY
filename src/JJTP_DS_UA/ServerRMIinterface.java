@@ -19,4 +19,7 @@ public interface ServerRMIinterface extends Remote
     public int[] getIDs(String ipAddr) throws RemoteException;
     public int getID(String ipAddr) throws RemoteException;
     public void deleteNode(int hash) throws RemoteException;
+    public int getNodeFromFilename(int fileHash) throws RemoteException;
+    public int getMapsize()throws RemoteException;
+    public String getLastNodeIP()throws RemoteException;
 }

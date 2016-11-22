@@ -12,4 +12,5 @@ public interface Node_nodeRMI_ReceiveInterface extends Remote
     public void setNeighbours(int prevHash, int nextHash) throws RemoteException;
     public void updateRightNeighbour(int hash) throws RemoteException;
     public void updateLeftNeighbour(int hash) throws RemoteException;
+    public void updateOnlyNode() throws RemoteException;
 }

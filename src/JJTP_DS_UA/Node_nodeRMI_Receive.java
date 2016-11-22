@@ -37,4 +37,10 @@ public class Node_nodeRMI_Receive extends UnicastRemoteObject implements Node_no
     {
         myNode.nextHash=hash; //rechterbuur van de node wordt geupdate door de huidige rechterbuur die weggaat
     }
+
+    @Override
+    public void updateOnlyNode()
+    {
+        myNode.onlyNode = true;
+    }
 }

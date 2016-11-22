@@ -61,4 +61,15 @@ public class Node_nodeRMI_Transmit
             e.printStackTrace();
         }
     }
+
+    public void updateOnlyNode()
+    {
+        try
+        {
+            nodeRMIReceive.updateOnlyNode();
+        } catch (RemoteException e)
+        {
+            e.printStackTrace();
+        }
+    }
 }

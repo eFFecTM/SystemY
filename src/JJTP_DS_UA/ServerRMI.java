@@ -5,6 +5,7 @@
 package JJTP_DS_UA;
 
 import java.net.Inet4Address;
+import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Map;
@@ -105,9 +106,16 @@ public class ServerRMI extends UnicastRemoteObject implements ServerRMIinterface
     }
 
     @Override
-    public int getID(String ipAddr) throws RemoteException
+    public int getID(String ipAddr) throws RemoteException //@fixme /'en in de adresse nakijken (volgens jan ok)
     {
         int ID = -1;
+        try
+        {
+            Inet4Address ip = (Inet4Address) Inet4Address.getByName(ipAddr);
+        } catch (UnknownHostException e)
+        {
+            e.printStackTrace();
+        }
         for(Map.Entry<Integer, Inet4Address> entry : ns.nodeMap.entrySet())
         {
             if(entry.getValue().equals(ipAddr))
@@ -124,5 +132,33 @@ public class ServerRMI extends UnicastRemoteObject implements ServerRMIinterface
             ns.nodeMap.remove(hash);
         else
             System.err.println("No such Node.");
+    }
+
+    public int getNodeFromFilename(int fileHash)
+    {
+        if (ns.nodeMap.containsKey(fileHash))
+        {
+            return fileHash;
+        }
+        else if (ns.nodeMap.lowerKey(fileHash) == null)
+        {
+            return ns.nodeMap.lastKey();
+        }
+        else
+        {
+            return ns.nodeMap.lowerKey(fileHash);
+        }
+    }
+
+    @Override
+    public int getMapsize() throws RemoteException
+    {
+        return ns.nodeMap.size();
+    }
+
+    @Override
+    public String getLastNodeIP() throws RemoteException
+    {
+        return ns.nodeMap.get(ns.nodeMap.firstKey()).toString().substring(1); //verwijdert de / van het ip adres.
     }
 }
