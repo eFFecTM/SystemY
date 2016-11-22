@@ -125,4 +125,16 @@ public class ServerRMI extends UnicastRemoteObject implements ServerRMIinterface
         else
             System.err.println("No such Node.");
     }
+
+    @Override
+    public int getMapsize() throws RemoteException
+    {
+        return ns.nodeMap.size();
+    }
+
+    @Override
+    public String getLastNodeIP() throws RemoteException
+    {
+        return ns.nodeMap.get(ns.nodeMap.firstKey()).toString().substring(1); //verwijdert de / van het ip adres.
+    }
 }

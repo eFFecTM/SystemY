@@ -83,9 +83,16 @@ public class Node
             NScommunication.deleteNode(ownHash); //delete eigen node uit de map van de server
         else
         {
+            NScommunication.deleteNode(ownHash); //delete eigen node uit de map van de server
+            if(NScommunication.getMapsize() == 1) //er schiet nog maar 1 node over
+            {
+                String lastNodeIP = NScommunication.getLastNodeIP(); //zet de "onlynode" boolean op true van die laatst overgebleven node
+                Node_nodeRMI_Transmit nRMIt = new Node_nodeRMI_Transmit(lastNodeIP, this);
+                nRMIt.updateOnlyNode();
+            }
             updateLeftNeighbour(); //geef zijn linkerbuur aan de rechterbuur
             updateRightNeighbour(); //geeft zijn rechterbuur aan de linkerbuur
-            NScommunication.deleteNode(ownHash); //delete eigen node uit de map van de server
+
         }
         System.exit(0); //terminate JVM
     }
@@ -270,13 +277,32 @@ public class Node
     public void failureOtherNode(String IP) //ip adrr van falende node
     {
         int[] neighbours = NScommunication.getIDs(IP); //in [0] zit de linkse buur, in [1] zit de rechtse buur
+        if(neighbours[0] == neighbours[1])//in dit geval is deze node de laatste node
+        {
+            onlyNode = true;
+            prevHash = ownHash;
+            nextHash = ownHash;
+        }
+        else if(neighbours[0] == ownHash) //deze node is de linkse buur van de gefaalde node
+        {
+            Node_nodeRMI_Transmit nodeRMITransmitR = new Node_nodeRMI_Transmit(NScommunication.getIP(neighbours[1]),this);
+            nodeRMITransmitR.updateLeftNeighbour(neighbours[0]); //verbindt met de RECHTSEbuur van de GEFAALDE node en update ZIJN LINKSE buur met de linkse van de gefaalde
+            nextHash = neighbours[1]; //update jezelf
 
-        Node_nodeRMI_Transmit nodeRMITransmitL = new Node_nodeRMI_Transmit(NScommunication.getIP(neighbours[0]),this);
-        nodeRMITransmitL.updateRightNeighbour(neighbours[1]); //update buur
-
-        Node_nodeRMI_Transmit nodeRMITransmitR = new Node_nodeRMI_Transmit(NScommunication.getIP(neighbours[1]),this);
-        nodeRMITransmitR.updateLeftNeighbour(neighbours[0]); //update buur
-
+        }
+        else if(neighbours[1] == ownHash) //deze node is de rechtse buur van de gefaalde node
+        {
+            Node_nodeRMI_Transmit nodeRMITransmitL = new Node_nodeRMI_Transmit(NScommunication.getIP(neighbours[0]),this);
+            nodeRMITransmitL.updateRightNeighbour(neighbours[1]); //verbindt met de LINKSE node van de GEFAALDE node, en update ZIJN RECHTSE buur met de RECHTSE van de gefaalde node
+            prevHash = neighbours[0];
+        }
+        else
+        {
+            Node_nodeRMI_Transmit nodeRMITransmitL = new Node_nodeRMI_Transmit(NScommunication.getIP(neighbours[0]),this);
+            nodeRMITransmitL.updateRightNeighbour(neighbours[1]); //verbindt met de LINKSE node van de GEFAALDE node, en update ZIJN RECHTSE buur met de RECHTSE van de gefaalde node
+            Node_nodeRMI_Transmit nodeRMITransmitR = new Node_nodeRMI_Transmit(NScommunication.getIP(neighbours[1]),this);
+            nodeRMITransmitR.updateLeftNeighbour(neighbours[0]); //verbindt met de RECHTSEbuur van de GEFAALDE node en update ZIJN LINKSE buur met de linkse van de gefaalde
+        }
         NScommunication.deleteNode(NScommunication.getID(IP));
     }
 

@@ -138,4 +138,28 @@ public class Node_NameServerRMI
             e.printStackTrace();
         }
     }
+
+    public int getMapsize()
+    {
+        try
+        {
+            return NSI.getMapsize();
+        } catch (RemoteException e)
+        {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    public String getLastNodeIP()
+    {
+        try
+        {
+            return NSI.getLastNodeIP();
+        } catch (RemoteException e)
+        {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }
