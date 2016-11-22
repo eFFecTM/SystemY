@@ -134,6 +134,22 @@ public class ServerRMI extends UnicastRemoteObject implements ServerRMIinterface
             System.err.println("No such Node.");
     }
 
+    public int getNodeFromFilename(int fileHash)
+    {
+        if (ns.nodeMap.containsKey(fileHash))
+        {
+            return fileHash;
+        }
+        else if (ns.nodeMap.lowerKey(fileHash) == null)
+        {
+            return ns.nodeMap.lastKey();
+        }
+        else
+        {
+            return ns.nodeMap.lowerKey(fileHash);
+        }
+    }
+
     @Override
     public int getMapsize() throws RemoteException
     {

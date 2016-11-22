@@ -110,9 +110,11 @@ public class Node_NameServerRMI
 
     public int[] getIDs(String ipAddr)
     {
-        try {
+        try
+        {
             return NSI.getIDs(ipAddr);
-        } catch (RemoteException e) {
+        } catch (RemoteException e)
+        {
             e.printStackTrace();
             return null;
         }
@@ -120,9 +122,11 @@ public class Node_NameServerRMI
 
     public int getID(String ipAddr)
     {
-        try {
+        try
+        {
             return NSI.getID(ipAddr);
-        } catch (RemoteException e) {
+        } catch (RemoteException e)
+        {
             e.printStackTrace();
             return -1;
         }
@@ -162,4 +166,17 @@ public class Node_NameServerRMI
             return null;
         }
     }
+
+    public int getNodeFromFilename(int fileHash)
+    {
+        try
+        {
+            return NSI.getNodeFromFilename(fileHash);
+        } catch (RemoteException e)
+        {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
 }

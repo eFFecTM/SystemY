@@ -7,7 +7,7 @@ public class FileMarker
 {
     String fileName;
     int fileNameHash;
-    int ownerID; //degene die nu eigenaar is (naar waar het voor het laatst gerepliceerd is)
+    public int ownerID; //degene die nu eigenaar is (naar waar het voor het laatst gerepliceerd is)
     int creator; //degene die het bestand origineel in het netwerk bracht
     //bevat ook op welke noden het bestand te vinden is (onderscheid lokaal en gedownload)
 
@@ -16,5 +16,10 @@ public class FileMarker
         this.fileName = fileName;
         this.fileNameHash = fileNameHash;
         this.creator = creator;
+    }
+
+    public void setOwnerID(int ownerID)
+    {
+        this.ownerID = ownerID;
     }
 }

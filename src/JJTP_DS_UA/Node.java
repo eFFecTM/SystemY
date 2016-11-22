@@ -28,7 +28,9 @@ public class Node
     //Node_nodeRMI_Transmit nodeRMITransmit;
     int ownHash, prevHash, nextHash, newNodeHash; //newHash = van nieuwe node opgemerkt uit de multicast
     boolean onlyNode, lowEdge, highEdge, shutdown = false, wrongName;
-    HashMap<String,FileMarker> fileMarkers;
+    HashMap<String,FileMarker> fileMarkerMap;
+    File fileDir;
+    File[] fileList;
 
     // Node constructor
     public Node() throws SocketException, UnknownHostException
@@ -36,9 +38,6 @@ public class Node
         getIP();
         NScommunication = new Node_NameServerRMI();
         bindNodeRMIReceive(); // RMI Node-Node
-        //startUp(); // bevat setName(), sendMC(), getStartupInfoFromNS() en testBootstrapDiscovery()
-        //listenMC();
-        //testBootstrapDiscovery();
     }
 
     // Op registerpoort 9876 wordt de Node_nodeRMI_Receive klasse verbonden op een locatie
@@ -73,6 +72,7 @@ public class Node
         }
         getStartupInfoFromNS();
         testBootstrapDiscovery();
+        //loadFiles();
     }
 
     public void shutDown()
@@ -342,15 +342,82 @@ public class Node
         }
     }
 
-    public void loadFiles()
+    public void loadFiles() // TODO: 22/11/2016 testen!
     {
-        File fileMap = new File("\\Files"); // gaat naar de "Files" directory in de locale projectmap
-        File[] fileList = fileMap.listFiles(); //maakt een array van alle files in de directory  !! enkel files geen directories zelf
+        fileDir = new File("\\Files"); // gaat naar de "Files" directory in de locale projectmap
+        fileList = fileDir.listFiles(); //maakt een array van alle files in de directory  !! enkel files geen directories zelf
         for(int i=0; i<fileList.length ;i++)
         {
+            /*
             String fileName = fileList[i].getName();
             int fileNameHash = calcHash(fileList[i].getName());
-            fileMarkers.put(fileName, new FileMarker(fileName,fileNameHash,ownHash)); //maak bestandfiche aan en zet in de hashmap
+            FileMarker fileMarker = new FileMarker(fileName,fileNameHash,ownHash);
+            fileMarkerMap.put(fileName,fileMarker); //maak bestandfiche aan en zet in de hashmap
+            int fileOwnerHash = NScommunication.getNodeFromFilename(fileNameHash);
+            if(fileOwnerHash == ownHash)
+            {
+                fileMarker.setOwnerID(prevHash);
+                //prevHash;
+            }
+            else
+            {
+                fileMarker.setOwnerID(fileOwnerHash);
+                //doorsturen;
+            }
+            */
+            addFile(i,fileList);
+        }
+    }
+
+    public void updateFiles() // TODO: 22/11/2016 testen!
+    {
+        new Thread(new Runnable()
+        {
+            public void run()
+            {
+                int j=0, amount = 0;
+                try
+                {
+                    Thread.sleep(30000); // Update na elke 30 seconden
+                } catch (InterruptedException e)
+                {
+                    e.printStackTrace();
+                }
+                File[] newfileList = fileDir.listFiles();
+
+                for(int i=0; i<newfileList.length; i++)
+                {
+                    if(newfileList[i]!=fileList[j])
+                    {
+                        addFile(i, newfileList);
+                        amount++;
+                        j--;
+                    }
+                    j++;
+                }
+                System.out.println("amount: "+amount);
+            }
+        }).start();
+    }
+
+    public void addFile(int fileIndex, File[] fileList) // TODO: 22/11/2016 testen!
+    {
+        int index = fileIndex;
+        this.fileList = fileList;
+        String fileName = fileList[index].getName();
+        int fileNameHash = calcHash(fileList[index].getName());
+        FileMarker fileMarker = new FileMarker(fileName,fileNameHash,ownHash);
+        fileMarkerMap.put(fileName,fileMarker); //maak bestandfiche aan en zet in de hashmap
+        int fileOwnerHash = NScommunication.getNodeFromFilename(fileNameHash);
+        if(fileOwnerHash == ownHash)
+        {
+            fileMarker.setOwnerID(prevHash);
+            //prevHash;
+        }
+        else
+        {
+            fileMarker.setOwnerID(fileOwnerHash);
+            //doorsturen;
         }
     }
 

@@ -25,6 +25,7 @@ public class Main_node
         setNodeName();
         node.getIP();
         node.listenMC();
+        //node.updateFiles();
 
         gui.logOutButtonActionListener(new ActionListener()
         {
@@ -55,42 +56,11 @@ public class Main_node
         node.checkName(name);
         while(node.wrongName)
         {
-            name = gui.setNodeNameAgain();
-            node.checkName(name);
+                name = gui.setNodeNameAgain();
+                node.checkName(name);
         }
-        node.startUp(name);
+
+        node.startUp(name); // bevat sendMC(), getStartupInfoFromNS() en testBootstrapDiscovery()
         gui.openPanel();
     }
-/*
-    public static void getIP() throws UnknownHostException, SocketException
-    {
-        boolean hasIP = false;
-        Inet4Address IP = null;
-        for (NetworkInterface netint : Collections.list(NetworkInterface.getNetworkInterfaces()))
-        {
-            for (InetAddress inetAddress : Collections.list(netint.getInetAddresses()))
-            {
-                System.out.println("Found IP's: " + inetAddress);
-                if (inetAddress.toString().contains("192.168.1."))
-                {
-                    hasIP = true;
-                    System.out.println("IP Adres: " + inetAddress);
-                    IP = (Inet4Address) inetAddress;
-                }
-            }
-        }
-        if (hasIP)
-        {
-            node = new Node(IP);
-
-        } else
-        {
-            System.out.println("IP not found! Type your local IP manually:");
-            Scanner s = new Scanner(System.in);
-            node = new Node((Inet4Address) Inet4Address.getByName(s.nextLine()));
-        }
-    }
-    */
-    //getByName is een method van InetAddress, maar Inet4Address extends InetAddress
-    //het geeft een inetAddress terug, dus casten naar Inet4Address
 }
