@@ -26,6 +26,7 @@ public class Main_node
         node.getIP();
         node.listenMC();
         //node.updateFiles();
+        //node.receiveFiles();
 
         gui.logOutButtonActionListener(new ActionListener()
         {
