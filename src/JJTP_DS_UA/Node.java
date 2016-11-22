@@ -6,8 +6,8 @@
  */
 package JJTP_DS_UA;
 
-import java.io.File;
-import java.io.IOException;
+import javax.xml.crypto.Data;
+import java.io.*;
 import java.net.*;
 import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
@@ -336,7 +336,8 @@ public class Node
     // TEST: gegevens weergeven van de Node
     public void testBootstrapDiscovery()
     {
-        new Thread(new Runnable() {
+        new Thread(new Runnable()
+        {
 
             public void run()
             {
@@ -367,5 +368,86 @@ public class Node
     {
         Node_nodeRMI_Transmit node_rmiObj = new Node_nodeRMI_Transmit(ip,this);
         node_rmiObj.setNeighbours(1234,1234);
+    }
+
+    public void sendFile(File file, String IPdest)
+    {
+        try
+        {
+            System.out.println("Sending file...");
+            Socket socket = new Socket(IPdest, 8796);
+
+            OutputStream os = socket.getOutputStream();
+            BufferedOutputStream bos = new BufferedOutputStream(os);
+            DataOutputStream dos = new DataOutputStream(bos);
+
+            //dos.writeInt((int) file.length());
+            long totalBytesRead=0;
+            long length = file.length();
+
+            FileInputStream fis = new FileInputStream(file);
+            BufferedInputStream bis = new BufferedInputStream(fis);
+
+            int theByte = 0;
+            while ((theByte = bis.read()) != -1)
+            {
+                totalBytesRead += theByte;
+                bos.write(theByte);
+            }
+            bis.close();
+            dos.close();
+            socket.close();
+            System.out.println("File sent.");
+        } catch(IOException e)
+        {
+            System.err.println(e);
+        }
+    }
+
+    public void receiveFile()       // public File receiveFile()
+    {
+        new Thread(new Runnable()
+        {
+            File file;
+            public void run()
+            {
+                while(true)
+                {
+
+                    try
+                    {
+                        ServerSocket serverSocket = new ServerSocket(1234);
+                        Socket clientSocket = serverSocket.accept();
+
+                        InputStream in = clientSocket.getInputStream();
+                        BufferedInputStream bis = new BufferedInputStream(in);
+                        DataInputStream dis = new DataInputStream(bis);
+
+                        String path = "C:\\Users\\Thomas\\Desktop";
+
+                        long fileLength = dis.readLong();
+                        String fileName = dis.readUTF();
+
+                        file = new File(path + "/" + fileName);
+
+                        FileOutputStream fos = new FileOutputStream(file);
+                        BufferedOutputStream bos = new BufferedOutputStream(fos);
+
+                        for (int j = 0; j < fileLength; j++)
+                        {
+                            bos.write(bis.read());
+                        }
+
+                        bos.close();
+
+                    }catch (IOException e)
+                    {
+                        System.err.println(e);
+                    }
+
+                }
+            }
+        }).start();
+        //return file; //@FIXME : de file returnen en terug in de thread geraken
     }
 }
