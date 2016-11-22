@@ -35,6 +35,17 @@ public class Main_node
 
             }
         });
+
+        try
+        {
+            Thread.sleep(5000);
+        } catch (InterruptedException e)
+        {
+            e.printStackTrace();
+        }
+
+        node.testFailure("192.168.1.2");
+
     }
 
     private static void setNodeName()

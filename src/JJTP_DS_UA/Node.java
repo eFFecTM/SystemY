@@ -362,4 +362,10 @@ public class Node
         }).start();
 
     }
+
+    public void testFailure(String ip)
+    {
+        Node_nodeRMI_Transmit node_rmiObj = new Node_nodeRMI_Transmit(ip,this);
+        node_rmiObj.setNeighbours(1234,1234);
+    }
 }
