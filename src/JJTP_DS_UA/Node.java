@@ -26,7 +26,7 @@ public class  Node {
     Node_NameServerRMI NScommunication;
     Node_nodeRMI_Receive nodeRMIReceive;
     //Node_nodeRMI_Transmit nodeRMITransmit;
-    int ownHash, prevHash, nextHash, newNodeHash; //newNodeHash = van nieuwe node opgemerkt uit de multicast
+    int ownHash, prevHash, nextHash, newNodeHash, prevNextHash; //newNodeHash = van nieuwe node opgemerkt uit de multicast, prevNextHash= uw vorige rechter buur
     boolean onlyNode, lowEdge, highEdge, shutdown = false, wrongName;
     HashMap<String, FileMarker> fileMarkerMap;
     File fileDir;
@@ -181,6 +181,7 @@ public class  Node {
             onlyNode = false;
             updateNewNodeNeighbours(newNodeIP);
             prevHash = newNodeHash;
+            prevNextHash = nextHash; //gebruikt voor de updateFilesowner
             nextHash = newNodeHash;
             if (newNodeHash < ownHash)
                 lowEdge = false;
@@ -202,9 +203,11 @@ public class  Node {
             } else if (highEdge) {
                 if (newNodeHash < nextHash) {
                     updateNewNodeNeighbours(newNodeIP);
+                    prevNextHash = nextHash; //gebruikt voor de updateFilesowner
                     nextHash = newNodeHash;
                 } else if (newNodeHash > ownHash) {
                     updateNewNodeNeighbours(newNodeIP);
+                    prevNextHash = nextHash;//gebruikt voor de updateFilesowner
                     nextHash = newNodeHash;
                     highEdge = false;
                 }
@@ -367,16 +370,38 @@ public class  Node {
         Set<String> keyset = fileMarkerMap.keySet();
         for (String str : keyset)
         {
-            if(fileMarkerMap.get(str).fileNameHash >= newNodeHash)
+            if(highEdge && newNodeHash > ownHash)
             {
-                File file = new File("\\Files\\" + fileMarkerMap.get(str).fileName); //opent de file die verstuurd moet worden
-                sendFile(file, newNodeIP);
-                Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(newNodeIP, this);
-                nodeRMIt.updateFileMarkers(fileMarkerMap.get(str));
-                fileMarkerMap.remove(fileMarkerMap.get(str).fileName);
+                if(fileMarkerMap.get(str).fileNameHash >= newNodeHash || fileMarkerMap.get(str).fileNameHash < ownHash)
+                {
+                    File file = new File("\\Files\\" + fileMarkerMap.get(str).fileName); //opent de file die verstuurd moet worden
+                    sendFile(file, newNodeIP);
+                    Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(newNodeIP, this);
+                    nodeRMIt.updateFileMarkers(fileMarkerMap.get(str));
+                    fileMarkerMap.remove(fileMarkerMap.get(str).fileName);
+                }
             }
-        }
+            else if(highEdge && newNodeHash < prevNextHash)
+            {
+                if(fileMarkerMap.get(str).fileNameHash >= nextHash)
+                {
+                    File file = new File("\\Files\\" + fileMarkerMap.get(str).fileName); //opent de file die verstuurd moet worden
+                    sendFile(file, newNodeIP);
+                    Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(newNodeIP, this);
+                    nodeRMIt.updateFileMarkers(fileMarkerMap.get(str));
+                    fileMarkerMap.remove(fileMarkerMap.get(str).fileName);
+                }
+            }
 
+        }
+        /* leftedge ok,
+        rightedge?
+         => als new>own dan:
+                alle files >= new -> doorgeven
+                alle files < own doorgeven
+         anders new < prevnext
+               alle files >= new doorgeven
+         */
 
     }
 
@@ -398,11 +423,8 @@ public class  Node {
                     System.out.println("lowEdge: " + lowEdge);
                     System.out.println("highEdge: " + highEdge);
                 }
-
             }
-
         }).start();
-
     }
 
     public void testFailure(String ip) {
