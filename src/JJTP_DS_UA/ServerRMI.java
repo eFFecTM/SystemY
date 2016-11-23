@@ -30,7 +30,7 @@ public class ServerRMI extends UnicastRemoteObject implements ServerRMIinterface
      **/
 
     @Override
-    public Inet4Address findFile (String fileName) throws RemoteException
+    public Inet4Address findFile (String fileName) throws RemoteException //@fixme als hash = nodeid, geef dat ip terug
     {
         int hash = ns.calcHash(fileName);
         if(ns.nodeMap.lowerKey(hash) == null) // returnt key < dan de meegegeven parameter of null als die niet bestaat

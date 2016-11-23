@@ -72,4 +72,15 @@ public class Node_nodeRMI_Transmit
             e.printStackTrace();
         }
     }
+
+    public void updateFileMarkers(FileMarker fm)
+    {
+        try
+        {
+            nodeRMIReceive.updateFileMarkers(fm);
+        } catch (RemoteException e)
+        {
+            e.printStackTrace();
+        }
+    }
 }

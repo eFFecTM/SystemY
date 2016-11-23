@@ -16,6 +16,7 @@ import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Set;
 
 // Boven: Main_Node
 // Onder: Node_NameServerRMI, Node_nodeRMI_Receive, Node_nodeRMI_Transmit
@@ -25,7 +26,7 @@ public class  Node {
     Node_NameServerRMI NScommunication;
     Node_nodeRMI_Receive nodeRMIReceive;
     //Node_nodeRMI_Transmit nodeRMITransmit;
-    int ownHash, prevHash, nextHash, newNodeHash; //newHash = van nieuwe node opgemerkt uit de multicast
+    int ownHash, prevHash, nextHash, newNodeHash; //newNodeHash = van nieuwe node opgemerkt uit de multicast
     boolean onlyNode, lowEdge, highEdge, shutdown = false, wrongName;
     HashMap<String, FileMarker> fileMarkerMap;
     File fileDir;
@@ -156,11 +157,12 @@ public class  Node {
                         System.out.println("Waiting for a  multicast message...");
                         mcSocket.receive(packet);
                         String msg = new String(packet.getData(), packet.getOffset(), packet.getLength());
-                        ;
                         String[] info = msg.split(" "); // het ontvangen bericht splitsen in woorden gescheiden door een spatie
                         newNodeHash = calcHash(info[0]);
                         newNodeIP = info[1];
                         recalcPosition();
+                        if(newNodeHash == nextHash) //indien de nieuwe node een rechtse buur wordt: update eigenaar van de files.
+                            updateFilesOwner();
                         System.out.println("Naam: " + info[0]);
                         System.out.println("IP: " + info[1]);
                     }
@@ -292,28 +294,11 @@ public class  Node {
         fileDir = new File("\\Files"); // gaat naar de "Files" directory in de locale projectmap
         fileList = fileDir.listFiles(); //maakt een array van alle files in de directory  !! enkel files geen directories zelf
         for (int i = 0; i < fileList.length; i++) {
-            /*
-            String fileName = fileList[i].getName();
-            int fileNameHash = calcHash(fileList[i].getName());
-            FileMarker fileMarker = new FileMarker(fileName,fileNameHash,ownHash);
-            fileMarkerMap.put(fileName,fileMarker); //maak bestandfiche aan en zet in de hashmap
-            int fileOwnerHash = NScommunication.getNodeFromFilename(fileNameHash);
-            if(fileOwnerHash == ownHash)
-            {
-                fileMarker.setOwnerID(prevHash);
-                //prevHash;
-            }
-            else
-            {
-                fileMarker.setOwnerID(fileOwnerHash);
-                //doorsturen;
-            }
-            */
             addFile(i, fileList);
         }
     }
 
-    public void updateFiles() // TODO: 22/11/2016 testen!
+    public void updateFiles() // fixme herschrijven (vorige stukken toegevoegd)
     {
         new Thread(new Runnable() {
             public void run() {
@@ -347,17 +332,52 @@ public class  Node {
         FileMarker fileMarker = new FileMarker(fileName, fileNameHash, ownHash);
         fileMarkerMap.put(fileName, fileMarker); //maak bestandfiche aan en zet in de hashmap
         int fileOwnerHash = NScommunication.getNodeFromFilename(fileNameHash);
-        if (fileOwnerHash == ownHash) {
-            fileMarker.setOwnerID(prevHash); //@fixme wanneer de file bij jezelf staat -> repliceren naar grootste node, maar je blijft zelf eigenaar
+        if (fileOwnerHash >= ownHash && fileOwnerHash<nextHash)
+        {
+            fileMarker.setOwnerID(ownHash);
             sendFile(fileList[index], NScommunication.getIP(prevHash));
-        } else {
+
+        }
+        else if(fileOwnerHash < ownHash && fileOwnerHash > 0)
+        {
+            fileMarker.setOwnerID(prevHash); //update de eigenaar in de filemarker
+            sendFile(fileList[index], NScommunication.getIP(prevHash)); //stuur file naar de eigenaar
+            Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(NScommunication.getIP(prevHash), this);
+            nodeRMIt.updateFileMarkers(fileMarker); //update de filemarkermap bij de eigenaar
+            fileMarkerMap.remove(fileMarker.fileName); //verwijder de filemarker uit de eigen map
+        }
+        else {
             fileMarker.setOwnerID(fileOwnerHash);
             sendFile(fileList[index], NScommunication.getIP(fileOwnerHash));
+            Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(NScommunication.getIP(fileOwnerHash), this);
+            nodeRMIt.updateFileMarkers(fileMarker);
+            fileMarkerMap.remove(fileMarker.fileName);
         }
     }
 
-    public void replicateFile() {
-        //@TODO hier begin ik woensdag
+    public void updateFilesOwner() // @TODO Speciale situaties toevoegen (aan de rand enz)
+    { //controleert wanneer een nieuwe node in het netwerk komt of deze node eigenaar wordt van de bestanden (waar deze node eigenaar van is)
+        try
+        {
+            Thread.sleep(5000); //geeft de nieuwe node tijd om op te starten
+        } catch (InterruptedException e)
+        {
+            e.printStackTrace();
+        }
+        Set<String> keyset = fileMarkerMap.keySet();
+        for (String str : keyset)
+        {
+            if(fileMarkerMap.get(str).fileNameHash >= newNodeHash)
+            {
+                File file = new File("\\Files\\" + fileMarkerMap.get(str).fileName); //opent de file die verstuurd moet worden
+                sendFile(file, newNodeIP);
+                Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(newNodeIP, this);
+                nodeRMIt.updateFileMarkers(fileMarkerMap.get(str));
+                fileMarkerMap.remove(fileMarkerMap.get(str).fileName);
+            }
+        }
+
+
     }
 
     // TEST: gegevens weergeven van de Node
@@ -420,7 +440,7 @@ public class  Node {
         }
     }
 
-    public void receiveFiles()       // public File receiveFile()
+    public void receiveFiles()   //@TODO Als er een file gereceived wordt: refresh de fileList (markers worden geupate via RMI door de andere node)
     {
         new Thread(new Runnable() {
             File file;
