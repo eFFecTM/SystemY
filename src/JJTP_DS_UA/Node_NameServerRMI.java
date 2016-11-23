@@ -19,7 +19,7 @@ public class Node_NameServerRMI
     {
         try
         {
-            String location = "//192.168.1.1/FileServer"; // 192.168.1.1 is de Name Server
+            String location = "//192.168.1.32/FileServer"; // @TODO aangepast naar 32 voor thuisgebruik via wifi (jonas)
             NSI = (ServerRMIinterface) Naming.lookup(location);
         } catch(Exception e)
         {
@@ -66,7 +66,7 @@ public class Node_NameServerRMI
         } catch (RemoteException e)
         {
             e.printStackTrace();
-            return false;  //@TODO nakijken/vragen over return statement
+            return false; // nagevraagd, was in orde
         }
     }
 

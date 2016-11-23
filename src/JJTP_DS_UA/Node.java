@@ -19,7 +19,7 @@ import java.util.HashMap;
 
 // Boven: Main_Node
 // Onder: Node_NameServerRMI, Node_nodeRMI_Receive, Node_nodeRMI_Transmit
-public class Node {
+public class  Node {
     String name, newNodeIP;
     Inet4Address ip;
     Node_NameServerRMI NScommunication;
@@ -348,7 +348,7 @@ public class Node {
         fileMarkerMap.put(fileName, fileMarker); //maak bestandfiche aan en zet in de hashmap
         int fileOwnerHash = NScommunication.getNodeFromFilename(fileNameHash);
         if (fileOwnerHash == ownHash) {
-            fileMarker.setOwnerID(prevHash);
+            fileMarker.setOwnerID(prevHash); //@fixme wanneer de file bij jezelf staat -> repliceren naar grootste node, maar je blijft zelf eigenaar
             sendFile(fileList[index], NScommunication.getIP(prevHash));
         } else {
             fileMarker.setOwnerID(fileOwnerHash);
