@@ -23,8 +23,8 @@ public class  Node {
     Node_NameServerRMI NScommunication;
     Node_nodeRMI_Receive nodeRMIReceive;
     //Node_nodeRMI_Transmit nodeRMITransmit;
-    int ownHash, prevHash, nextHash, newNodeHash, prevNextHash; //newNodeHash = van nieuwe node opgemerkt uit de multicast, prevNextHash= uw vorige rechter buur
-    boolean onlyNode, lowEdge, highEdge, shutdown = false, wrongName;
+    int ownHash, prevHash, nextHash, newNodeHash, prevNextHash, fileNameHash; //newNodeHash = van nieuwe node opgemerkt uit de multicast, prevNextHash= uw vorige rechter buur
+    boolean onlyNode, lowEdge, highEdge, shutdown = false, wrongName, prevHighEdge;
     HashMap<String, FileMarker> fileMarkerMap;
     File fileDir;
     File[] fileArray;
@@ -197,16 +197,22 @@ public class  Node {
                 } else if (newNodeHash > prevHash) {
                     prevHash = newNodeHash;
                 }
-            } else if (highEdge) {
-                if (newNodeHash < nextHash) {
+            }
+            else if (highEdge)
+            {
+                if (newNodeHash < nextHash)
+                {
                     updateNewNodeNeighbours(newNodeIP);
                     prevNextHash = nextHash; //gebruikt voor de updateFilesowner
                     nextHash = newNodeHash;
-                } else if (newNodeHash > ownHash) {
+                }
+                else if (newNodeHash > ownHash)
+                {
                     updateNewNodeNeighbours(newNodeIP);
                     prevNextHash = nextHash;//gebruikt voor de updateFilesowner
                     nextHash = newNodeHash;
                     highEdge = false;
+                    prevHighEdge = true;
                 }
             }
         }
@@ -358,6 +364,8 @@ public class  Node {
 
     public void updateFilesOwner() // @fixme speciale situaties nakijken
     { //controleert wanneer een nieuwe node in het netwerk komt of deze node eigenaar wordt van de bestanden (waar deze node eigenaar van is)
+        //hier kom je in als de nieuwe node uw nextNode is.
+
         try
         {
             Thread.sleep(5000); //geeft de nieuwe node tijd om op te starten
@@ -365,30 +373,36 @@ public class  Node {
         {
             e.printStackTrace();
         }
-        Set<String> keyset = fileMarkerMap.keySet();
+        Set<String> keyset = fileMarkerMap.keySet(); // Map waarbij je zelf owner bent
         for (String str : keyset)
         {
-            if(highEdge && newNodeHash > ownHash)
+            fileNameHash = fileMarkerMap.get(str).fileNameHash;
+            if (fileNameHash >= nextHash)   // elke "normale" situatie
             {
-                if(fileMarkerMap.get(str).fileNameHash >= newNodeHash || fileMarkerMap.get(str).fileNameHash < ownHash)
-                {
-                    File file = new File("\\Files\\" + fileMarkerMap.get(str).fileName); //opent de file die verstuurd moet worden
-                    sendFile(file, newNodeIP);
-                    Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(newNodeIP, this);
-                    nodeRMIt.updateFileMarkers(fileMarkerMap.get(str));
-                    fileMarkerMap.remove(fileMarkerMap.get(str).fileName);
-                }
+                File file = new File("\\Files\\" + fileMarkerMap.get(str).fileName);
+                sendFile(file, newNodeIP);
+                Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(newNodeIP, this);
+                nodeRMIt.updateFileMarkers(fileMarkerMap.get(str));
+                fileMarkerMap.remove(fileMarkerMap.get(str).fileName);
             }
-            else if(highEdge && newNodeHash < prevNextHash)
+//            else if(highEdge)
+//            {
+//                if(fileNameHash >= nextHash && fileNameHash < ownHash)
+//                {
+//                    File file = new File("\\Files\\" + fileMarkerMap.get(str).fileName); //opent de file die verstuurd moet worden
+//                    sendFile(file, newNodeIP);
+//                    Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(newNodeIP, this);
+//                    nodeRMIt.updateFileMarkers(fileMarkerMap.get(str));
+//                    fileMarkerMap.remove(fileMarkerMap.get(str).fileName);
+//                }
+//            }
+            else if(prevHighEdge && fileNameHash < ownHash)
             {
-                if(fileMarkerMap.get(str).fileNameHash >= nextHash)
-                {
-                    File file = new File("\\Files\\" + fileMarkerMap.get(str).fileName); //opent de file die verstuurd moet worden
-                    sendFile(file, newNodeIP);
-                    Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(newNodeIP, this);
-                    nodeRMIt.updateFileMarkers(fileMarkerMap.get(str));
-                    fileMarkerMap.remove(fileMarkerMap.get(str).fileName);
-                }
+                File file = new File("\\Files\\" + fileMarkerMap.get(str).fileName); //opent de file die verstuurd moet worden
+                sendFile(file, newNodeIP);
+                Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(newNodeIP, this);
+                nodeRMIt.updateFileMarkers(fileMarkerMap.get(str));
+                fileMarkerMap.remove(fileMarkerMap.get(str).fileName);
             }
 
         }
