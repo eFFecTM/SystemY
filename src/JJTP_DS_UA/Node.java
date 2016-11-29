@@ -432,35 +432,48 @@ public class  Node {
         node_rmiObj.setNeighbours(1234, 1234);
     }
 
-    public void sendFile(File file, String IPdest) {
-        try {
-            System.out.println("Sending file...");
-            Socket socket = new Socket(IPdest, 8796);
+    public static void sendFile(File file, String IPdest)
+    {
+        int port = 10000;
+        String fileLocation = file.getAbsolutePath().toString();
+        System.out.println(fileLocation);
 
+        try
+        {
+            Socket socket = new Socket(IPdest, port);
+            System.out.println("Server socket has been set up at port: " + port + ".");
+
+            //Sending a file
+            byte[] b = new byte[1024];
             OutputStream os = socket.getOutputStream();
-            BufferedOutputStream bos = new BufferedOutputStream(os);
-            DataOutputStream dos = new DataOutputStream(bos);
-
-            //dos.writeInt((int) file.length());
-            long totalBytesRead = 0;
-            long length = file.length();
-
-            FileInputStream fis = new FileInputStream(file);
-            BufferedInputStream bis = new BufferedInputStream(fis);
-
-            int theByte = 0;
-            while ((theByte = bis.read()) != -1) {
-                totalBytesRead += theByte;
-                bos.write(theByte);
+            BufferedOutputStream bos = new BufferedOutputStream(os, 1024);
+            FileInputStream fis = new FileInputStream(fileLocation);
+            int i;
+            int byteLength = 1024;
+            while ((i = fis.read(b, 0, 1024)) != -1)
+            {
+                //System.out.println("Sending file... " + byteLength + " bytes sent");
+                byteLength = byteLength + 1024;
+                bos.write(b, 0, i);
+                bos.flush();
             }
-            bis.close();
-            dos.close();
-            socket.close();
-            System.out.println("File sent.");
-        } catch (IOException e) {
-            System.err.println(e);
+            socket.shutdownOutput(); // Important: output is being terminated
+            System.out.println("Bytes Sent: " + byteLength);
+
+            //Receiving ACK from the client
+            ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
+            String ack = (String) ois.readObject();
+            System.out.println("Message from the client: " + ack);
+
+            bos.close();
+            fis.close();
+        }
+        catch (IOException | ClassNotFoundException e)
+        {
+            e.printStackTrace();
         }
     }
+
 
     public static void receiveFile()
     {
