@@ -462,45 +462,56 @@ public class  Node {
         }
     }
 
-    public void receiveFiles()   //@TODO Als er een file gereceived wordt: refresh de fileList (markers worden geupate via RMI door de andere node)
+    public static void receiveFile()
     {
-        new Thread(new Runnable() {
-            File file;
 
-            public void run() {
-                while (true) {
+        int port = 10000;
+        String fileLocation = "File";
 
-                    try {
-                        ServerSocket serverSocket = new ServerSocket(1234);
-                        Socket clientSocket = serverSocket.accept();
+        new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                while(true)
+                {
+                    try
+                    {
+                        ServerSocket serverSocket = new ServerSocket(port);
+                        Socket socket = serverSocket.accept();
+                        System.out.println("Connected to server on port " + port);
 
-                        InputStream in = clientSocket.getInputStream();
-                        BufferedInputStream bis = new BufferedInputStream(in);
-                        DataInputStream dis = new DataInputStream(bis);
-
-                        String path = "C:\\Users\\Thomas\\Desktop";
-
-                        long fileLength = dis.readLong();
-                        String fileName = dis.readUTF();
-
-                        file = new File(path + "/" + fileName);
-
-                        FileOutputStream fos = new FileOutputStream(file);
-                        BufferedOutputStream bos = new BufferedOutputStream(fos);
-
-                        for (int j = 0; j < fileLength; j++) {
-                            bos.write(bis.read());
+                        //Receiving a file from the server
+                        byte[] b = new byte[1024];
+                        int length;
+                        int byteLength = 1024;
+                        FileOutputStream fos = new FileOutputStream(fileLocation);
+                        InputStream is = socket.getInputStream();
+                        BufferedInputStream bis = new BufferedInputStream(is, 1024);
+                        while ((length = bis.read(b, 0, 1024)) != -1)
+                        {
+                            //System.out.println("Receiving file... " + byteLength + " bytes received");
+                            byteLength = byteLength + 1024;
+                            fos.write(b, 0, length);
                         }
+                        System.out.println("Bytes Written: " + byteLength);
 
-                        bos.close();
+                        //Sending an ACK to the server
+                        ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+                        oos.flush();
+                        oos.writeObject("ACKNOWLEDGE");
+                        System.out.println("ACK sent.");
 
-                    } catch (IOException e) {
-                        System.err.println(e);
+                        bis.close();
+                        fos.close();
+                    } catch (IOException e)
+                    {
+                        e.printStackTrace();
                     }
-
                 }
+
             }
         }).start();
-        //return file; //@FIXME : de file returnen en terug in de thread geraken
     }
+
 }
