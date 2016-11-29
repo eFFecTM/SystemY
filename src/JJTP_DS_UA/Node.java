@@ -13,10 +13,7 @@ import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Set;
+import java.util.*;
 
 // Boven: Main_Node
 // Onder: Node_NameServerRMI, Node_nodeRMI_Receive, Node_nodeRMI_Transmit
@@ -30,7 +27,7 @@ public class  Node {
     boolean onlyNode, lowEdge, highEdge, shutdown = false, wrongName;
     HashMap<String, FileMarker> fileMarkerMap;
     File fileDir;
-    File[] fileList;
+    File[] fileArray;
 
     // Node constructor
     public Node() throws SocketException, UnknownHostException {
@@ -292,73 +289,74 @@ public class  Node {
         }
     }
 
-    public void loadFiles() // TODO: 22/11/2016 testen!
+    public void loadFiles() // @TODO testen!
     {
         fileDir = new File("\\Files"); // gaat naar de "Files" directory in de locale projectmap
-        fileList = fileDir.listFiles(); //maakt een array van alle files in de directory  !! enkel files geen directories zelf
-        for (int i = 0; i < fileList.length; i++) {
-            addFile(i, fileList);
+        fileArray = fileDir.listFiles(); //maakt een array van alle files in de directory  !! enkel files geen directories zelf
+        for (int i = 0; i < fileArray.length; i++) {
+            addFile(fileArray[i]);
         }
     }
 
-    public void updateFiles() // fixme herschrijven (vorige stukken toegevoegd)
+    public void updateFiles() //@TODO testen!
     {
         new Thread(new Runnable() {
-            public void run() {
-                int j = 0, amount = 0;
-                try {
+            public void run()
+            {
+                try
+                {
                     Thread.sleep(30000); // Update na elke 30 seconden
-                } catch (InterruptedException e) {
+                } catch (InterruptedException e)
+                {
                     e.printStackTrace();
                 }
-                File[] newfileList = fileDir.listFiles();
-
-                for (int i = 0; i < newfileList.length; i++) {
-                    if (newfileList[i] != fileList[j]) {
-                        addFile(i, newfileList);
-                        amount++;
-                        j--;
+                File[] newFileArray = fileDir.listFiles();
+                List<File> newFileList = new ArrayList<>(Arrays.asList(newFileArray));
+                List<File> oldFileList = new ArrayList<>(Arrays.asList(fileArray));
+                fileArray = newFileArray;
+                newFileList.removeAll(oldFileList);
+                if(!newFileList.isEmpty())
+                {
+                    for(int i=0;i<newFileList.size();i++)
+                    {
+                        addFile(newFileList.get(i));
                     }
-                    j++;
                 }
-                System.out.println("amount: " + amount);
             }
         }).start();
     }
 
-    public void addFile(int fileIndex, File[] fileList) // TODO: 22/11/2016 testen!
+    public void addFile(File file) // TODO: testen!
     {
-        int index = fileIndex;
-        this.fileList = fileList;
-        String fileName = fileList[index].getName();
-        int fileNameHash = calcHash(fileList[index].getName());
+        String fileName = file.getName();
+        int fileNameHash = calcHash(file.getName());
         FileMarker fileMarker = new FileMarker(fileName, fileNameHash, ownHash);
         fileMarkerMap.put(fileName, fileMarker); //maak bestandfiche aan en zet in de hashmap
         int fileOwnerHash = NScommunication.getNodeFromFilename(fileNameHash);
         if (fileOwnerHash >= ownHash && fileOwnerHash<nextHash)
         {
             fileMarker.setOwnerID(ownHash);
-            sendFile(fileList[index], NScommunication.getIP(prevHash));
+            sendFile(file, NScommunication.getIP(prevHash));
 
         }
         else if(fileOwnerHash < ownHash && fileOwnerHash > 0)
         {
             fileMarker.setOwnerID(prevHash); //update de eigenaar in de filemarker
-            sendFile(fileList[index], NScommunication.getIP(prevHash)); //stuur file naar de eigenaar
+            sendFile(file, NScommunication.getIP(prevHash)); //stuur file naar de eigenaar
             Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(NScommunication.getIP(prevHash), this);
             nodeRMIt.updateFileMarkers(fileMarker); //update de filemarkermap bij de eigenaar
             fileMarkerMap.remove(fileMarker.fileName); //verwijder de filemarker uit de eigen map
         }
         else {
             fileMarker.setOwnerID(fileOwnerHash);
-            sendFile(fileList[index], NScommunication.getIP(fileOwnerHash));
+            sendFile(file, NScommunication.getIP(fileOwnerHash));
             Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(NScommunication.getIP(fileOwnerHash), this);
             nodeRMIt.updateFileMarkers(fileMarker);
             fileMarkerMap.remove(fileMarker.fileName);
         }
     }
 
-    public void updateFilesOwner() // @TODO Speciale situaties toevoegen (aan de rand enz)
+    public void updateFilesOwner() // @fixme speciale situaties nakijken
     { //controleert wanneer een nieuwe node in het netwerk komt of deze node eigenaar wordt van de bestanden (waar deze node eigenaar van is)
         try
         {
