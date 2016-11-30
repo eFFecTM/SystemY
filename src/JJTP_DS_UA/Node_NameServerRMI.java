@@ -19,7 +19,7 @@ public class Node_NameServerRMI
     {
         try
         {
-            String location = "//192.168.1.32/FileServer"; // @TODO aangepast naar 32 voor thuisgebruik via wifi (jonas)
+            String location = "//192.168.1.1/FileServer"; // @TODO aangepast naar 32 voor thuisgebruik via wifi (jonas)
             NSI = (ServerRMIinterface) Naming.lookup(location);
         } catch(Exception e)
         {

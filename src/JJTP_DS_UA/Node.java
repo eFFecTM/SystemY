@@ -6,7 +6,6 @@
  */
 package JJTP_DS_UA;
 
-import javax.xml.crypto.Data;
 import java.io.*;
 import java.net.*;
 import java.rmi.AlreadyBoundException;
@@ -17,7 +16,8 @@ import java.util.*;
 
 // Boven: Main_Node
 // Onder: Node_NameServerRMI, Node_nodeRMI_Receive, Node_nodeRMI_Transmit
-public class  Node {
+public class  Node
+{
     String name, newNodeIP;
     Inet4Address ip;
     Node_NameServerRMI NScommunication;
@@ -294,7 +294,7 @@ public class  Node {
 
     public void loadFiles() // @TODO testen!
     {
-        fileDir = new File("\\Files"); // gaat naar de "Files" directory in de locale projectmap
+        fileDir = new File("Files"); // gaat naar de "Files" directory in de locale projectmap
         fileArray = fileDir.listFiles(); //maakt een array van alle files in de directory  !! enkel files geen directories zelf
         for (int i = 0; i < fileArray.length; i++) {
             addFile(fileArray[i]);
@@ -466,6 +466,10 @@ public class  Node {
 
             bos.close();
             fis.close();
+            oos.close();
+            ois.close();
+            socket.close();
+
         }
         catch (IOException | ClassNotFoundException e)
         {
@@ -484,28 +488,24 @@ public class  Node {
             @Override
             public void run()
             {
-                while(true)
+                try
                 {
-                    try
+                    ServerSocket serverSocket = new ServerSocket(port);
+
+                    while(true)
                     {
-                        ServerSocket serverSocket = new ServerSocket(port);
                         Socket socket = serverSocket.accept();
                         System.out.println("Connected to server on port " + port);
 
                         ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
-                        String fileName = null;
-                        try {
-                            fileName = (String) ois.readObject();
-                        } catch (ClassNotFoundException e) {
-                            e.printStackTrace();
-                        }
+                        String fileName = (String) ois.readObject();
                         System.out.println("Message from the client: " + fileName);
 
                         //Receiving a file from the server
                         byte[] b = new byte[1024];
                         int length;
                         int byteLength = 1024;
-                        FileOutputStream fos = new FileOutputStream(fileDir.getName()+fileName);
+                        FileOutputStream fos = new FileOutputStream(fileDir.getName()+ "/" + fileName); //fixme: als het niet werkt: \\
                             System.out.println(fileDir.getName() + fileName);
                         InputStream is = socket.getInputStream();
                         BufferedInputStream bis = new BufferedInputStream(is, 1024);
@@ -525,12 +525,14 @@ public class  Node {
 
                         bis.close();
                         fos.close();
-                    } catch (IOException e)
-                    {
-                        e.printStackTrace();
+                        ois.close();
+                        oos.close();
+                        socket.close();
                     }
+                } catch (IOException | ClassNotFoundException e)
+                {
+                    e.printStackTrace();
                 }
-
             }
         }).start();
     }

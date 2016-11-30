@@ -1,9 +1,11 @@
 package JJTP_DS_UA;
 
+import java.io.Serializable;
+
 /**
  * Created by jonas on 19-11-2016.
  */
-public class FileMarker
+public class FileMarker implements Serializable
 {
     String fileName;
     int fileNameHash;

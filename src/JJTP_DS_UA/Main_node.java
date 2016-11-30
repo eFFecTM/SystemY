@@ -38,6 +38,7 @@ public class Main_node
             }
         });
 
+        /*
         try
         {
             Thread.sleep(5000);
@@ -46,8 +47,8 @@ public class Main_node
             e.printStackTrace();
         }
 
-        node.testFailure("192.168.1.2");
-
+        node.testFailure("192.168.1.2"); // om te testen?
+        */
     }
 
     private static void setNodeName()
