@@ -33,6 +33,7 @@ public class  Node {
         getIP();
         NScommunication = new Node_NameServerRMI();
         bindNodeRMIReceive(); // RMI Node-Node
+        fileMarkerMap = new HashMap<>();
     }
 
     // Op registerpoort 9876 wordt de Node_nodeRMI_Receive klasse verbonden op een locatie
@@ -224,14 +225,12 @@ public class  Node {
 
     public void updateLeftNeighbour() {
         String ip = NScommunication.getIP(prevHash);
-        ip = ip.substring(1); // ipaddress = "/192.168.1.4" so delete first character
         Node_nodeRMI_Transmit nodeRMITransmit = new Node_nodeRMI_Transmit(ip, this);
         nodeRMITransmit.updateLeftNeighbour(nextHash); //maak connectie met de linkerbuur en geef rechterbuur door
     }
 
     public void updateRightNeighbour() {
         String ip = NScommunication.getIP(nextHash);
-        ip = ip.substring(1);
         Node_nodeRMI_Transmit nodeRMITransmit = new Node_nodeRMI_Transmit(ip, this);
         nodeRMITransmit.updateRightNeighbour(prevHash);
     }
@@ -336,25 +335,31 @@ public class  Node {
         int fileNameHash = calcHash(file.getName());
         FileMarker fileMarker = new FileMarker(fileName, fileNameHash, ownHash);
         fileMarkerMap.put(fileName, fileMarker); //maak bestandfiche aan en zet in de hashmap
-        int fileOwnerHash = NScommunication.getNodeFromFilename(fileNameHash);
-        if (fileOwnerHash >= ownHash && fileOwnerHash<nextHash)
+        int fileOwnerID = NScommunication.getNodeFromFilename(fileNameHash);
+/*        if (fileOwnerID >= ownHash && fileOwnerID<nextHash)
         {
             fileMarker.setOwnerID(ownHash);
             sendFile(file, NScommunication.getIP(prevHash));
 
         }
-        else if(fileOwnerHash < ownHash && fileOwnerHash > 0)
+        else if(fileOwnerID < ownHash && fileOwnerID > 0)
         {
             fileMarker.setOwnerID(prevHash); //update de eigenaar in de filemarker
             sendFile(file, NScommunication.getIP(prevHash)); //stuur file naar de eigenaar
             Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(NScommunication.getIP(prevHash), this);
             nodeRMIt.updateFileMarkers(fileMarker); //update de filemarkermap bij de eigenaar
             fileMarkerMap.remove(fileMarker.fileName); //verwijder de filemarker uit de eigen map
+        }*/
+        if(fileOwnerID == ownHash)
+        {
+            fileMarker.setOwnerID(ownHash);
+            if(!onlyNode)
+                sendFile(file, NScommunication.getIP(prevHash));
         }
         else {
-            fileMarker.setOwnerID(fileOwnerHash);
-            sendFile(file, NScommunication.getIP(fileOwnerHash));
-            Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(NScommunication.getIP(fileOwnerHash), this);
+            fileMarker.setOwnerID(fileOwnerID);
+            sendFile(file, NScommunication.getIP(fileOwnerID));
+            Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(NScommunication.getIP(fileOwnerID), this);
             nodeRMIt.updateFileMarkers(fileMarker);
             fileMarkerMap.remove(fileMarker.fileName);
         }
