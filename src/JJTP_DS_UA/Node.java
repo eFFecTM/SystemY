@@ -22,10 +22,9 @@ public class  Node {
     Inet4Address ip;
     Node_NameServerRMI NScommunication;
     Node_nodeRMI_Receive nodeRMIReceive;
-    //Node_nodeRMI_Transmit nodeRMITransmit;
-    int ownHash, prevHash, nextHash, newNodeHash, prevNextHash, fileNameHash; //newNodeHash = van nieuwe node opgemerkt uit de multicast, prevNextHash= uw vorige rechter buur
+    int ownHash, prevHash, nextHash, newNodeHash, fileNameHash; //newNodeHash = van nieuwe node opgemerkt uit de multicast
     boolean onlyNode, lowEdge, highEdge, shutdown = false, wrongName, prevHighEdge;
-    HashMap<String, FileMarker> fileMarkerMap;
+    HashMap<String, FileMarker> fileMarkerMap; // markers met key=naam en filemarker object = value
     File fileDir;
     File[] fileArray;
 
@@ -62,8 +61,10 @@ public class  Node {
             e.printStackTrace();
         }
         getStartupInfoFromNS();
+        loadFiles();
+        updateFiles();
+        receiveFile();
         testBootstrapDiscovery();
-        //loadFiles();
     }
 
     public void shutDown() {
@@ -178,7 +179,6 @@ public class  Node {
             onlyNode = false;
             updateNewNodeNeighbours(newNodeIP);
             prevHash = newNodeHash;
-            prevNextHash = nextHash; //gebruikt voor de updateFilesowner
             nextHash = newNodeHash;
             if (newNodeHash < ownHash)
                 lowEdge = false;
@@ -203,13 +203,11 @@ public class  Node {
                 if (newNodeHash < nextHash)
                 {
                     updateNewNodeNeighbours(newNodeIP);
-                    prevNextHash = nextHash; //gebruikt voor de updateFilesowner
                     nextHash = newNodeHash;
                 }
                 else if (newNodeHash > ownHash)
                 {
                     updateNewNodeNeighbours(newNodeIP);
-                    prevNextHash = nextHash;//gebruikt voor de updateFilesowner
                     nextHash = newNodeHash;
                     highEdge = false;
                     prevHighEdge = true;
@@ -362,7 +360,7 @@ public class  Node {
         }
     }
 
-    public void updateFilesOwner() // @fixme speciale situaties nakijken
+    public void updateFilesOwner() // @todo testen
     { //controleert wanneer een nieuwe node in het netwerk komt of deze node eigenaar wordt van de bestanden (waar deze node eigenaar van is)
         //hier kom je in als de nieuwe node uw nextNode is.
 
@@ -373,48 +371,28 @@ public class  Node {
         {
             e.printStackTrace();
         }
-        Set<String> keyset = fileMarkerMap.keySet(); // Map waarbij je zelf owner bent
+        Set<String> keyset = fileMarkerMap.keySet(); // Map van files waar deze node owner van is
         for (String str : keyset)
         {
             fileNameHash = fileMarkerMap.get(str).fileNameHash;
-            if (fileNameHash >= nextHash)   // elke "normale" situatie
+            if (fileNameHash >= nextHash)   // elke "normale" situatie (of je bent highedge en er komt een leftedge in
             {
                 File file = new File("\\Files\\" + fileMarkerMap.get(str).fileName);
                 sendFile(file, newNodeIP);
                 Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(newNodeIP, this);
                 nodeRMIt.updateFileMarkers(fileMarkerMap.get(str));
-                fileMarkerMap.remove(fileMarkerMap.get(str).fileName);
+                fileMarkerMap.remove(str);
             }
-//            else if(highEdge)
-//            {
-//                if(fileNameHash >= nextHash && fileNameHash < ownHash)
-//                {
-//                    File file = new File("\\Files\\" + fileMarkerMap.get(str).fileName); //opent de file die verstuurd moet worden
-//                    sendFile(file, newNodeIP);
-//                    Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(newNodeIP, this);
-//                    nodeRMIt.updateFileMarkers(fileMarkerMap.get(str));
-//                    fileMarkerMap.remove(fileMarkerMap.get(str).fileName);
-//                }
-//            }
-            else if(prevHighEdge && fileNameHash < ownHash)
+            else if(prevHighEdge && fileNameHash < ownHash) //er komt een nieuwe highedge in
             {
                 File file = new File("\\Files\\" + fileMarkerMap.get(str).fileName); //opent de file die verstuurd moet worden
                 sendFile(file, newNodeIP);
                 Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(newNodeIP, this);
                 nodeRMIt.updateFileMarkers(fileMarkerMap.get(str));
-                fileMarkerMap.remove(fileMarkerMap.get(str).fileName);
+                fileMarkerMap.remove(str);
             }
 
         }
-        /* leftedge ok,
-        rightedge?
-         => als new>own dan:
-                alle files >= new -> doorgeven
-                alle files < own doorgeven
-         anders new < prevnext
-               alle files >= new doorgeven
-         */
-
     }
 
     // TEST: gegevens weergeven van de Node
@@ -444,7 +422,7 @@ public class  Node {
         node_rmiObj.setNeighbours(1234, 1234);
     }
 
-    public static void sendFile(File file, String IPdest)
+    public void sendFile(File file, String IPdest)
     {
         int port = 10000;
         String fileLocation = file.getAbsolutePath().toString();
@@ -454,6 +432,10 @@ public class  Node {
         {
             Socket socket = new Socket(IPdest, port);
             System.out.println("Server socket has been set up at port: " + port + ".");
+
+            ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+            oos.flush();
+            oos.writeObject(file.getName());
 
             //Sending a file
             byte[] b = new byte[1024];
@@ -487,11 +469,10 @@ public class  Node {
     }
 
 
-    public static void receiveFile()
+    public void receiveFile()
     {
 
         int port = 10000;
-        String fileLocation = "File";
 
         new Thread(new Runnable()
         {
@@ -506,11 +487,21 @@ public class  Node {
                         Socket socket = serverSocket.accept();
                         System.out.println("Connected to server on port " + port);
 
+                        ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
+                        String fileName = null;
+                        try {
+                            fileName = (String) ois.readObject();
+                        } catch (ClassNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                        System.out.println("Message from the client: " + fileName);
+
                         //Receiving a file from the server
                         byte[] b = new byte[1024];
                         int length;
                         int byteLength = 1024;
-                        FileOutputStream fos = new FileOutputStream(fileLocation);
+                        FileOutputStream fos = new FileOutputStream(fileDir.getName()+fileName);
+                            System.out.println(fileDir.getName() + fileName);
                         InputStream is = socket.getInputStream();
                         BufferedInputStream bis = new BufferedInputStream(is, 1024);
                         while ((length = bis.read(b, 0, 1024)) != -1)
