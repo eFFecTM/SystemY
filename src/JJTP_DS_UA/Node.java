@@ -460,18 +460,18 @@ public class  Node
             System.out.println("Bytes Sent: " + byteLength);
 
             //Receiving ACK from the client
-            ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
-            String ack = (String) ois.readObject();
-            System.out.println("Message from the client: " + ack);
+            //ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
+            //String ack = (String) ois.readObject();
+            //System.out.println("Message from the client: " + ack);
 
             bos.close();
             fis.close();
             oos.close();
-            ois.close();
+            //ois.close();
             socket.close();
 
         }
-        catch (IOException | ClassNotFoundException e)
+        catch (IOException e)
         {
             e.printStackTrace();
         }
@@ -518,15 +518,15 @@ public class  Node
                         System.out.println("Bytes Written: " + byteLength);
 
                         //Sending an ACK to the server
-                        ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-                        oos.flush();
-                        oos.writeObject("ACKNOWLEDGE");
-                        System.out.println("ACK sent.");
+                        //ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+                        //oos.flush();
+                        //oos.writeObject("ACKNOWLEDGE");
+                        //System.out.println("ACK sent.");
 
                         bis.close();
                         fos.close();
                         ois.close();
-                        oos.close();
+                        //oos.close();
                         socket.close();
                     }
                 } catch (IOException | ClassNotFoundException e)
