@@ -6,6 +6,7 @@
  */
 package JJTP_DS_UA;
 
+import javax.xml.crypto.Data;
 import java.io.*;
 import java.net.*;
 import java.rmi.AlreadyBoundException;
@@ -65,7 +66,7 @@ public class  Node
         loadFiles();
         updateFiles();
         receiveFile();
-        testBootstrapDiscovery();
+        //testBootstrapDiscovery();
     }
 
     public void shutDown() {
@@ -371,7 +372,7 @@ public class  Node
 
         try
         {
-            Thread.sleep(5000); //geeft de nieuwe node tijd om op te starten
+            Thread.sleep(15000); //geeft de nieuwe node tijd om op te starten
         } catch (InterruptedException e)
         {
             e.printStackTrace();
@@ -430,13 +431,13 @@ public class  Node
     public void sendFile(File file, String IPdest)
     {
         int port = 10000;
-        String fileLocation = file.getAbsolutePath().toString();
-        System.out.println(fileLocation);
+        String fileLocation = fileDir.toString() + "/" + file.getName();
+        System.out.println("sendFile1: "+fileLocation);
 
         try
         {
             Socket socket = new Socket(IPdest, port);
-            System.out.println("Server socket has been set up at port: " + port + ".");
+            System.out.println("SendFile2: Server socket has been set up at port: " + port + ".");
 
             ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
             oos.flush();
@@ -457,7 +458,7 @@ public class  Node
                 bos.flush();
             }
             socket.shutdownOutput(); // Important: output is being terminated
-            System.out.println("Bytes Sent: " + byteLength);
+            System.out.println("SendFile3: Bytes Sent: " + byteLength);
 
             //Receiving ACK from the client
             //ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
@@ -495,18 +496,18 @@ public class  Node
                     while(true)
                     {
                         Socket socket = serverSocket.accept();
-                        System.out.println("Connected to server on port " + port);
+                        System.out.println("receiveFiles1: Connected to server on port " + port);
 
                         ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
                         String fileName = (String) ois.readObject();
-                        System.out.println("Message from the client: " + fileName);
+                        System.out.println("receiveFiles2: Message from the client: " + fileName);
 
-                        //Receiving a file from the server
+                        //Receiving a file from another node
                         byte[] b = new byte[1024];
                         int length;
                         int byteLength = 1024;
                         FileOutputStream fos = new FileOutputStream(fileDir.getName()+ "/" + fileName); //fixme: als het niet werkt: \\
-                            System.out.println(fileDir.getName() + fileName);
+                            System.out.println("receiveFiles3: "+fileDir.getName() + "/" + fileName);
                         InputStream is = socket.getInputStream();
                         BufferedInputStream bis = new BufferedInputStream(is, 1024);
                         while ((length = bis.read(b, 0, 1024)) != -1)
@@ -515,7 +516,7 @@ public class  Node
                             byteLength = byteLength + 1024;
                             fos.write(b, 0, length);
                         }
-                        System.out.println("Bytes Written: " + byteLength);
+                        System.out.println("receiveFiles4: Bytes Written: " + byteLength);
 
                         //Sending an ACK to the server
                         //ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
