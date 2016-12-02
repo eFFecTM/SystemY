@@ -47,6 +47,6 @@ public class Node_nodeRMI_Receive extends UnicastRemoteObject implements Node_no
     @Override
     public void updateFileMarkers(FileMarker fm) throws RemoteException
     {
-        myNode.fileMarkerMap.put(fm.fileName, fm);
+        myNode.updateFileMarker(fm);
     }
 }

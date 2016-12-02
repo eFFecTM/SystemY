@@ -366,13 +366,13 @@ public class  Node
         }
     }
 
-    public void updateFilesOwner() // @todo testen
+    public synchronized void updateFilesOwner() // @todo testen
     { //controleert wanneer een nieuwe node in het netwerk komt of deze node eigenaar wordt van de bestanden (waar deze node eigenaar van is)
         //hier kom je in als de nieuwe node uw nextNode is.
 
         try
         {
-            Thread.sleep(15000); //geeft de nieuwe node tijd om op te starten
+            Thread.sleep(5000); //geeft de nieuwe node tijd om op te starten
         } catch (InterruptedException e)
         {
             e.printStackTrace();
@@ -476,6 +476,11 @@ public class  Node
         {
             e.printStackTrace();
         }
+    }
+
+    public synchronized void updateFileMarker(FileMarker fm)
+    {
+        fileMarkerMap.put(fm.fileName, fm);
     }
 
 
