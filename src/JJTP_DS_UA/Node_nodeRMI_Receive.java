@@ -49,4 +49,12 @@ public class Node_nodeRMI_Receive extends UnicastRemoteObject implements Node_no
     {
         myNode.updateFileMarker(fm);
     }
+
+    @Override
+    public boolean notifyOwner(String fileName, int ownHash) throws RemoteException
+    {
+        return myNode.notifyOwner(fileName, ownHash);
+    }
+
+
 }

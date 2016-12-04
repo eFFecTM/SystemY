@@ -83,4 +83,17 @@ public class Node_nodeRMI_Transmit
             e.printStackTrace();
         }
     }
+
+    public boolean notifyOwner(String fileName, int ownHash)
+    {
+        try
+        {
+            return nodeRMIReceive.notifyOwner(fileName, ownHash);
+        } catch (RemoteException e)
+        {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
 }

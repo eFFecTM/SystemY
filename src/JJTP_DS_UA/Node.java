@@ -72,9 +72,10 @@ public class  Node
     public void shutDown() {
         shutdown = true; //overbodig
 
-        if (prevHash == ownHash && nextHash == ownHash)
+        if (prevHash == ownHash && nextHash == ownHash) // fixme: kan dit niet veranderd worden naar if(onlyNode)?
             NScommunication.deleteNode(ownHash); //delete eigen node uit de map van de server
-        else {
+        else
+        {
             NScommunication.deleteNode(ownHash); //delete eigen node uit de map van de server
             if (NScommunication.getMapsize() == 1) //er schiet nog maar 1 node over
             {
@@ -82,12 +83,83 @@ public class  Node
                 Node_nodeRMI_Transmit nRMIt = new Node_nodeRMI_Transmit(lastNodeIP, this);
                 nRMIt.updateOnlyNode();
             }
+
+            //bestandenregeling todo: SHUTDOWN MOET GETEST WORDEN
+            for(File file : fileArray)
+            {
+                String fileName = file.getName();
+                int fileNameHash = calcHash(fileName);
+                int nodeHash;
+
+                if(fileMarkerMap.containsKey(fileName) && fileNameHash != ownHash) // Node is owner + filehash verwijst niet naar zichzelf -> replicated file
+                {
+                    FileMarker fileMarker = fileMarkerMap.get(fileName);
+
+                    if(fileMarker.localList.contains(prevHash)) //fixme: geen rekening houden met: als de prev van de prev node het bestand ook lokaal bevat
+                    {
+                        nodeHash = NScommunication.getNodeFromFilename(prevHash-1); // gebruiken om prev node van jouw prev node te weten te komen
+                    }
+                    else
+                    {
+                        nodeHash = prevHash;
+                    }
+
+                    fileMarker.setOwnerID(nodeHash);
+                    sendFile(file,NScommunication.getIP(nodeHash));
+                    Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(NScommunication.getIP(nodeHash), this);
+                    nodeRMIt.updateFileMarkers(fileMarker);
+                    fileMarkerMap.remove(fileMarker.fileName);
+                }
+                else // Local file
+                {
+                    int fileOwnerID = NScommunication.getNodeFromFilename(fileNameHash);
+                    Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(NScommunication.getIP(fileOwnerID), this);
+
+                    if(nodeRMIt.notifyOwner(fileName,ownHash)) // als het bestand nooit gedownload is
+                    {
+                        file.delete();
+                        System.out.println("File: " + fileName + " has been found and deleted from owner and here!");
+                    }
+                }
+            }
+
             updateLeftNeighbour(); //geef zijn linkerbuur aan de rechterbuur
             updateRightNeighbour(); //geeft zijn rechterbuur aan de linkerbuur
 
         }
         System.exit(0); //terminate JVM
     }
+
+    // Een andere node heeft een lokaal bestand waarvan ik owner ben, die zal uitgezet worden // todo: hoort bij shutdown, moet getest worden!
+    public boolean notifyOwner(String fileName, int ownHash)
+    {
+        boolean isEmpty = fileMarkerMap.get(fileName).downloadList.isEmpty();
+        boolean isDeleted = false;
+
+        if(isEmpty) // zoja bestand verwijderen
+        {
+            fileMarkerMap.remove(fileName);
+            for (File file : fileArray)
+            {
+                if(file.getName().equals(fileName))
+                {
+                    isDeleted = file.delete();
+                }
+            }
+
+            if(!isDeleted)
+            {
+                System.out.println("!!! File: " + fileName + " hasn't been deleted !!!");
+            }
+        }
+        else
+        {
+            fileMarkerMap.get(fileName).removeLocalList(ownHash); // verwijdert de shutgedowne node uit de lijst
+        }
+
+        return isEmpty;
+    }
+
 
     // Initialisatie: Een naam
     public void checkName(String name) {
@@ -355,9 +427,13 @@ public class  Node
         {
             fileMarker.setOwnerID(ownHash);
             if(!onlyNode)
+            {
                 sendFile(file, NScommunication.getIP(prevHash));
+                fileMarker.addLocalList(prevHash);
+            }
         }
-        else {
+        else
+        {
             fileMarker.setOwnerID(fileOwnerID);
             sendFile(file, NScommunication.getIP(fileOwnerID));
             Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(NScommunication.getIP(fileOwnerID), this);
@@ -366,10 +442,10 @@ public class  Node
         }
     }
 
+    //controleert wanneer een nieuwe node in het netwerk komt of deze node eigenaar wordt van de bestanden (waar deze node eigenaar van is)
+    //hier kom je in als de nieuwe node uw nextNode is.
     public synchronized void updateFilesOwner() // @todo testen
-    { //controleert wanneer een nieuwe node in het netwerk komt of deze node eigenaar wordt van de bestanden (waar deze node eigenaar van is)
-        //hier kom je in als de nieuwe node uw nextNode is.
-
+    {
         try
         {
             Thread.sleep(5000); //geeft de nieuwe node tijd om op te starten
@@ -385,6 +461,7 @@ public class  Node
             {
                 File file = new File("\\Files\\" + fileMarkerMap.get(str).fileName);
                 sendFile(file, newNodeIP);
+
                 Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(newNodeIP, this);
                 nodeRMIt.updateFileMarkers(fileMarkerMap.get(str));
                 fileMarkerMap.remove(str);
@@ -481,6 +558,7 @@ public class  Node
     public synchronized void updateFileMarker(FileMarker fm)
     {
         fileMarkerMap.put(fm.fileName, fm);
+        fm.addLocalList(ownHash); // zichzelf toevoegen aan de lokale lijst van nodes die de file bevatten
     }
 
 
