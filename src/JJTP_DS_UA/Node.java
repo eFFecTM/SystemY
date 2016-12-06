@@ -25,7 +25,7 @@ public class  Node
     Node_NameServerRMI NScommunication;
     Node_nodeRMI_Receive nodeRMIReceive;
     int ownHash, prevHash, nextHash, newNodeHash, fileNameHash; //newNodeHash = van nieuwe node opgemerkt uit de multicast
-    boolean onlyNode, lowEdge, highEdge, shutdown = false, wrongName, prevHighEdge, wasOnlyNode;
+    boolean onlyNode, lowEdge, highEdge, shutdown = false, prevHighEdge;
     ConcurrentHashMap<String, FileMarker> fileMarkerMap; // markers met key=naam en filemarker object = value
     File fileDir;
     File[] fileArray;
@@ -85,23 +85,29 @@ public class  Node
             }
             updateLeftNeighbour(); //geef zijn linkerbuur aan de rechterbuur
             updateRightNeighbour(); //geeft zijn rechterbuur aan de linkerbuur
+
         }
         System.exit(0); //terminate JVM
     }
 
     // Initialisatie: Een naam
-    public void checkName(String name) {
-        String tempName = name;
+    public boolean checkName(String name)
+    {
+        boolean isCorrectName;
         //System.out.println("Choose a name for the node and press enter.");
         //Scanner s = new Scanner(System.in);
         //name = s.nextLine();
-        if (tempName.contains(" ") || NScommunication.checkIfNameExists(tempName)) {
-            wrongName = true;
+        if (name.contains(" ") || NScommunication.checkIfNameExists(name))
+        {
+            isCorrectName = false;
             //System.out.println("Your name contains a white space or already exists, please choose another name.");
             //name = s.nextLine();
-        } else {
-            wrongName = false;
         }
+        else
+        {
+            isCorrectName = true;
+        }
+        return isCorrectName;
     }
 
     // Nakijken of de Node op de laagste en/of hoogste rand zit en is Node de eerste Node in de cirkel?

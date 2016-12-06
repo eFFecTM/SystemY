@@ -17,7 +17,6 @@ public class GUI
     private JLabel serachLabel;
     private JTextField filenameTextField;
     private JButton searchButton;
-    String name;
 
     public GUI()
     {
@@ -25,13 +24,18 @@ public class GUI
 
     public String setNodeName()
     {
-        return name = JOptionPane.showInputDialog("Welcome to System Y! Please enter your name.");
+        String name = JOptionPane.showInputDialog("Welcome to System Y! Please enter your name.");
+
+        while (name.equals(""))
+        {
+            System.out.println("Please enter a name.");
+            JOptionPane.showMessageDialog(null, "Please enter a name.", "Authorization required", JOptionPane.INFORMATION_MESSAGE);
+            name = JOptionPane.showInputDialog("Welcome to System Y! Please enter your name.");
+        }
+        //if (name == JOptionPane.CANCEL_OPTION)
+        return name;
     }
 
-    public String setNodeNameAgain()
-    {
-        return name = JOptionPane.showInputDialog("Your name contains a white space or already exists, please choose another name.");
-    }
 
     public void openPanel()
     {

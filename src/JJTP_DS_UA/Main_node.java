@@ -55,12 +55,21 @@ public class Main_node
     {
         String name;
         name = gui.setNodeName();
-        node.checkName(name);
-        while(node.wrongName)
+        while(!node.checkName(name))
         {
-                name = gui.setNodeNameAgain();
-                node.checkName(name);
+            name = gui.setNodeName();
         }
+
+
+
+
+//        name = gui.setNodeName();
+//        node.checkName(name);
+//        while(node.wrongName)
+//        {
+//                name = gui.setNodeNameAgain();
+//                node.checkName(name);
+//        }
 
         node.startUp(name); // bevat sendMC(), getStartupInfoFromNS() en testBootstrapDiscovery()
         gui.openPanel();
