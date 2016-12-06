@@ -25,7 +25,7 @@ public class  Node
     Node_NameServerRMI NScommunication;
     Node_nodeRMI_Receive nodeRMIReceive;
     int ownHash, prevHash, nextHash, newNodeHash, fileNameHash; //newNodeHash = van nieuwe node opgemerkt uit de multicast
-    boolean onlyNode, lowEdge, highEdge, shutdown = false, wrongName, prevHighEdge;
+    boolean onlyNode, lowEdge, highEdge, shutdown = false, wrongName, prevHighEdge, wasOnlyNode;
     ConcurrentHashMap<String, FileMarker> fileMarkerMap; // markers met key=naam en filemarker object = value
     File fileDir;
     File[] fileArray;
@@ -85,7 +85,6 @@ public class  Node
             }
             updateLeftNeighbour(); //geef zijn linkerbuur aan de rechterbuur
             updateRightNeighbour(); //geeft zijn rechterbuur aan de linkerbuur
-
         }
         System.exit(0); //terminate JVM
     }
@@ -177,16 +176,22 @@ public class  Node
 
     // Positie (buren) wordt gehercalculeerd door volgend algoritme
     public void recalcPosition() {
+        prevHighEdge = false;
+        wasOnlyNode = false;
         if (onlyNode) // Enigste Node in de cirkel
         {
             onlyNode = false;
+            wasOnlyNode = true;
             updateNewNodeNeighbours(newNodeIP);
             prevHash = newNodeHash;
             nextHash = newNodeHash;
             if (newNodeHash < ownHash)
                 lowEdge = false;
             else
+            {
                 highEdge = false;
+                prevHighEdge = true;
+            }
         } else {
             if (newNodeHash > ownHash && newNodeHash < nextHash) {
                 updateNewNodeNeighbours(newNodeIP);
@@ -243,6 +248,7 @@ public class  Node
         if (neighbours[0] == neighbours[1])//in dit geval is deze node de laatste node
         {
             onlyNode = true;
+            wasOnlyNode = false;
             prevHash = ownHash;
             nextHash = ownHash;
         } else if (neighbours[0] == ownHash) //deze node is de linkse buur van de gefaalde node
@@ -304,6 +310,7 @@ public class  Node
     }
 
     public void updateFiles() //@TODO testen!
+                                //@TODO lijst van gerepliceerde bijhouden; moeten niet terug gerepliceerd worden.
     {
         new Thread(new Runnable() {
             public void run()
@@ -382,7 +389,7 @@ public class  Node
         for (String str : keyset)
         {
             fileNameHash = fileMarkerMap.get(str).fileNameHash;
-            if (fileNameHash >= nextHash)   // elke "normale" situatie (of je bent highedge en er komt een leftedge in
+            if (fileNameHash > nextHash)   // elke "normale" situatie (of je bent highedge en er komt een leftedge in
             {
                 File file = new File("\\Files\\" + fileMarkerMap.get(str).fileName);
                 sendFile(file, newNodeIP);
@@ -397,6 +404,12 @@ public class  Node
                 Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(newNodeIP, this);
                 nodeRMIt.updateFileMarkers(fileMarkerMap.get(str));
                 fileMarkerMap.remove(str);
+            }
+            else if(wasOnlyNode)
+            {
+                File file = new File("\\Files\\" + fileMarkerMap.get(str).fileName);
+                sendFile(file, newNodeIP);
+                //@todo hier wordt een file doorgestuurd, dus filemarker update (met downloads)
             }
 
         }

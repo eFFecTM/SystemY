@@ -136,11 +136,7 @@ public class ServerRMI extends UnicastRemoteObject implements ServerRMIinterface
 
     public int getNodeFromFilename(int fileHash)
     {
-        if (ns.nodeMap.containsKey(fileHash))
-        {
-            return fileHash;
-        }
-        else if (ns.nodeMap.lowerKey(fileHash) == null)
+        if (ns.nodeMap.lowerKey(fileHash) == null)
         {
             return ns.nodeMap.lastKey();
         }
