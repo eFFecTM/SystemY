@@ -17,6 +17,12 @@ public class GUI
     private JLabel serachLabel;
     private JTextField filenameTextField;
     private JButton searchButton;
+    private JButton removeLocalButton;
+    private JButton removeLocalButton1;
+    private JButton removeLocalButton2;
+    private JButton removeLocalButton3;
+    private JButton removeLocalButton4;
+    private JScrollBar scrollBar1;
 
     public GUI()
     {
@@ -32,6 +38,7 @@ public class GUI
             JOptionPane.showMessageDialog(null, "Please enter a name.", "Authorization required", JOptionPane.INFORMATION_MESSAGE);
             name = JOptionPane.showInputDialog("Welcome to System Y! Please enter your name.");
         }
+
         //if (name == JOptionPane.CANCEL_OPTION)
         return name;
     }

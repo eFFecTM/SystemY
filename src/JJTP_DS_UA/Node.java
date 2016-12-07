@@ -25,7 +25,7 @@ public class  Node
     Node_NameServerRMI NScommunication;
     Node_nodeRMI_Receive nodeRMIReceive;
     int ownHash, prevHash, nextHash, newNodeHash, fileNameHash; //newNodeHash = van nieuwe node opgemerkt uit de multicast
-    boolean onlyNode, lowEdge, highEdge, shutdown = false, prevHighEdge;
+    boolean onlyNode, wasOnlyNode, lowEdge, highEdge, shutdown = false, prevHighEdge;
     ConcurrentHashMap<String, FileMarker> fileMarkerMap; // markers met key=naam en filemarker object = value
     File fileDir;
     File[] fileArray;
@@ -507,7 +507,7 @@ public class  Node
     public void receiveFile()
     {
 
-        int port = 10000;
+        int port = 10001;
 
         new Thread(new Runnable()
         {

@@ -59,18 +59,6 @@ public class Main_node
         {
             name = gui.setNodeName();
         }
-
-
-
-
-//        name = gui.setNodeName();
-//        node.checkName(name);
-//        while(node.wrongName)
-//        {
-//                name = gui.setNodeNameAgain();
-//                node.checkName(name);
-//        }
-
         node.startUp(name); // bevat sendMC(), getStartupInfoFromNS() en testBootstrapDiscovery()
         gui.openPanel();
     }
