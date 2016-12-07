@@ -593,10 +593,11 @@ public class  Node
             {
                 try
                 {
-                    ServerSocket serverSocket = new ServerSocket(port);
+                    ServerSocket serverSocket;
 
                     while(true)
                     {
+                        serverSocket = new ServerSocket(port);
                         Socket socket = serverSocket.accept();
                         System.out.println("receiveFiles1: Connected to server on port " + port);
 
@@ -631,6 +632,7 @@ public class  Node
                         ois.close();
                         //oos.close();
                         socket.close();
+                        serverSocket.close();
                     }
                 } catch (IOException | ClassNotFoundException e)
                 {
