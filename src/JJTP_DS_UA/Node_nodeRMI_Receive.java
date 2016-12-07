@@ -56,5 +56,11 @@ public class Node_nodeRMI_Receive extends UnicastRemoteObject implements Node_no
         return myNode.notifyOwner(fileName, ownHash);
     }
 
+    @Override
+    public int negotiatePort() throws RemoteException
+    {
+        return myNode.negotiatePort();
+    }
+
 
 }

@@ -24,7 +24,7 @@ public class  Node
     Inet4Address ip;
     Node_NameServerRMI NScommunication;
     Node_nodeRMI_Receive nodeRMIReceive;
-    int ownHash, prevHash, nextHash, newNodeHash, fileNameHash; //newNodeHash = van nieuwe node opgemerkt uit de multicast
+    int ownHash, prevHash, nextHash, newNodeHash, fileNameHash,port; //newNodeHash = van nieuwe node opgemerkt uit de multicast
     boolean onlyNode, wasOnlyNode, lowEdge, highEdge, shutdown = false, prevHighEdge;
     ConcurrentHashMap<String, FileMarker> fileMarkerMap; // markers met key=naam en filemarker object = value
     File fileDir;
@@ -527,7 +527,8 @@ public class  Node
 
     public void sendFile(File file, String IPdest)
     {
-        int port = 10000;
+        Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(IPdest, this);
+        int port = nodeRMIt.negotiatePort();
         String fileLocation = fileDir.toString() + "/" + file.getName();
         System.out.println("sendFile1: "+fileLocation);
 
@@ -585,8 +586,6 @@ public class  Node
     public void receiveFile()
     {
 
-        int port = 10001;
-
         new Thread(new Runnable()
         {
             @Override
@@ -639,6 +638,13 @@ public class  Node
                 }
             }
         }).start();
+    }
+
+    public int negotiatePort()
+    {
+        Random rand = new Random();
+        port = rand.nextInt((30000 - 10000) + 1) + 10000; // return port tussen 10 000 en 30 000
+        return port;
     }
 
 }

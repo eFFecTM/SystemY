@@ -15,4 +15,5 @@ public interface Node_nodeRMI_ReceiveInterface extends Remote
     public void updateOnlyNode() throws RemoteException;
     public void updateFileMarkers(FileMarker fm) throws RemoteException;
     public boolean notifyOwner(String fileName, int ownHash) throws RemoteException;
+    public int negotiatePort() throws RemoteException;
 }
