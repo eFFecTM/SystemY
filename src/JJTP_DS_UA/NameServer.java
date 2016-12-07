@@ -158,7 +158,7 @@ public class NameServer
                     {
                         System.out.println("ID: " + k + " - ip: " + nodeMap.get(k));
                     }
-                    System.out.println("----*******************************************----");
+                    System.out.println("----******************************************************************----");
                 }
 
             }

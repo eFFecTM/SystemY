@@ -14,6 +14,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 // Boven: Main_Node
 // Onder: Node_NameServerRMI, Node_nodeRMI_Receive, Node_nodeRMI_Transmit
@@ -24,8 +25,8 @@ public class  Node
     Node_NameServerRMI NScommunication;
     Node_nodeRMI_Receive nodeRMIReceive;
     int ownHash, prevHash, nextHash, newNodeHash, fileNameHash; //newNodeHash = van nieuwe node opgemerkt uit de multicast
-    boolean onlyNode, lowEdge, highEdge, shutdown = false, wrongName, prevHighEdge;
-    HashMap<String, FileMarker> fileMarkerMap; // markers met key=naam en filemarker object = value
+    boolean onlyNode, lowEdge, highEdge, shutdown = false, prevHighEdge, wasOnlyNode;
+    ConcurrentHashMap<String, FileMarker> fileMarkerMap; // markers met key=naam en filemarker object = value
     File fileDir;
     File[] fileArray;
 
@@ -34,7 +35,7 @@ public class  Node
         getIP();
         NScommunication = new Node_NameServerRMI();
         bindNodeRMIReceive(); // RMI Node-Node
-        fileMarkerMap = new HashMap<>();
+        fileMarkerMap = new ConcurrentHashMap<>();
     }
 
     // Op registerpoort 9876 wordt de Node_nodeRMI_Receive klasse verbonden op een locatie
@@ -162,19 +163,25 @@ public class  Node
 
 
     // Initialisatie: Een naam
-    public void checkName(String name) {
-        String tempName = name;
+    public boolean checkName(String name)
+    {
+        boolean isCorrectName;
         //System.out.println("Choose a name for the node and press enter.");
         //Scanner s = new Scanner(System.in);
         //name = s.nextLine();
-        if (tempName.contains(" ") || NScommunication.checkIfNameExists(tempName)) {
-            wrongName = true;
+        if (name.contains(" ") || NScommunication.checkIfNameExists(name))
+        {
+            isCorrectName = false;
             //System.out.println("Your name contains a white space or already exists, please choose another name.");
             //name = s.nextLine();
-        } else {
-            wrongName = false;
         }
+        else
+        {
+            isCorrectName = true;
+        }
+        return isCorrectName;
     }
+
 
     // Nakijken of de Node op de laagste en/of hoogste rand zit en is Node de eerste Node in de cirkel?
     public void getStartupInfoFromNS() {
@@ -248,16 +255,22 @@ public class  Node
 
     // Positie (buren) wordt gehercalculeerd door volgend algoritme
     public void recalcPosition() {
+        prevHighEdge = false;
+        wasOnlyNode = false;
         if (onlyNode) // Enigste Node in de cirkel
         {
             onlyNode = false;
+            wasOnlyNode = true;
             updateNewNodeNeighbours(newNodeIP);
             prevHash = newNodeHash;
             nextHash = newNodeHash;
             if (newNodeHash < ownHash)
                 lowEdge = false;
             else
+            {
                 highEdge = false;
+                prevHighEdge = true;
+            }
         } else {
             if (newNodeHash > ownHash && newNodeHash < nextHash) {
                 updateNewNodeNeighbours(newNodeIP);
@@ -314,6 +327,7 @@ public class  Node
         if (neighbours[0] == neighbours[1])//in dit geval is deze node de laatste node
         {
             onlyNode = true;
+            wasOnlyNode = false;
             prevHash = ownHash;
             nextHash = ownHash;
         } else if (neighbours[0] == ownHash) //deze node is de linkse buur van de gefaalde node
@@ -375,6 +389,7 @@ public class  Node
     }
 
     public void updateFiles() //@TODO testen!
+                                //@TODO lijst van gerepliceerde bijhouden; moeten niet terug gerepliceerd worden.
     {
         new Thread(new Runnable() {
             public void run()
@@ -457,11 +472,10 @@ public class  Node
         for (String str : keyset)
         {
             fileNameHash = fileMarkerMap.get(str).fileNameHash;
-            if (fileNameHash >= nextHash)   // elke "normale" situatie (of je bent highedge en er komt een leftedge in
+            if (fileNameHash > nextHash)   // elke "normale" situatie (of je bent highedge en er komt een leftedge in
             {
                 File file = new File("\\Files\\" + fileMarkerMap.get(str).fileName);
                 sendFile(file, newNodeIP);
-
                 Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(newNodeIP, this);
                 nodeRMIt.updateFileMarkers(fileMarkerMap.get(str));
                 fileMarkerMap.remove(str);
@@ -473,6 +487,12 @@ public class  Node
                 Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(newNodeIP, this);
                 nodeRMIt.updateFileMarkers(fileMarkerMap.get(str));
                 fileMarkerMap.remove(str);
+            }
+            else if(wasOnlyNode)
+            {
+                File file = new File("\\Files\\" + fileMarkerMap.get(str).fileName);
+                sendFile(file, newNodeIP);
+                //@todo hier wordt een file doorgestuurd, dus filemarker update (met downloads)
             }
 
         }
