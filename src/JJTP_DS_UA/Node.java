@@ -24,7 +24,7 @@ public class  Node
     Inet4Address ip;
     Node_NameServerRMI NScommunication;
     Node_nodeRMI_Receive nodeRMIReceive;
-    int ownHash, prevHash, nextHash, newNodeHash, fileNameHash,port; //newNodeHash = van nieuwe node opgemerkt uit de multicast
+    int ownHash, prevHash, nextHash, newNodeHash, fileNameHash, port; //newNodeHash = van nieuwe node opgemerkt uit de multicast
     boolean onlyNode, wasOnlyNode, lowEdge, highEdge, shutdown = false, prevHighEdge;
     ConcurrentHashMap<String, FileMarker> fileMarkerMap; // markers met key=naam en filemarker object = value
     File fileDir;
@@ -66,7 +66,7 @@ public class  Node
         getStartupInfoFromNS();
         loadFiles();
         updateFiles();
-        receiveFile();
+        //receiveFile();
         //testBootstrapDiscovery();
     }
 
@@ -595,8 +595,9 @@ public class  Node
                 {
                     ServerSocket serverSocket = new ServerSocket(port);
 
-                    while(true)
-                    {
+                    //while(true)
+                    //{
+                        System.out.println("receiveFile: " + port);
                         Socket socket = serverSocket.accept();
                         System.out.println("receiveFiles1: Connected to server on port " + port);
 
@@ -608,8 +609,8 @@ public class  Node
                         byte[] b = new byte[1024];
                         int length;
                         int byteLength = 1024;
-                        FileOutputStream fos = new FileOutputStream(fileDir.getName()+ "/" + fileName); //fixme: als het niet werkt: \\
-                            System.out.println("receiveFiles3: "+fileDir.getName() + "/" + fileName);
+                        FileOutputStream fos = new FileOutputStream(fileDir.getName() + "/" + fileName); //fixme: als het niet werkt: \\
+                        System.out.println("receiveFiles3: " + fileDir.getName() + "/" + fileName);
                         InputStream is = socket.getInputStream();
                         BufferedInputStream bis = new BufferedInputStream(is, 1024);
                         while ((length = bis.read(b, 0, 1024)) != -1)
@@ -631,7 +632,8 @@ public class  Node
                         ois.close();
                         //oos.close();
                         socket.close();
-                    }
+                        serverSocket.close();
+                    //}
                 } catch (IOException | ClassNotFoundException e)
                 {
                     e.printStackTrace();
@@ -644,6 +646,8 @@ public class  Node
     {
         Random rand = new Random();
         port = rand.nextInt((30000 - 10000) + 1) + 10000; // return port tussen 10 000 en 30 000
+        System.out.println("negotiatePort: port: "+port);
+        receiveFile();
         return port;
     }
 
