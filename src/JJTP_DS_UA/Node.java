@@ -609,8 +609,8 @@ public class  Node
                         byte[] b = new byte[1024];
                         int length;
                         int byteLength = 1024;
-                        FileOutputStream fos = new FileOutputStream(fileDir.getName() + "/" + fileName); //fixme: als het niet werkt: \\
-                        System.out.println("receiveFiles3: " + fileDir.getName() + "/" + fileName);
+                        FileOutputStream fos = new FileOutputStream(fileDir.getName()+ "/" + fileName); //fixme: als het niet werkt: \\
+                            System.out.println("receiveFiles3: "+fileDir.getName() + "/" + fileName);
                         InputStream is = socket.getInputStream();
                         BufferedInputStream bis = new BufferedInputStream(is, 1024);
                         while ((length = bis.read(b, 0, 1024)) != -1)
