@@ -5,8 +5,6 @@ package JJTP_DS_UA;
 
 import java.rmi.Naming;
 import java.rmi.RemoteException;
-import java.rmi.registry.Registry;
-import java.util.Random;
 
 public class Node_nodeRMI_Transmit
 {
@@ -96,6 +94,17 @@ public class Node_nodeRMI_Transmit
             return false;
         }
 
+    }
+
+    public void transferFileAgent(FileAgent agent)
+    {
+        try
+        {
+            nodeRMIReceive.receiveFileAgent(agent);
+        } catch (RemoteException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     public int negotiatePort()

@@ -24,9 +24,10 @@ public class  Node
     Inet4Address ip;
     Node_NameServerRMI NScommunication;
     Node_nodeRMI_Receive nodeRMIReceive;
-    int ownHash, prevHash, nextHash, newNodeHash, fileNameHash, port; //newNodeHash = van nieuwe node opgemerkt uit de multicast
+    int ownHash, prevHash, nextHash, newNodeHash, fileNameHash,port; //newNodeHash = van nieuwe node opgemerkt uit de multicast
     boolean onlyNode, wasOnlyNode, lowEdge, highEdge, shutdown = false, prevHighEdge;
     ConcurrentHashMap<String, FileMarker> fileMarkerMap; // markers met key=naam en filemarker object = value
+    ConcurrentHashMap<String, Boolean> systemYFiles; // string is filenaam, Boolean = lock op de file
     File fileDir;
     File[] fileArray;
     ArrayList<File> newFileList;
@@ -68,7 +69,7 @@ public class  Node
         getStartupInfoFromNS();
         loadFiles();
         updateFiles();
-        //receiveFile();
+        receiveFile();
         //testBootstrapDiscovery();
     }
 
@@ -240,6 +241,8 @@ public class  Node
                         String[] info = msg.split(" "); // het ontvangen bericht splitsen in woorden gescheiden door een spatie
                         newNodeHash = calcHash(info[0]);
                         newNodeIP = info[1];
+                        //if(onlyNode)
+                            //startFileAgent(newNodeIP);
                         recalcPosition();
                         if(newNodeHash == nextHash) //indien de nieuwe node een rechtse buur wordt: update eigenaar van de files.
                             updateFilesOwner();
@@ -252,6 +255,15 @@ public class  Node
                 }
             }
         }).start();
+    }
+
+    public void startFileAgent(String ip)
+    {
+        FileAgent fileAgent = new FileAgent();
+        fileAgent.setCurrentNode(this);
+        fileAgent.run();
+        Node_nodeRMI_Transmit nodeRMITransmit = new Node_nodeRMI_Transmit(ip,this);
+        nodeRMITransmit.transferFileAgent(fileAgent);
     }
 
     // Positie (buren) wordt gehercalculeerd door volgend algoritme
@@ -403,9 +415,8 @@ public class  Node
                     e.printStackTrace();
                 }
                 File[] newFileArray = fileDir.listFiles();
-                newFileList = new ArrayList<>(Arrays.asList(newFileArray));
-                oldFileList = new ArrayList<>(Arrays.asList(fileArray));
-
+                List<File> newFileList = new ArrayList<>(Arrays.asList(newFileArray));
+                List<File> oldFileList = new ArrayList<>(Arrays.asList(fileArray));
                 fileArray = newFileArray;
                 newFileList.removeAll(oldFileList);
                 if(!newFileList.isEmpty())
@@ -596,11 +607,11 @@ public class  Node
             {
                 try
                 {
-                    ServerSocket serverSocket = new ServerSocket(port);
+                    ServerSocket serverSocket;
 
-                    //while(true)
-                    //{
-                        System.out.println("receiveFile: " + port);
+                    while(true)
+                    {
+                        serverSocket = new ServerSocket(port);
                         Socket socket = serverSocket.accept();
                         System.out.println("receiveFiles1: Connected to server on port " + port);
 
@@ -624,14 +635,11 @@ public class  Node
                         }
                         System.out.println("receiveFiles4: Bytes Written: " + byteLength);
 
-                        //Laat niet toe om een bestand continu heen en weer te laten sturen
-                        File file = new File(fileDir.getName() + "/" + fileName);
-                        fileArray[fileArray.length] = file;
-
                         //Sending an ACK to the server
                         //ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
                         //oos.flush();
                         //oos.writeObject("ACKNOWLEDGE");
+                        //System.out.println("ACK sent.");
 
                         bis.close();
                         fos.close();
@@ -639,7 +647,7 @@ public class  Node
                         //oos.close();
                         socket.close();
                         serverSocket.close();
-                    //}
+                    }
                 } catch (IOException | ClassNotFoundException e)
                 {
                     e.printStackTrace();
@@ -652,8 +660,6 @@ public class  Node
     {
         Random rand = new Random();
         port = rand.nextInt((30000 - 10000) + 1) + 10000; // return port tussen 10 000 en 30 000
-        System.out.println("negotiatePort: port: "+port);
-        receiveFile();
         return port;
     }
 
