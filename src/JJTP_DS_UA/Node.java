@@ -25,9 +25,10 @@ public class  Node
     Inet4Address ip;
     Node_NameServerRMI NScommunication;
     Node_nodeRMI_Receive nodeRMIReceive;
-    int ownHash, prevHash, nextHash, newNodeHash, fileNameHash, port; //newNodeHash = van nieuwe node opgemerkt uit de multicast
+    int ownHash, prevHash, nextHash, newNodeHash, fileNameHash,port; //newNodeHash = van nieuwe node opgemerkt uit de multicast
     boolean onlyNode, wasOnlyNode, lowEdge, highEdge, shutdown = false, prevHighEdge;
     ConcurrentHashMap<String, FileMarker> fileMarkerMap; // markers met key=naam en filemarker object = value
+    ConcurrentHashMap<String, Boolean> systemYFiles; // string is filenaam, Boolean = lock op de file
     File fileDir;
     CopyOnWriteArrayList<File> currentFileList;
     CopyOnWriteArrayList<File> newFileList;
@@ -240,6 +241,8 @@ public class  Node
                         String[] info = msg.split(" "); // het ontvangen bericht splitsen in woorden gescheiden door een spatie
                         newNodeHash = calcHash(info[0]);
                         newNodeIP = info[1];
+                        //if(onlyNode)
+                            //startFileAgent(newNodeIP);
                         recalcPosition();
                         if(newNodeHash == nextHash) //indien de nieuwe node een rechtse buur wordt: update eigenaar van de files.
                             updateFilesOwner();
@@ -252,6 +255,15 @@ public class  Node
                 }
             }
         }).start();
+    }
+
+    public void startFileAgent(String ip)
+    {
+        FileAgent fileAgent = new FileAgent();
+        fileAgent.setCurrentNode(this);
+        fileAgent.run();
+        Node_nodeRMI_Transmit nodeRMITransmit = new Node_nodeRMI_Transmit(ip,this);
+        nodeRMITransmit.transferFileAgent(fileAgent);
     }
 
     // Positie (buren) wordt gehercalculeerd door volgend algoritme
@@ -596,11 +608,11 @@ public class  Node
             {
                 try
                 {
-                    ServerSocket serverSocket = new ServerSocket(port);
+                    ServerSocket serverSocket;
 
-                    //while(true)
-                    //{
-                        System.out.println("receiveFile: " + port);
+                   // while(true)
+                   // {
+                        serverSocket = new ServerSocket(port);
                         Socket socket = serverSocket.accept();
                         System.out.println("receiveFiles1: Connected to server on port " + port);
 
