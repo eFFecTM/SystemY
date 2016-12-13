@@ -27,11 +27,13 @@ public class  Node
     Node_nodeRMI_Receive nodeRMIReceive;
     int ownHash, prevHash, nextHash, newNodeHash, fileNameHash,port; //newNodeHash = van nieuwe node opgemerkt uit de multicast
     boolean onlyNode, wasOnlyNode, lowEdge, highEdge, shutdown = false, prevHighEdge;
-    ConcurrentHashMap<String, FileMarker> fileMarkerMap; // markers met key=naam en filemarker object = value
-    ConcurrentHashMap<String, Boolean> systemYFiles; // string is filenaam, Boolean = lock op de file
+    ConcurrentHashMap<String, FileMarker> fileMarkerMap; // markers met key=naam en filemarker object = value: eigenaar
+    ConcurrentHashMap<String, Boolean> systemYfiles; // string is filenaam, Boolean = lock op de file
+    ArrayList<String> removedFiles;
     File fileDir;
     CopyOnWriteArrayList<File> currentFileList;
     CopyOnWriteArrayList<File> newFileList;
+
 
     // Node constructor
     public Node() throws SocketException, UnknownHostException {
@@ -39,6 +41,7 @@ public class  Node
         NScommunication = new Node_NameServerRMI();
         bindNodeRMIReceive(); // RMI Node-Node
         fileMarkerMap = new ConcurrentHashMap<>();
+        removedFiles = new ArrayList<>();
     }
 
     // Op registerpoort 9876 wordt de Node_nodeRMI_Receive klasse verbonden op een locatie
@@ -119,7 +122,7 @@ public class  Node
                     int fileOwnerID = NScommunication.getNodeFromFilename(fileNameHash);
                     Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(NScommunication.getIP(fileOwnerID), this);
 
-                    if(nodeRMIt.notifyOwner(fileName,ownHash)) // als het bestand nooit gedownload is
+                    if(nodeRMIt.notifyOwner(fileName,ownHash)) // als het bestand nooit gedownload is @fixme uitzondering: creator = owner + bij delete: owner moet naam toeveogenin removedFiles arraylist
                     {
                         file.delete();
                         System.out.println("File: " + fileName + " has been found and deleted from owner and here!");
@@ -147,6 +150,7 @@ public class  Node
             {
                 if(file.getName().equals(fileName))
                 {
+                    removedFiles.add(fileName);
                     isDeleted = file.delete();
                 }
             }
