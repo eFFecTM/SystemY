@@ -15,6 +15,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 // Boven: Main_Node
 // Onder: Node_NameServerRMI, Node_nodeRMI_Receive, Node_nodeRMI_Transmit
@@ -29,9 +30,8 @@ public class  Node
     ConcurrentHashMap<String, FileMarker> fileMarkerMap; // markers met key=naam en filemarker object = value
     ConcurrentHashMap<String, Boolean> systemYFiles; // string is filenaam, Boolean = lock op de file
     File fileDir;
-    File[] fileArray;
-    ArrayList<File> newFileList;
-    ArrayList<File> oldFileList;
+    CopyOnWriteArrayList<File> currentFileList;
+    CopyOnWriteArrayList<File> newFileList;
 
     // Node constructor
     public Node() throws SocketException, UnknownHostException {
@@ -69,7 +69,7 @@ public class  Node
         getStartupInfoFromNS();
         loadFiles();
         updateFiles();
-        receiveFile();
+        //receiveFile();
         //testBootstrapDiscovery();
     }
 
@@ -89,7 +89,7 @@ public class  Node
             }
 
             //bestandenregeling todo: SHUTDOWN MOET GETEST WORDEN
-            for(File file : fileArray)
+            for(File file : currentFileList)
             {
                 String fileName = file.getName();
                 int fileNameHash = calcHash(fileName);
@@ -143,7 +143,7 @@ public class  Node
         if(isEmpty) // zoja bestand verwijderen
         {
             fileMarkerMap.remove(fileName);
-            for (File file : fileArray)
+            for (File file : currentFileList)
             {
                 if(file.getName().equals(fileName))
                 {
@@ -395,9 +395,10 @@ public class  Node
     public void loadFiles() // @TODO testen!
     {
         fileDir = new File("Files"); // gaat naar de "Files" directory in de locale projectmap
-        fileArray = fileDir.listFiles(); //maakt een array van alle files in de directory  !! enkel files geen directories zelf
-        for (int i = 0; i < fileArray.length; i++) {
-            addFile(fileArray[i]);
+        File[] fileArray = fileDir.listFiles(); //maakt een array van alle files in de directory  !! enkel files geen directories zelf
+        currentFileList = new CopyOnWriteArrayList<>(Arrays.asList(fileArray));
+        for (File file : currentFileList) {
+            addFile(file);
         }
     }
 
@@ -415,9 +416,11 @@ public class  Node
                     e.printStackTrace();
                 }
                 File[] newFileArray = fileDir.listFiles();
-                List<File> newFileList = new ArrayList<>(Arrays.asList(newFileArray));
-                List<File> oldFileList = new ArrayList<>(Arrays.asList(fileArray));
-                fileArray = newFileArray;
+                newFileList = new CopyOnWriteArrayList<File>(Arrays.asList(newFileArray));
+                CopyOnWriteArrayList<File> oldFileList = currentFileList;
+                currentFileList = newFileList;
+
+                //Check for new files (not already send or received)
                 newFileList.removeAll(oldFileList);
                 if(!newFileList.isEmpty())
                 {
@@ -609,8 +612,8 @@ public class  Node
                 {
                     ServerSocket serverSocket;
 
-                    while(true)
-                    {
+                   // while(true)
+                   // {
                         serverSocket = new ServerSocket(port);
                         Socket socket = serverSocket.accept();
                         System.out.println("receiveFiles1: Connected to server on port " + port);
@@ -635,11 +638,14 @@ public class  Node
                         }
                         System.out.println("receiveFiles4: Bytes Written: " + byteLength);
 
+                        //Laat niet toe om een bestand continu heen en weer te laten sturen
+                        File file = new File(fileDir.getName() + "/" + fileName);
+                        currentFileList.add(file);
+
                         //Sending an ACK to the server
                         //ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
                         //oos.flush();
                         //oos.writeObject("ACKNOWLEDGE");
-                        //System.out.println("ACK sent.");
 
                         bis.close();
                         fos.close();
@@ -647,7 +653,7 @@ public class  Node
                         //oos.close();
                         socket.close();
                         serverSocket.close();
-                    }
+                    //}
                 } catch (IOException | ClassNotFoundException e)
                 {
                     e.printStackTrace();
@@ -660,6 +666,8 @@ public class  Node
     {
         Random rand = new Random();
         port = rand.nextInt((30000 - 10000) + 1) + 10000; // return port tussen 10 000 en 30 000
+        System.out.println("negotiatePort: port: "+port);
+        receiveFile();
         return port;
     }
 
