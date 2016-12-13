@@ -12,8 +12,8 @@ public class FileMarker implements Serializable
     int fileNameHash;
     public int ownerID; //degene die nu eigenaar is (naar waar het voor het laatst gerepliceerd is)
     int creator; //degene die het bestand origineel in het netwerk bracht
-    ArrayList<Integer> localList, downloadList; // bevat respectievelijk de nodehashes van de nodes die het bestand lokaal hebben staan en die het gedownload hebben
-    // lokaal = creator + replica
+    ArrayList<Integer> downloadList; // bevat respectievelijk de nodehashes van de nodes die het bestand lokaal hebben staan en die het gedownload hebben
+    // lokaal = enkel creator!
     // downloaded = handmatig gedownload hebben
 
     public FileMarker(String fileName, int fileNameHash, int creator)
@@ -21,8 +21,6 @@ public class FileMarker implements Serializable
         this.fileName = fileName;
         this.fileNameHash = fileNameHash;
         this.creator = creator;
-        localList = new ArrayList<>();
-        localList.add(creator);
         downloadList = new ArrayList<>();
     }
 
@@ -31,19 +29,9 @@ public class FileMarker implements Serializable
         this.ownerID = ownerID;
     }
 
-    public void addLocalList(int nodeHash)
-    {
-        localList.add(nodeHash);
-    }
-
     public void addDownloadList(int nodeHash)
     {
         downloadList.add(nodeHash);
-    }
-
-    public void removeLocalList(int nodeHash)
-    {
-        localList.remove(nodeHash);
     }
 
     public void removeDownloadList(int nodeHash)

@@ -102,7 +102,7 @@ public class  Node
                 {
                     FileMarker fileMarker = fileMarkerMap.get(fileName);
 
-                    if(fileMarker.localList.contains(prevHash)) //fixme: geen rekening houden met: als de prev van de prev node het bestand ook lokaal bevat
+                    if(fileMarker.creator == prevHash)
                     {
                         nodeHash = NScommunication.getNodeFromFilename(prevHash-1); // gebruiken om prev node van jouw prev node te weten te komen
                     }
@@ -162,7 +162,7 @@ public class  Node
         }
         else
         {
-            fileMarkerMap.get(fileName).removeLocalList(ownHash); // verwijdert de shutgedowne node uit de lijst
+            fileMarkerMap.get(fileName).creator = -1; // verwijdert de shutgedowne local node, local = creator
         }
 
         return isEmpty;
@@ -464,7 +464,6 @@ public class  Node
             if(!onlyNode)
             {
                 sendFile(file, NScommunication.getIP(prevHash));
-                fileMarker.addLocalList(prevHash);
             }
         }
         else
@@ -600,7 +599,6 @@ public class  Node
     public synchronized void updateFileMarker(FileMarker fm)
     {
         fileMarkerMap.put(fm.fileName, fm);
-        fm.addLocalList(ownHash); // zichzelf toevoegen aan de lokale lijst van nodes die de file bevatten
     }
 
 
