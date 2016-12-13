@@ -28,9 +28,8 @@ public class  Node
     boolean onlyNode, wasOnlyNode, lowEdge, highEdge, shutdown = false, prevHighEdge;
     ConcurrentHashMap<String, FileMarker> fileMarkerMap; // markers met key=naam en filemarker object = value
     File fileDir;
-    File[] fileArray;
+    ArrayList<File> currentFileList;
     ArrayList<File> newFileList;
-    ArrayList<File> oldFileList;
 
     // Node constructor
     public Node() throws SocketException, UnknownHostException {
@@ -88,7 +87,7 @@ public class  Node
             }
 
             //bestandenregeling todo: SHUTDOWN MOET GETEST WORDEN
-            for(File file : fileArray)
+            for(File file : currentFileList)
             {
                 String fileName = file.getName();
                 int fileNameHash = calcHash(fileName);
@@ -142,7 +141,7 @@ public class  Node
         if(isEmpty) // zoja bestand verwijderen
         {
             fileMarkerMap.remove(fileName);
-            for (File file : fileArray)
+            for (File file : currentFileList)
             {
                 if(file.getName().equals(fileName))
                 {
@@ -383,9 +382,10 @@ public class  Node
     public void loadFiles() // @TODO testen!
     {
         fileDir = new File("Files"); // gaat naar de "Files" directory in de locale projectmap
-        fileArray = fileDir.listFiles(); //maakt een array van alle files in de directory  !! enkel files geen directories zelf
-        for (int i = 0; i < fileArray.length; i++) {
-            addFile(fileArray[i]);
+        File[] fileArray = fileDir.listFiles(); //maakt een array van alle files in de directory  !! enkel files geen directories zelf
+        currentFileList = new ArrayList<>(Arrays.asList(fileArray));
+        for (File file : currentFileList) {
+            addFile(file);
         }
     }
 
@@ -404,9 +404,10 @@ public class  Node
                 }
                 File[] newFileArray = fileDir.listFiles();
                 newFileList = new ArrayList<>(Arrays.asList(newFileArray));
-                oldFileList = new ArrayList<>(Arrays.asList(fileArray));
+                ArrayList<File> oldFileList = currentFileList;
+                currentFileList = newFileList;
 
-                fileArray = newFileArray;
+                //Check for new files (not already send or received)
                 newFileList.removeAll(oldFileList);
                 if(!newFileList.isEmpty())
                 {
@@ -626,7 +627,7 @@ public class  Node
 
                         //Laat niet toe om een bestand continu heen en weer te laten sturen
                         File file = new File(fileDir.getName() + "/" + fileName);
-                        fileArray[fileArray.length] = file;
+                        currentFileList.add(file);
 
                         //Sending an ACK to the server
                         //ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
