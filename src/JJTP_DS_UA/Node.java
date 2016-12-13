@@ -26,9 +26,11 @@ public class  Node
     Inet4Address ip;
     Node_NameServerRMI NScommunication;
     Node_nodeRMI_Receive nodeRMIReceive;
-    int ownHash, prevHash, nextHash, newNodeHash, fileNameHash, port; //newNodeHash = van nieuwe node opgemerkt uit de multicast
+    int ownHash, prevHash, nextHash, newNodeHash, fileNameHash,port; //newNodeHash = van nieuwe node opgemerkt uit de multicast
     boolean onlyNode, wasOnlyNode, lowEdge, highEdge, shutdown = false, prevHighEdge;
-    ConcurrentHashMap<String, FileMarker> fileMarkerMap; // markers met key=naam en filemarker object = value
+    ConcurrentHashMap<String, FileMarker> fileMarkerMap; // markers met key=naam en filemarker object = value: eigenaar
+    ConcurrentHashMap<String, Boolean> systemYfiles; // string is filenaam, Boolean = lock op de file
+    ArrayList<String> removedFiles;
     File fileDir;
     CopyOnWriteArrayList<File> currentFileList;
     CopyOnWriteArrayList<File> newFileList;
@@ -39,6 +41,7 @@ public class  Node
         NScommunication = new Node_NameServerRMI();
         bindNodeRMIReceive(); // RMI Node-Node
         fileMarkerMap = new ConcurrentHashMap<>();
+        removedFiles = new ArrayList<>();
     }
 
     // Op registerpoort 9876 wordt de Node_nodeRMI_Receive klasse verbonden op een locatie
@@ -99,7 +102,7 @@ public class  Node
                 {
                     FileMarker fileMarker = fileMarkerMap.get(fileName);
 
-                    if(fileMarker.localList.contains(prevHash)) //fixme: geen rekening houden met: als de prev van de prev node het bestand ook lokaal bevat
+                    if(fileMarker.creator == prevHash)
                     {
                         nodeHash = NScommunication.getNodeFromFilename(prevHash-1); // gebruiken om prev node van jouw prev node te weten te komen
                     }
@@ -124,7 +127,7 @@ public class  Node
                     int fileOwnerID = NScommunication.getNodeFromFilename(fileNameHash);
                     Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(NScommunication.getIP(fileOwnerID), this);
 
-                    if(nodeRMIt.notifyOwner(fileName,ownHash)) // als het bestand nooit gedownload is
+                    if(nodeRMIt.notifyOwner(fileName,ownHash)) // als het bestand nooit gedownload is @fixme uitzondering: creator = owner + bij delete: owner moet naam toeveogenin removedFiles arraylist
                     {
                         file.delete();
                         System.out.println("File: " + fileName + " has been found and deleted from owner and here!");
@@ -152,6 +155,7 @@ public class  Node
             {
                 if(file.getName().equals(fileName))
                 {
+                    removedFiles.add(fileName);
                     isDeleted = file.delete();
                 }
             }
@@ -163,7 +167,7 @@ public class  Node
         }
         else
         {
-            fileMarkerMap.get(fileName).removeLocalList(ownHash); // verwijdert de shutgedowne node uit de lijst
+            fileMarkerMap.get(fileName).creator = -1; // verwijdert de shutgedowne local node, local = creator
         }
 
         return isEmpty;
@@ -246,6 +250,8 @@ public class  Node
                         String[] info = msg.split(" "); // het ontvangen bericht splitsen in woorden gescheiden door een spatie
                         newNodeHash = calcHash(info[0]);
                         newNodeIP = info[1];
+                        //if(onlyNode)
+                            //startFileAgent(newNodeIP);
                         recalcPosition();
                         if(newNodeHash == nextHash) //indien de nieuwe node een rechtse buur wordt: update eigenaar van de files.
                             updateFilesOwner();
@@ -258,6 +264,15 @@ public class  Node
                 }
             }
         }).start();
+    }
+
+    public void startFileAgent(String ip)
+    {
+        FileAgent fileAgent = new FileAgent();
+        fileAgent.setCurrentNode(this);
+        fileAgent.run();
+        Node_nodeRMI_Transmit nodeRMITransmit = new Node_nodeRMI_Transmit(ip,this);
+        nodeRMITransmit.transferFileAgent(fileAgent);
     }
 
     // Positie (buren) wordt gehercalculeerd door volgend algoritme
@@ -391,8 +406,7 @@ public class  Node
         fileDir = new File("Files"); // gaat naar de "Files" directory in de locale projectmap
         File[] fileArray = fileDir.listFiles(); //maakt een array van alle files in de directory  !! enkel files geen directories zelf
         currentFileList = new CopyOnWriteArrayList<>(Arrays.asList(fileArray));
-        for (File file : currentFileList)
-        {
+        for (File file : currentFileList) {
             addFile(file);
         }
     }
@@ -460,7 +474,7 @@ public class  Node
                 nodeRMIt.negotiatePort(fileName, askFile, ipDest);
                 sendFile(file, ipDest);
 
-                fileMarker.addLocalList(prevHash);
+                //fileMarker.addLocalList(prevHash);
             }
         }
         else
@@ -614,7 +628,6 @@ public class  Node
     public synchronized void updateFileMarker(FileMarker fm)
     {
         fileMarkerMap.put(fm.fileName, fm);
-        fm.addLocalList(ownHash); // zichzelf toevoegen aan de lokale lijst van nodes die de file bevatten
     }
 
 
@@ -628,11 +641,11 @@ public class  Node
             {
                 try
                 {
-                    ServerSocket serverSocket = new ServerSocket(port);
+                    ServerSocket serverSocket;
 
-                    //while(true)
-                    //{
-                        System.out.println("receiveFile: " + port);
+                   // while(true)
+                   // {
+                        serverSocket = new ServerSocket(port);
                         Socket socket = serverSocket.accept();
                         System.out.println("receiveFiles1: Connected to server on port " + port);
 

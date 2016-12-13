@@ -63,5 +63,23 @@ public class Node_nodeRMI_Receive extends UnicastRemoteObject implements Node_no
         return myNode.negotiatePort(filename, askFile, ipDest);
     }
 
+    @Override
+    public void receiveFileAgent(FileAgent agent) throws RemoteException
+    {
+        new Thread(new Runnable()
+        {
+            public void run()
+            {
+                agent.setCurrentNode(myNode);
+                agent.run();
+            }
+        }).start();
+    }
+
+
+
+
+
+
 
 }
