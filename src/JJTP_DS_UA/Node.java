@@ -29,6 +29,8 @@ public class  Node
     ConcurrentHashMap<String, FileMarker> fileMarkerMap; // markers met key=naam en filemarker object = value
     File fileDir;
     File[] fileArray;
+    ArrayList<File> newFileList;
+    ArrayList<File> oldFileList;
 
     // Node constructor
     public Node() throws SocketException, UnknownHostException {
@@ -401,8 +403,9 @@ public class  Node
                     e.printStackTrace();
                 }
                 File[] newFileArray = fileDir.listFiles();
-                List<File> newFileList = new ArrayList<>(Arrays.asList(newFileArray));
-                List<File> oldFileList = new ArrayList<>(Arrays.asList(fileArray));
+                newFileList = new ArrayList<>(Arrays.asList(newFileArray));
+                oldFileList = new ArrayList<>(Arrays.asList(fileArray));
+
                 fileArray = newFileArray;
                 newFileList.removeAll(oldFileList);
                 if(!newFileList.isEmpty())
@@ -621,11 +624,14 @@ public class  Node
                         }
                         System.out.println("receiveFiles4: Bytes Written: " + byteLength);
 
+                        //Laat niet toe om een bestand continu heen en weer te laten sturen
+                        File file = new File(fileDir.getName() + "/" + fileName);
+                        fileArray[fileArray.length] = file;
+
                         //Sending an ACK to the server
                         //ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
                         //oos.flush();
                         //oos.writeObject("ACKNOWLEDGE");
-                        //System.out.println("ACK sent.");
 
                         bis.close();
                         fos.close();
