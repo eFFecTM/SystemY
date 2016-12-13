@@ -15,6 +15,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 // Boven: Main_Node
 // Onder: Node_NameServerRMI, Node_nodeRMI_Receive, Node_nodeRMI_Transmit
@@ -28,8 +29,8 @@ public class  Node
     boolean onlyNode, wasOnlyNode, lowEdge, highEdge, shutdown = false, prevHighEdge;
     ConcurrentHashMap<String, FileMarker> fileMarkerMap; // markers met key=naam en filemarker object = value
     File fileDir;
-    ArrayList<File> currentFileList;
-    ArrayList<File> newFileList;
+    CopyOnWriteArrayList<File> currentFileList;
+    CopyOnWriteArrayList<File> newFileList;
 
     // Node constructor
     public Node() throws SocketException, UnknownHostException {
@@ -383,7 +384,7 @@ public class  Node
     {
         fileDir = new File("Files"); // gaat naar de "Files" directory in de locale projectmap
         File[] fileArray = fileDir.listFiles(); //maakt een array van alle files in de directory  !! enkel files geen directories zelf
-        currentFileList = new ArrayList<>(Arrays.asList(fileArray));
+        currentFileList = new CopyOnWriteArrayList<>(Arrays.asList(fileArray));
         for (File file : currentFileList) {
             addFile(file);
         }
@@ -403,8 +404,8 @@ public class  Node
                     e.printStackTrace();
                 }
                 File[] newFileArray = fileDir.listFiles();
-                newFileList = new ArrayList<>(Arrays.asList(newFileArray));
-                ArrayList<File> oldFileList = currentFileList;
+                newFileList = new CopyOnWriteArrayList<File>(Arrays.asList(newFileArray));
+                CopyOnWriteArrayList<File> oldFileList = currentFileList;
                 currentFileList = newFileList;
 
                 //Check for new files (not already send or received)
