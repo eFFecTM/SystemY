@@ -21,6 +21,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 // Onder: Node_NameServerRMI, Node_nodeRMI_Receive, Node_nodeRMI_Transmit
 public class  Node
 {
+    Node thisNode = this;
     String name, newNodeIP;
     Inet4Address ip;
     Node_NameServerRMI NScommunication;
@@ -108,8 +109,13 @@ public class  Node
                     }
 
                     fileMarker.setOwnerID(nodeHash);
-                    sendFile(file,NScommunication.getIP(nodeHash));
-                    Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(NScommunication.getIP(nodeHash), this);
+
+                    String ipDest = NScommunication.getIP(nodeHash);
+                    boolean askFile = false;
+
+                    Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(ipDest, this);
+                    nodeRMIt.negotiatePort(fileName, askFile, ipDest);
+                    sendFile(file,ipDest);
                     nodeRMIt.updateFileMarkers(fileMarker);
                     fileMarkerMap.remove(fileMarker.fileName);
                 }
@@ -385,7 +391,8 @@ public class  Node
         fileDir = new File("Files"); // gaat naar de "Files" directory in de locale projectmap
         File[] fileArray = fileDir.listFiles(); //maakt een array van alle files in de directory  !! enkel files geen directories zelf
         currentFileList = new CopyOnWriteArrayList<>(Arrays.asList(fileArray));
-        for (File file : currentFileList) {
+        for (File file : currentFileList)
+        {
             addFile(file);
         }
     }
@@ -447,15 +454,25 @@ public class  Node
             fileMarker.setOwnerID(ownHash);
             if(!onlyNode)
             {
-                sendFile(file, NScommunication.getIP(prevHash));
+                String ipDest = NScommunication.getIP(prevHash);
+                boolean askFile = false;
+                Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(ipDest, this);
+                nodeRMIt.negotiatePort(fileName, askFile, ipDest);
+                sendFile(file, ipDest);
+
                 fileMarker.addLocalList(prevHash);
             }
         }
         else
         {
             fileMarker.setOwnerID(fileOwnerID);
-            sendFile(file, NScommunication.getIP(fileOwnerID));
-            Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(NScommunication.getIP(fileOwnerID), this);
+
+            String ipDest = NScommunication.getIP(fileOwnerID);
+            boolean askFile = false;
+            Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(ipDest, this);
+            nodeRMIt.negotiatePort(fileName, askFile, ipDest);
+            sendFile(file, ipDest);
+
             nodeRMIt.updateFileMarkers(fileMarker);
             fileMarkerMap.remove(fileMarker.fileName);
         }
@@ -479,23 +496,36 @@ public class  Node
             if (fileNameHash > nextHash)   // elke "normale" situatie (of je bent highedge en er komt een leftedge in
             {
                 File file = new File("\\Files\\" + fileMarkerMap.get(str).fileName);
+
+                boolean askFile = false;
+                Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(newNodeIP, this);
+                nodeRMIt.negotiatePort(file.getName(), askFile, newNodeIP);
                 sendFile(file, newNodeIP);
 
-                Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(newNodeIP, this);
                 nodeRMIt.updateFileMarkers(fileMarkerMap.get(str));
                 fileMarkerMap.remove(str);
             }
             else if(prevHighEdge && fileNameHash < ownHash) //er komt een nieuwe highedge in
             {
                 File file = new File("\\Files\\" + fileMarkerMap.get(str).fileName); //opent de file die verstuurd moet worden
-                sendFile(file, newNodeIP);
+
+                boolean askFile = false;
                 Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(newNodeIP, this);
+                nodeRMIt.negotiatePort(file.getName(), askFile, newNodeIP);
+
+                sendFile(file, newNodeIP);
                 nodeRMIt.updateFileMarkers(fileMarkerMap.get(str));
                 fileMarkerMap.remove(str);
             }
             else if(wasOnlyNode)
             {
                 File file = new File("\\Files\\" + fileMarkerMap.get(str).fileName);
+
+                String ipDest = NScommunication.getIP(prevHash);
+                boolean askFile = false;
+                Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(newNodeIP, this);
+                nodeRMIt.negotiatePort(file.getName(), askFile, newNodeIP);
+
                 sendFile(file, newNodeIP);
                 //@todo hier wordt een file doorgestuurd, dus filemarker update (met downloads)
             }
@@ -532,8 +562,8 @@ public class  Node
 
     public void sendFile(File file, String IPdest)
     {
-        Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(IPdest, this);
-        int port = nodeRMIt.negotiatePort();
+        //Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(IPdest, this);
+        //int port = nodeRMIt.negotiatePort();
         String fileLocation = fileDir.toString() + "/" + file.getName();
         System.out.println("sendFile1: "+fileLocation);
 
@@ -650,13 +680,55 @@ public class  Node
         }).start();
     }
 
-    public int negotiatePort()
+    public int negotiatePort(String filename, boolean askedFile, String ipDest )
     {
         Random rand = new Random();
         port = rand.nextInt((30000 - 10000) + 1) + 10000; // return port tussen 10 000 en 30 000
         System.out.println("negotiatePort: port: "+port);
-        receiveFile();
+        if (askedFile)
+        {
+            File file = getFileFromFilename(filename);
+            sendFile(file, ipDest);
+        }
+        else
+        {
+            receiveFile();
+        }
         return port;
     }
 
+    public void downloadFile(String filename)
+    {
+        new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                int fileHash = calcHash(filename);
+                Node_NameServerRMI node_serverRMI = new Node_NameServerRMI();
+                String IPdest = node_serverRMI.getIP(node_serverRMI.getNodeFromFilename(fileHash));
+                boolean askFile = true;
+                Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(IPdest, thisNode); //TODO: kijken of dit de propere manier is om een reference te sturen in een thread.
+
+                String ipDest = ip.toString();
+                int port = nodeRMIt.negotiatePort(filename, askFile, ipDest);
+                receiveFile();
+            }
+
+        }).start();
+    }
+
+    public File getFileFromFilename(String filename)
+    {
+        File fileToSend = null;
+        for(File file : currentFileList)
+        {
+            String tempFilename = file.getName();
+            if(tempFilename.equals(filename))
+            {
+                fileToSend = file;
+            }
+        }
+        return fileToSend;
+    }
 }

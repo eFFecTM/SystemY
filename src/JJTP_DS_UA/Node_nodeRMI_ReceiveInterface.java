@@ -4,6 +4,7 @@
  */
 package JJTP_DS_UA;
 
+import java.net.Inet4Address;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
@@ -15,5 +16,5 @@ public interface Node_nodeRMI_ReceiveInterface extends Remote
     public void updateOnlyNode() throws RemoteException;
     public void updateFileMarkers(FileMarker fm) throws RemoteException;
     public boolean notifyOwner(String fileName, int ownHash) throws RemoteException;
-    public int negotiatePort() throws RemoteException;
+    public int negotiatePort(String filename, Boolean askFile, String ipDest) throws RemoteException;
 }

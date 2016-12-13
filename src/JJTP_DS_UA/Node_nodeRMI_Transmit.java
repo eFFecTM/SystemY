@@ -3,6 +3,7 @@
  */
 package JJTP_DS_UA;
 
+import java.net.Inet4Address;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
@@ -98,11 +99,11 @@ public class Node_nodeRMI_Transmit
 
     }
 
-    public int negotiatePort()
+    public int negotiatePort(String filename,Boolean askFile,String ipDest)
     {
         try
         {
-            return nodeRMIReceive.negotiatePort();
+            return nodeRMIReceive.negotiatePort(filename, askFile, ipDest);
         } catch (RemoteException e)
         {
             e.printStackTrace();

@@ -4,6 +4,7 @@
  */
 package JJTP_DS_UA;
 
+import java.net.Inet4Address;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
@@ -57,9 +58,9 @@ public class Node_nodeRMI_Receive extends UnicastRemoteObject implements Node_no
     }
 
     @Override
-    public int negotiatePort() throws RemoteException
+    public int negotiatePort(String filename, Boolean askFile, String ipDest) throws RemoteException
     {
-        return myNode.negotiatePort();
+        return myNode.negotiatePort(filename, askFile, ipDest);
     }
 
 
