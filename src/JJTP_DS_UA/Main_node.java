@@ -4,6 +4,7 @@
  */
 package JJTP_DS_UA;
 
+import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.*;
@@ -20,12 +21,14 @@ public class Main_node
 
     public static void main(String[] args) throws SocketException, UnknownHostException
     {
-        node = new Node();
+        //node = new Node();
         gui = new GUI(); // Zet dit in commentaar als men de GUI tijdelijk niet nodig heeft
-        setNodeName();
-        node.listenMC();
+        fillTable();
+        //setNodeName();
+        //node.listenMC();
         //node.updateFiles();
         //node.receiveFiles();
+
 
         gui.logOutButtonActionListener(new ActionListener()
         {
@@ -49,6 +52,19 @@ public class Main_node
         node.testFailure("192.168.1.2"); // om te testen?
         */
     }
+
+    private static void fillTable()
+    {
+        DefaultTableModel tableModel = (DefaultTableModel) gui.table.getModel();
+        tableModel.setColumnCount(4);
+        for(int i=0;i<5;i++)
+        {
+            tableModel.addRow(new Object[]{"File Name","Open","Delete","Delete Local"});
+        }
+
+        //System.out.println("Rijen: " +tableModel.getRowCount() + " Kolommen:" + tableModel.getColumnCount());
+    }
+
 
     private static void setNodeName()
     {
