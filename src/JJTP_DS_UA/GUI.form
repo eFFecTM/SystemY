@@ -24,48 +24,39 @@
           <text value="Log out"/>
         </properties>
       </component>
-      <component id="f2198" class="javax.swing.JLabel">
+      <component id="f2198" class="javax.swing.JLabel" binding="label">
         <constraints border-constraint="North"/>
         <properties>
           <font name="Segoe UI" size="26" style="1"/>
           <foreground color="-5653755"/>
-          <text value="System Y files"/>
+          <horizontalAlignment value="0"/>
+          <horizontalTextPosition value="4"/>
+          <icon value="file-server.png"/>
+          <text value="Network Files"/>
         </properties>
       </component>
-      <scrollpane id="b3a2f">
+      <component id="518b7" class="javax.swing.JTable" binding="table">
         <constraints border-constraint="Center"/>
         <properties>
-          <background color="-15850431"/>
-          <foreground color="-15850431"/>
-          <opaque value="true"/>
-          <visible value="true"/>
+          <autoCreateRowSorter value="false"/>
+          <autoResizeMode value="4"/>
+          <background color="-7622478"/>
+          <cellSelectionEnabled value="true"/>
+          <columnSelectionAllowed value="true"/>
+          <enabled value="true"/>
+          <font name="Segoe UI" size="14"/>
+          <gridColor color="-121837"/>
+          <inheritsPopupMenu value="false"/>
+          <name value=""/>
+          <opaque value="false"/>
+          <preferredSize width="400" height="350"/>
+          <rowHeight value="25"/>
+          <selectionBackground color="-5298680"/>
+          <selectionForeground color="-1"/>
+          <showHorizontalLines value="false"/>
+          <showVerticalLines value="false"/>
         </properties>
-        <border type="none"/>
-        <children>
-          <component id="518b7" class="javax.swing.JTable" binding="table">
-            <constraints/>
-            <properties>
-              <autoCreateRowSorter value="true"/>
-              <autoResizeMode value="0"/>
-              <background color="-7816261"/>
-              <cellSelectionEnabled value="true"/>
-              <columnSelectionAllowed value="true"/>
-              <enabled value="true"/>
-              <font name="Segoe UI" size="14"/>
-              <gridColor color="-121837"/>
-              <inheritsPopupMenu value="false"/>
-              <name value=""/>
-              <opaque value="false"/>
-              <preferredSize width="400" height="350"/>
-              <rowHeight value="25"/>
-              <selectionBackground color="-5298680"/>
-              <selectionForeground color="-1"/>
-              <showHorizontalLines value="false"/>
-              <showVerticalLines value="false"/>
-            </properties>
-          </component>
-        </children>
-      </scrollpane>
+      </component>
     </children>
   </grid>
 </form>

@@ -16,13 +16,19 @@ public class GUI
     private JPanel mainPanel;
     private JButton logOutButton;
     JTable table;
+    private JLabel label;
 
     public GUI()
     {
         $$$setupUI$$$();
         openPanel();
         table.setModel(tableModel);
-        setColorForButtons();
+        DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
+        tableModel.setColumnCount(4);
+        for (int i = 1; i < 4; i++)
+        {
+            table.getColumnModel().getColumn(i).setPreferredWidth(30);
+        }
     }
 
     DefaultTableModel tableModel = new DefaultTableModel()
@@ -63,14 +69,6 @@ public class GUI
         table.setCellSelectionEnabled(true);
     }
 
-    public void setColorForButtons()
-    {
-        for (int i = 1; i < 4; i++)
-        {
-            //table.getColumnModel().getColumn(i).
-        }
-    }
-
     void logOutButtonActionListener(ActionListener al)
     {
         logOutButton.addActionListener(al);
@@ -105,21 +103,18 @@ public class GUI
         logOutButton.setPreferredSize(new Dimension(400, 45));
         logOutButton.setText("Log out");
         mainPanel.add(logOutButton, BorderLayout.SOUTH);
-        final JLabel label1 = new JLabel();
-        label1.setFont(new Font("Segoe UI", Font.BOLD, 26));
-        label1.setForeground(new Color(-5653755));
-        label1.setText("System Y files");
-        mainPanel.add(label1, BorderLayout.NORTH);
-        final JScrollPane scrollPane1 = new JScrollPane();
-        scrollPane1.setBackground(new Color(-15850431));
-        scrollPane1.setForeground(new Color(-15850431));
-        scrollPane1.setOpaque(true);
-        scrollPane1.setVisible(false);
-        mainPanel.add(scrollPane1, BorderLayout.CENTER);
+        label = new JLabel();
+        label.setFont(new Font("Segoe UI", Font.BOLD, 26));
+        label.setForeground(new Color(-5653755));
+        label.setHorizontalAlignment(0);
+        label.setHorizontalTextPosition(4);
+        label.setIcon(new ImageIcon(getClass().getResource("/file-server.png")));
+        label.setText("Network Files");
+        mainPanel.add(label, BorderLayout.NORTH);
         table = new JTable();
-        table.setAutoCreateRowSorter(true);
-        table.setAutoResizeMode(0);
-        table.setBackground(new Color(-7816261));
+        table.setAutoCreateRowSorter(false);
+        table.setAutoResizeMode(4);
+        table.setBackground(new Color(-7622478));
         table.setCellSelectionEnabled(true);
         table.setColumnSelectionAllowed(true);
         table.setEnabled(true);
@@ -134,7 +129,7 @@ public class GUI
         table.setSelectionForeground(new Color(-1));
         table.setShowHorizontalLines(false);
         table.setShowVerticalLines(false);
-        scrollPane1.setViewportView(table);
+        mainPanel.add(table, BorderLayout.CENTER);
     }
 
     /**

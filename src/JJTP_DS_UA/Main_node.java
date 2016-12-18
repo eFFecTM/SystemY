@@ -23,12 +23,11 @@ public class Main_node
     {
         //node = new Node();
         gui = new GUI(); // Zet dit in commentaar als men de GUI tijdelijk niet nodig heeft
-        fillTable();
+        //node.loadFiles();
         //setNodeName();
         //node.listenMC();
         //node.updateFiles();
         //node.receiveFiles();
-
 
         gui.logOutButtonActionListener(new ActionListener()
         {
@@ -36,7 +35,6 @@ public class Main_node
             public void actionPerformed(ActionEvent e)
             {
                 node.shutDown();
-
             }
         });
 
@@ -58,31 +56,17 @@ public class Main_node
                     if(column != 0)
                     {
                         fileName = gui.tableModel.getValueAt(row,0).toString();
-                        //node.manageFile(String fileName, int column); // column: 1=open, 2=delete, 3=delete local
+                        node.manageFile(fileName, column); // column: 1=open, 2=delete, 3=delete local
                     }
                 }
             }
         });
 
-
     }
 
-    private static void fillTable()
+    public static void addFileToTable(String fileName) //todo: bron van files is de filelijst dat de node van de agent krijgt
     {
-        DefaultTableModel tableModel = (DefaultTableModel) gui.table.getModel();
-        tableModel.setColumnCount(4);
-        for(int i=1;i<4;i++)
-        {
-            gui.table.getColumnModel().getColumn(i).setPreferredWidth(30);
-        }
-
-        for(int i=0;i<5;i++)
-        {
-            tableModel.addRow(new Object[]{"File Name","Open","Delete","Delete Local"});
-        }
-
-        tableModel.addRow(new Object[]{"z","Open","Delete","Delete Local"});
-        //System.out.println("Rijen: " +tableModel.getRowCount() + " Kolommen:" + tableModel.getColumnCount());
+        gui.tableModel.addRow(new Object[]{fileName,"Open","Delete","Delete Local"});
     }
 
 
