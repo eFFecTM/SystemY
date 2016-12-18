@@ -2,8 +2,11 @@ package JJTP_DS_UA;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseListener;
 
 /**
  * Created by JJTP on 11/11/2016.
@@ -18,7 +21,19 @@ public class GUI
     {
         $$$setupUI$$$();
         openPanel();
+        table.setModel(tableModel);
+        setColorForButtons();
     }
+
+    DefaultTableModel tableModel = new DefaultTableModel()
+    {
+        @Override
+        public boolean isCellEditable(int row, int column)
+        {
+            return false;
+        }
+    };
+
 
     public String setNodeName()
     {
@@ -48,9 +63,22 @@ public class GUI
         table.setCellSelectionEnabled(true);
     }
 
+    public void setColorForButtons()
+    {
+        for (int i = 1; i < 4; i++)
+        {
+            //table.getColumnModel().getColumn(i).
+        }
+    }
+
     void logOutButtonActionListener(ActionListener al)
     {
         logOutButton.addActionListener(al);
+    }
+
+    void tableCellMouseListener(MouseAdapter ma)
+    {
+        table.addMouseListener(ma);
     }
 
     /**
@@ -63,24 +91,12 @@ public class GUI
     private void $$$setupUI$$$()
     {
         mainPanel = new JPanel();
-        mainPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+        mainPanel.setLayout(new BorderLayout(0, 0));
         mainPanel.setAutoscrolls(false);
         mainPanel.setBackground(new Color(-15850431));
+        mainPanel.setForeground(new Color(-15850431));
         mainPanel.setMinimumSize(new Dimension(450, 450));
         mainPanel.setPreferredSize(new Dimension(450, 450));
-        table = new JTable();
-        table.setBackground(new Color(-16722968));
-        table.setColumnSelectionAllowed(false);
-        table.setFont(new Font("Segoe UI", table.getFont().getStyle(), table.getFont().getSize()));
-        table.setGridColor(new Color(-14987010));
-        table.setName("");
-        table.setOpaque(false);
-        table.setPreferredSize(new Dimension(400, 350));
-        table.setRowHeight(25);
-        table.setSelectionForeground(new Color(-1));
-        table.setShowHorizontalLines(false);
-        table.setShowVerticalLines(false);
-        mainPanel.add(table);
         logOutButton = new JButton();
         logOutButton.setFont(new Font(logOutButton.getFont().getName(), logOutButton.getFont().getStyle(), 18));
         logOutButton.setHorizontalAlignment(0);
@@ -88,7 +104,37 @@ public class GUI
         logOutButton.setMinimumSize(new Dimension(150, 41));
         logOutButton.setPreferredSize(new Dimension(400, 45));
         logOutButton.setText("Log out");
-        mainPanel.add(logOutButton);
+        mainPanel.add(logOutButton, BorderLayout.SOUTH);
+        final JLabel label1 = new JLabel();
+        label1.setFont(new Font("Segoe UI", Font.BOLD, 26));
+        label1.setForeground(new Color(-5653755));
+        label1.setText("System Y files");
+        mainPanel.add(label1, BorderLayout.NORTH);
+        final JScrollPane scrollPane1 = new JScrollPane();
+        scrollPane1.setBackground(new Color(-15850431));
+        scrollPane1.setForeground(new Color(-15850431));
+        scrollPane1.setOpaque(true);
+        scrollPane1.setVisible(false);
+        mainPanel.add(scrollPane1, BorderLayout.CENTER);
+        table = new JTable();
+        table.setAutoCreateRowSorter(true);
+        table.setAutoResizeMode(0);
+        table.setBackground(new Color(-7816261));
+        table.setCellSelectionEnabled(true);
+        table.setColumnSelectionAllowed(true);
+        table.setEnabled(true);
+        table.setFont(new Font("Segoe UI", table.getFont().getStyle(), 14));
+        table.setGridColor(new Color(-121837));
+        table.setInheritsPopupMenu(false);
+        table.setName("");
+        table.setOpaque(false);
+        table.setPreferredSize(new Dimension(400, 350));
+        table.setRowHeight(25);
+        table.setSelectionBackground(new Color(-5298680));
+        table.setSelectionForeground(new Color(-1));
+        table.setShowHorizontalLines(false);
+        table.setShowVerticalLines(false);
+        scrollPane1.setViewportView(table);
     }
 
     /**
