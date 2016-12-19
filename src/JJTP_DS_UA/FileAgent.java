@@ -22,8 +22,9 @@ public class FileAgent implements Runnable,Serializable
     @Override
     public void run()
     {
-
-
+        updateSystemYfiles(); //volgorde niet verzekerd juist
+        updateNodeSystemYfiles();
+        checkLocks();
     }
 
     public void updateSystemYfiles()
@@ -41,12 +42,24 @@ public class FileAgent implements Runnable,Serializable
         Set<String> keyset = systemYfiles.keySet();
         for(String key : keyset)
         {
-
+            if(!currentNode.systemYfiles.containsKey(key))
+                currentNode.systemYfiles.put(key, false);
         }
     }
-    public void checkLocks()
+    public void checkLocks() //@TODO bij het voltooien van download, de locks juist uitwerken
     {
-
+        Set<String> keyset = currentNode.systemYfiles.keySet();
+        for(String key : keyset)
+        {
+            if(currentNode.systemYfiles.get(key) == true) //de node heeft een lock
+            {
+                if(systemYfiles.get(key) == null) //er is nog geen lock
+                {
+                    // do something like give permission to download and release their lock
+                    systemYfiles.put(key, currentNode.ownHash); //voeg de lock toe in de lijst van de node
+                }
+            }
+        }
     }
 
     public void setCurrentNode(Node node)

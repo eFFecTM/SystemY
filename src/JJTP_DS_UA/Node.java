@@ -251,7 +251,7 @@ public class  Node
                         newNodeHash = calcHash(info[0]);
                         newNodeIP = info[1];
                         //if(onlyNode)
-                            //startFileAgent(newNodeIP);
+                            //startFileAgent();
                         recalcPosition();
                         if(newNodeHash == nextHash) //indien de nieuwe node een rechtse buur wordt: update eigenaar van de files.
                             updateFilesOwner();
@@ -266,12 +266,12 @@ public class  Node
         }).start();
     }
 
-    public void startFileAgent(String ip)
+    public void startFileAgent()
     {
         FileAgent fileAgent = new FileAgent();
         fileAgent.setCurrentNode(this);
         fileAgent.run();
-        Node_nodeRMI_Transmit nodeRMITransmit = new Node_nodeRMI_Transmit(ip,this);
+        Node_nodeRMI_Transmit nodeRMITransmit = new Node_nodeRMI_Transmit(NScommunication.getIP(nextHash),this);
         nodeRMITransmit.transferFileAgent(fileAgent);
     }
 
@@ -346,6 +346,7 @@ public class  Node
     public void failureOtherNode(String IP) //ip adrr van falende node
     {
         int[] neighbours = NScommunication.getIDs(IP); //in [0] zit de linkse buur, in [1] zit de rechtse buur
+        //FailureAgent failureAgent = new FailureAgent(NScommunication.getID(IP), this, neighbouts[1]);
         if (neighbours[0] == neighbours[1])//in dit geval is deze node de laatste node
         {
             onlyNode = true;
