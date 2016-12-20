@@ -431,28 +431,20 @@ public class  Node
                     }
                     File[] newFileArray = fileDir.listFiles();
                     newFileList.addAll(Arrays.asList(newFileArray));
-                    oldFileList.addAll(currentFileList);
-                    currentFileList.addAll(newFileList);
+                    CopyOnWriteArrayList<File> tempFileList = new CopyOnWriteArrayList<File>();
+                    tempFileList.addAll(newFileList);
 
-                    System.out.println("the currentFileList size: " + currentFileList.size());
-                    System.out.println("the oldFileList size (should be the same): " + oldFileList.size());
-                    System.out.println("the newFileList size: " + newFileList.size());
-
+                    tempFileList.removeAll(currentFileList);
+                    currentFileList.addAllAbsent(newFileList);
 
                     //Check for new files (not already send or received)
-                    newFileList.removeAll(oldFileList);
-                    if(!newFileList.isEmpty())
+                    if(!tempFileList.isEmpty())
                     {
-                        for(int i=0;i<newFileList.size();i++)
+                        for(int i=0;i<tempFileList.size();i++)
                         {
-                            addFile(newFileList.get(i));
+                            addFile(tempFileList.get(i));
                         }
                     }
-
-                    System.out.println("ERACHTER");
-                    System.out.println("the currentFileList size: " + currentFileList.size());
-                    System.out.println("the oldFileList size (should be the same): " + oldFileList.size());
-                    System.out.println("the newFileList size: " + newFileList.size());
 
                     //print all filemarkers
                     Set<String> keyset = fileMarkerMap.keySet(); //maak een set van keys van de map van de node van de bestanden waar hij eigenaar van is
