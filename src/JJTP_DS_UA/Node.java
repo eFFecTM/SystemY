@@ -111,7 +111,7 @@ public class  Node
                         nodeHash = prevHash;
                     }
 
-                    fileMarker.setOwnerID(nodeHash);
+                    fileMarker.ownerID = nodeHash;
 
                     String ipDest = NScommunication.getIP(nodeHash);
                     boolean askFile = false;
@@ -119,6 +119,7 @@ public class  Node
                     Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(ipDest, this);
                     int port = nodeRMIt.negotiatePort(fileName, askFile, ipDest);
                     sendFile(file, ipDest, port);
+                    fileMarker.downloadList.remove(ownHash); //node gaat weg
                     nodeRMIt.updateFileMarkers(fileMarker);
                     fileMarkerMap.remove(fileMarker.fileName);
                 }
@@ -480,7 +481,7 @@ public class  Node
         }*/
         if(fileOwnerID == ownHash)
         {
-            fileMarker.setOwnerID(ownHash);
+            fileMarker.ownerID = ownHash;
             if(!onlyNode)
             {
                 String ipDest = NScommunication.getIP(prevHash);
@@ -494,7 +495,7 @@ public class  Node
         }
         else
         {
-            fileMarker.setOwnerID(fileOwnerID);
+            fileMarker.ownerID = fileOwnerID;
 
             String ipDest = NScommunication.getIP(fileOwnerID);
             boolean askFile = false;
@@ -521,7 +522,8 @@ public class  Node
         Set<String> keyset = fileMarkerMap.keySet(); // Map van files waar deze node owner van is
         for (String str : keyset)
         {
-            fileNameHash = fileMarkerMap.get(str).fileNameHash;
+            FileMarker fileMarker = fileMarkerMap.get(str);
+            fileNameHash = fileMarker.fileNameHash;
             if (fileNameHash > nextHash)   // elke "normale" situatie (of je bent highedge en er komt een leftedge in
             {
                 File file = new File("\\Files\\" + fileMarkerMap.get(str).fileName);
@@ -530,8 +532,9 @@ public class  Node
                 Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(newNodeIP, this);
                 int port = nodeRMIt.negotiatePort(file.getName(), askFile, newNodeIP);
                 sendFile(file, newNodeIP, port);
-
-                nodeRMIt.updateFileMarkers(fileMarkerMap.get(str));
+                if(fileMarker.creator != ownHash)
+                    fileMarker.downloadList.add(ownHash); // node zal een downloadlocatie worden
+                nodeRMIt.updateFileMarkers(fileMarker);
                 fileMarkerMap.remove(str);
             }
             else if(prevHighEdge && fileNameHash < ownHash) //er komt een nieuwe highedge in
@@ -541,9 +544,10 @@ public class  Node
                 boolean askFile = false;
                 Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(newNodeIP, this);
                 int port = nodeRMIt.negotiatePort(file.getName(), askFile, newNodeIP);
-
                 sendFile(file, newNodeIP, port);
-                nodeRMIt.updateFileMarkers(fileMarkerMap.get(str));
+                if(fileMarker.creator != ownHash)
+                    fileMarker.downloadList.add(ownHash); // node zal een downloadlocatie worden
+                nodeRMIt.updateFileMarkers(fileMarker);
                 fileMarkerMap.remove(str);
             }
             else if(wasOnlyNode)
@@ -556,7 +560,6 @@ public class  Node
                 int port = nodeRMIt.negotiatePort(file.getName(), askFile, newNodeIP);
 
                 sendFile(file, newNodeIP, port);
-                //@todo hier wordt een file doorgestuurd, dus filemarker update (met downloads)
             }
 
         }
