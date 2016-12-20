@@ -22,7 +22,8 @@ public class Node_nodeRMI_Transmit
         } catch(Exception e)
         {
             node.failureOtherNode(ipAddr);
-            System.err.println("NodeSet exception: "+ e.getMessage());
+            System.err.println("@@@@@@@@@@@@@@$$$$$$$$$$$$$$$ DEES ISSEM @@@@@@@@@@@@@@@@@@$$$$$$$$$$$$$$$$$$$$");
+            System.err.println("Failure: NodeSet exception: "+ e.getMessage());
             e.printStackTrace();
         }
     }
