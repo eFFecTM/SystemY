@@ -145,7 +145,7 @@ public class  Node
                         }
 
                     }
-                    else if(nodeRMIt.notifyOwner(fileName,ownHash)) // als het bestand nooit gedownload is @fixme uitzondering: creator = owner + bij delete: owner moet naam toeveogenin removedFiles arraylist
+                    else if(nodeRMIt.notifyOwner(fileName,ownHash)) // als het bestand nooit gedownload is @fixme uitzondering: bij delete: owner moet naam toeveogenin removedFiles arraylist
                     {
                         file.delete();
                         System.out.println("File: " + fileName + " has been found and deleted from owner and here!");
