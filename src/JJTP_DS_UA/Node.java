@@ -41,6 +41,8 @@ public class  Node
         bindNodeRMIReceive(); // RMI Node-Node
         fileMarkerMap = new ConcurrentHashMap<>();
         removedFiles = new ArrayList<>();
+        newFileList = new CopyOnWriteArrayList<File>();
+        oldFileList = new CopyOnWriteArrayList<File>();
     }
 
     // Op registerpoort 9876 wordt de Node_nodeRMI_Receive klasse verbonden op een locatie
@@ -427,8 +429,7 @@ public class  Node
                         e.printStackTrace();
                     }
                     File[] newFileArray = fileDir.listFiles();
-                    newFileList = new CopyOnWriteArrayList<File>(Arrays.asList(newFileArray));
-                    oldFileList = new CopyOnWriteArrayList<File>();
+                    newFileList.addAll(Arrays.asList(newFileArray));
                     oldFileList = currentFileList;
                     currentFileList = newFileList;
 
@@ -446,6 +447,11 @@ public class  Node
                             addFile(newFileList.get(i));
                         }
                     }
+
+                    System.out.println("ERACHTER");
+                    System.out.println("the currentFileList size: " + currentFileList.size());
+                    System.out.println("the oldFileList size (should be the same): " + oldFileList.size());
+                    System.out.println("the newFileList size: " + newFileList.size());
 
                     //print all filemarkers
                     Set<String> keyset = fileMarkerMap.keySet(); //maak een set van keys van de map van de node van de bestanden waar hij eigenaar van is
