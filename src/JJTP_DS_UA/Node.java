@@ -438,6 +438,7 @@ public class  Node
                     {
                         for(int i=0;i<newFileList.size();i++)
                         {
+                            System.out.println("'new' file sent from 'updateFiles' method");
                             addFile(newFileList.get(i));
                         }
                     }
