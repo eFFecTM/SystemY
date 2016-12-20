@@ -32,8 +32,7 @@ public class  Node
     ConcurrentHashMap<String, Boolean> systemYfiles; // string is filenaam, Boolean = lock op de file
     ArrayList<String> removedFiles;
     File fileDir;
-    CopyOnWriteArrayList<File> currentFileList;
-    CopyOnWriteArrayList<File> newFileList;
+    CopyOnWriteArrayList<File> currentFileList, oldFileList, newFileList;
 
     // Node constructor
     public Node() throws SocketException, UnknownHostException {
@@ -429,7 +428,8 @@ public class  Node
                     }
                     File[] newFileArray = fileDir.listFiles();
                     newFileList = new CopyOnWriteArrayList<File>(Arrays.asList(newFileArray));
-                    CopyOnWriteArrayList<File> oldFileList = currentFileList;
+                    oldFileList = new CopyOnWriteArrayList<File>();
+                    oldFileList = currentFileList;
                     currentFileList = newFileList;
 
                     System.out.println("the currentFileList size: " + currentFileList.size());
