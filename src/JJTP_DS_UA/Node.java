@@ -432,13 +432,16 @@ public class  Node
                     CopyOnWriteArrayList<File> oldFileList = currentFileList;
                     currentFileList = newFileList;
 
+                    System.out.println("the currentFileList size: " + currentFileList.size());
+                    System.out.println("the oldFileList size (should be the same): " + oldFileList.size());
+                    System.out.println("the newFileList size: " + newFileList.size());
+
                     //Check for new files (not already send or received)
                     newFileList.removeAll(oldFileList);
                     if(!newFileList.isEmpty())
                     {
                         for(int i=0;i<newFileList.size();i++)
                         {
-                            System.out.println("'new' file sent from 'updateFiles' method");
                             addFile(newFileList.get(i));
                         }
                     }
