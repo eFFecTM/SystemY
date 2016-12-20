@@ -448,7 +448,6 @@ public class  Node
                             addFile(tempFileList.get(i));
                         }
                     }
-
                     tempFileList.clear();
                     newFileList.clear();
 
@@ -693,7 +692,8 @@ public class  Node
 
                         //Laat niet toe om een bestand continu heen en weer te laten sturen
                         File file = new File(fileDir.getName() + "/" + fileName);
-                        currentFileList.add(file);
+                        if(!currentFileList.contains(file))
+                            currentFileList.add(file);
 
                         //Sending an ACK to the server
                         //ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
