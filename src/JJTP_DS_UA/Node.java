@@ -32,7 +32,7 @@ public class  Node
     ConcurrentHashMap<String, Boolean> systemYfiles; // string is filenaam, Boolean = lock op de file
     ArrayList<String> removedFiles;
     File fileDir;
-    CopyOnWriteArrayList<File> currentFileList, oldFileList, newFileList;
+    CopyOnWriteArrayList<File> currentFileList, newFileList;
 
     // Node constructor
     public Node() throws SocketException, UnknownHostException {
@@ -42,7 +42,6 @@ public class  Node
         fileMarkerMap = new ConcurrentHashMap<>();
         removedFiles = new ArrayList<>();
         newFileList = new CopyOnWriteArrayList<File>();
-        oldFileList = new CopyOnWriteArrayList<File>();
     }
 
     // Op registerpoort 9876 wordt de Node_nodeRMI_Receive klasse verbonden op een locatie
@@ -437,6 +436,10 @@ public class  Node
                     tempFileList.removeAll(currentFileList);
                     currentFileList.addAllAbsent(newFileList);
 
+                    System.out.println("newFilelist size: " + newFileList.size());
+                    System.out.println("tempFilelist size: " + tempFileList.size());
+                    System.out.println("currentFilelist size: " + currentFileList.size());
+
                     //Check for new files (not already send or received)
                     if(!tempFileList.isEmpty())
                     {
@@ -445,6 +448,9 @@ public class  Node
                             addFile(tempFileList.get(i));
                         }
                     }
+
+                    tempFileList.clear();
+                    newFileList.clear();
 
                     //print all filemarkers
                     Set<String> keyset = fileMarkerMap.keySet(); //maak een set van keys van de map van de node van de bestanden waar hij eigenaar van is
