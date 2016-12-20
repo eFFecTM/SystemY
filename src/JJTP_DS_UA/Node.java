@@ -597,7 +597,7 @@ public class  Node
         //Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(IPdest, this);
         //int port = nodeRMIt.negotiatePort();
         String fileLocation = fileDir.toString() + "/" + file.getName();
-        System.out.println("\n sendFile1: "+fileLocation);
+        System.out.println("\n sendFile: "+fileLocation);
         System.out.println("IP dest: "+IPdest);
 
         try
@@ -664,7 +664,6 @@ public class  Node
                    // {
                         serverSocket = new ServerSocket(port);
                         Socket socket = serverSocket.accept();
-                        System.out.println("\n receiving file on port " + port);
 
                         ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
                         String fileName = (String) ois.readObject();
@@ -674,6 +673,7 @@ public class  Node
                         int length;
                         int byteLength = 1024;
                         FileOutputStream fos = new FileOutputStream(fileDir.getName()+ "/" + fileName); //fixme: als het niet werkt: \\
+                        System.out.println("\n receiving file: "+fileDir.getName() + "/" + fileName);
                         InputStream is = socket.getInputStream();
                         BufferedInputStream bis = new BufferedInputStream(is, 1024);
                         while ((length = bis.read(b, 0, 1024)) != -1)
