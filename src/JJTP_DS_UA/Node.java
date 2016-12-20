@@ -418,25 +418,28 @@ public class  Node
         new Thread(new Runnable() {
             public void run()
             {
-                try
+                while(true)
                 {
-                    Thread.sleep(30000); // Update na elke 30 seconden
-                } catch (InterruptedException e)
-                {
-                    e.printStackTrace();
-                }
-                File[] newFileArray = fileDir.listFiles();
-                newFileList = new CopyOnWriteArrayList<File>(Arrays.asList(newFileArray));
-                CopyOnWriteArrayList<File> oldFileList = currentFileList;
-                currentFileList = newFileList;
-
-                //Check for new files (not already send or received)
-                newFileList.removeAll(oldFileList);
-                if(!newFileList.isEmpty())
-                {
-                    for(int i=0;i<newFileList.size();i++)
+                    try
                     {
-                        addFile(newFileList.get(i));
+                        Thread.sleep(30000); // Update na elke 30 seconden
+                    } catch (InterruptedException e)
+                    {
+                        e.printStackTrace();
+                    }
+                    File[] newFileArray = fileDir.listFiles();
+                    newFileList = new CopyOnWriteArrayList<File>(Arrays.asList(newFileArray));
+                    CopyOnWriteArrayList<File> oldFileList = currentFileList;
+                    currentFileList = newFileList;
+
+                    //Check for new files (not already send or received)
+                    newFileList.removeAll(oldFileList);
+                    if(!newFileList.isEmpty())
+                    {
+                        for(int i=0;i<newFileList.size();i++)
+                        {
+                            addFile(newFileList.get(i));
+                        }
                     }
                 }
             }

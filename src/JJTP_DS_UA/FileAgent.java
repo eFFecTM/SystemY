@@ -22,10 +22,11 @@ public class FileAgent implements Runnable,Serializable
     @Override
     public void run()
     {
-        updateSystemYfiles(); //volgorde niet verzekerd juist
+        updateSystemYfiles();
         updateNodeSystemYfiles();
-        checkLocks();
+        //checkLocks();
     }
+
 
     public void updateSystemYfiles()
     {
