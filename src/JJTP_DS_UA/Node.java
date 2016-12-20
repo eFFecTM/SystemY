@@ -431,12 +431,13 @@ public class  Node
                     }
                     File[] newFileArray = fileDir.listFiles();
                     newFileList.addAll(Arrays.asList(newFileArray));
-                    oldFileList = currentFileList;
-                    currentFileList = newFileList;
+                    oldFileList.addAll(currentFileList);
+                    currentFileList.addAll(newFileList);
 
                     System.out.println("the currentFileList size: " + currentFileList.size());
                     System.out.println("the oldFileList size (should be the same): " + oldFileList.size());
                     System.out.println("the newFileList size: " + newFileList.size());
+
 
                     //Check for new files (not already send or received)
                     newFileList.removeAll(oldFileList);
