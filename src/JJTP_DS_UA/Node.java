@@ -32,8 +32,7 @@ public class  Node
     ConcurrentHashMap<String, Boolean> systemYfiles; // string is filenaam, Boolean = lock op de file
     ArrayList<String> removedFiles;
     File fileDir;
-    CopyOnWriteArrayList<File> currentFileList;
-    CopyOnWriteArrayList<File> newFileList;
+    CopyOnWriteArrayList<File> currentFileList, oldFileList, newFileList;
 
     // Node constructor
     public Node() throws SocketException, UnknownHostException {
@@ -42,6 +41,8 @@ public class  Node
         bindNodeRMIReceive(); // RMI Node-Node
         fileMarkerMap = new ConcurrentHashMap<>();
         removedFiles = new ArrayList<>();
+        newFileList = new CopyOnWriteArrayList<File>();
+        oldFileList = new CopyOnWriteArrayList<File>();
     }
 
     // Op registerpoort 9876 wordt de Node_nodeRMI_Receive klasse verbonden op een locatie
@@ -429,9 +430,13 @@ public class  Node
                         e.printStackTrace();
                     }
                     File[] newFileArray = fileDir.listFiles();
-                    newFileList = new CopyOnWriteArrayList<File>(Arrays.asList(newFileArray));
-                    CopyOnWriteArrayList<File> oldFileList = currentFileList;
+                    newFileList.addAll(Arrays.asList(newFileArray));
+                    oldFileList = currentFileList;
                     currentFileList = newFileList;
+
+                    System.out.println("the currentFileList size: " + currentFileList.size());
+                    System.out.println("the oldFileList size (should be the same): " + oldFileList.size());
+                    System.out.println("the newFileList size: " + newFileList.size());
 
                     //Check for new files (not already send or received)
                     newFileList.removeAll(oldFileList);
@@ -439,10 +444,14 @@ public class  Node
                     {
                         for(int i=0;i<newFileList.size();i++)
                         {
-                            System.out.println("'new' file sent from 'updateFiles' method");
                             addFile(newFileList.get(i));
                         }
                     }
+
+                    System.out.println("ERACHTER");
+                    System.out.println("the currentFileList size: " + currentFileList.size());
+                    System.out.println("the oldFileList size (should be the same): " + oldFileList.size());
+                    System.out.println("the newFileList size: " + newFileList.size());
 
                     //print all filemarkers
                     Set<String> keyset = fileMarkerMap.keySet(); //maak een set van keys van de map van de node van de bestanden waar hij eigenaar van is
@@ -597,7 +606,7 @@ public class  Node
         //Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(IPdest, this);
         //int port = nodeRMIt.negotiatePort();
         String fileLocation = fileDir.toString() + "/" + file.getName();
-        System.out.println("\n sendFile1: "+fileLocation);
+        System.out.println("\n sendFile: "+fileLocation);
         System.out.println("IP dest: "+IPdest);
 
         try
@@ -664,7 +673,6 @@ public class  Node
                    // {
                         serverSocket = new ServerSocket(port);
                         Socket socket = serverSocket.accept();
-                        System.out.println("\n receiving file on port " + port);
 
                         ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
                         String fileName = (String) ois.readObject();
@@ -674,6 +682,7 @@ public class  Node
                         int length;
                         int byteLength = 1024;
                         FileOutputStream fos = new FileOutputStream(fileDir.getName()+ "/" + fileName); //fixme: als het niet werkt: \\
+                        System.out.println("\n receiving file: "+fileDir.getName() + "/" + fileName);
                         InputStream is = socket.getInputStream();
                         BufferedInputStream bis = new BufferedInputStream(is, 1024);
                         while ((length = bis.read(b, 0, 1024)) != -1)
