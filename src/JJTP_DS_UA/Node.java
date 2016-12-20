@@ -446,7 +446,7 @@ public class  Node
                     //print all filemarkers
                     Set<String> keyset = fileMarkerMap.keySet(); //maak een set van keys van de map van de node van de bestanden waar hij eigenaar van is
                     System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-                    System.out.println("---All Files that the Node contains---");
+                    System.out.println("---All Files that the Node is owner of---");
                     for(String key : keyset) //ga de map af (van de files waar de node eigenaar van is) en put alles in de systemYfiles
                     {
                         System.out.println("File: "+key);
@@ -594,7 +594,8 @@ public class  Node
         //Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(IPdest, this);
         //int port = nodeRMIt.negotiatePort();
         String fileLocation = fileDir.toString() + "/" + file.getName();
-        System.out.println("sendFile1: "+fileLocation);
+        System.out.println("\n sendFile1: "+fileLocation);
+        System.out.println("IP dest: "+IPdest);
 
         try
         {
@@ -662,7 +663,7 @@ public class  Node
                    // {
                         serverSocket = new ServerSocket(port);
                         Socket socket = serverSocket.accept();
-                        System.out.println("receiveFiles1: Connected to server on port " + port);
+                        System.out.println("\n receiveFiles1: Connected to server on port " + port);
 
                         ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
                         String fileName = (String) ois.readObject();
@@ -712,7 +713,7 @@ public class  Node
     {
         Random rand = new Random();
         int port = rand.nextInt((30000 - 10000) + 1) + 10000; // return port tussen 10 000 en 30 000
-        System.out.println("negotiatePort: port: "+port);
+        System.out.println("\n negotiatePort: port: "+port);
         if (askedFile)
         {
             File file = getFileFromFilename(filename);
