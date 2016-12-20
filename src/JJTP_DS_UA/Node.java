@@ -441,6 +441,16 @@ public class  Node
                             addFile(newFileList.get(i));
                         }
                     }
+
+                    //print all filemarkers
+                    Set<String> keyset = fileMarkerMap.keySet(); //maak een set van keys van de map van de node van de bestanden waar hij eigenaar van is
+                    System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+                    System.out.println("---All Files that the Node contains---");
+                    for(String key : keyset) //ga de map af (van de files waar de node eigenaar van is) en put alles in de systemYfiles
+                    {
+                        System.out.println("File: "+key);
+                    }
+                    System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
                 }
             }
         }).start();
