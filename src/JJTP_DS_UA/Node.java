@@ -119,7 +119,6 @@ public class  Node
                     Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(ipDest, this);
                     int port = nodeRMIt.negotiatePort(fileName, askFile, ipDest);
                     sendFile(file, ipDest, port);
-                    fileMarker.downloadList.remove(ownHash); //node gaat weg
                     nodeRMIt.updateFileMarkers(fileMarker);
                     fileMarkerMap.remove(fileMarker.fileName);
                 }
@@ -128,7 +127,25 @@ public class  Node
                     int fileOwnerID = NScommunication.getNodeFromFilename(fileNameHash);
                     Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(NScommunication.getIP(fileOwnerID), this);
 
-                    if(nodeRMIt.notifyOwner(fileName,ownHash)) // als het bestand nooit gedownload is @fixme uitzondering: creator = owner + bij delete: owner moet naam toeveogenin removedFiles arraylist
+                    if(fileMarkerMap.containsKey(fileName))
+                    {
+                        if(fileMarkerMap.get(fileName).downloadList.isEmpty()) // als het bestand nooit gedownload is
+                        {
+                            removedFiles.add(fileName);
+                            file.delete();
+                            System.out.println("Creator = Owner -> File deleted.");
+                        }
+                        else if(ownHash == fileMarkerMap.get(fileName).creator) // de node is lokaal maar de creator
+                        {
+                            fileMarkerMap.get(fileName).creator = -1; // verwijdert de shutgedowne local node, local = creator
+                        }
+                        else // de node is lokaal maar geen creator
+                        {
+                            fileMarkerMap.get(fileName).downloadList.remove(ownHash);
+                        }
+
+                    }
+                    else if(nodeRMIt.notifyOwner(fileName,ownHash)) // als het bestand nooit gedownload is @fixme uitzondering: bij delete: owner moet naam toeveogenin removedFiles arraylist
                     {
                         file.delete();
                         System.out.println("File: " + fileName + " has been found and deleted from owner and here!");
@@ -154,11 +171,8 @@ public class  Node
             fileMarkerMap.remove(fileName);
             for (File file : currentFileList)
             {
-                if(file.getName().equals(fileName))
-                {
-                    removedFiles.add(fileName);
-                    isDeleted = file.delete();
-                }
+                removedFiles.add(fileName);
+                isDeleted = file.delete();
             }
 
             if(!isDeleted)
@@ -166,9 +180,13 @@ public class  Node
                 System.out.println("!!! File: " + fileName + " hasn't been deleted !!!");
             }
         }
-        else
+        else if(ownHash == fileMarkerMap.get(fileName).creator) // de node is lokaal maar de creator
         {
             fileMarkerMap.get(fileName).creator = -1; // verwijdert de shutgedowne local node, local = creator
+        }
+        else // de node is lokaal maar geen creator
+        {
+            fileMarkerMap.get(fileName).downloadList.remove(ownHash);
         }
 
         return isEmpty;
