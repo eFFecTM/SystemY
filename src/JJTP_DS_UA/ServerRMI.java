@@ -87,8 +87,14 @@ public class ServerRMI extends UnicastRemoteObject implements ServerRMIinterface
         int[] neighbours = new int[2];
         for(Map.Entry<Integer, Inet4Address> entry : ns.nodeMap.entrySet())
         {
-            if(entry.getValue().equals(ipAddr))
-                ID = entry.getKey();
+            try
+            {
+                if(entry.getValue().equals(Inet4Address.getByName(ipAddr)))
+                    ID = entry.getKey();
+            } catch (UnknownHostException e)
+            {
+                e.printStackTrace();
+            }
         }
         if(ID != -1)
         {
