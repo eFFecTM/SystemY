@@ -446,7 +446,7 @@ public class  Node
                     //print all filemarkers
                     Set<String> keyset = fileMarkerMap.keySet(); //maak een set van keys van de map van de node van de bestanden waar hij eigenaar van is
                     System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-                    System.out.println("---All Files that the Node is owner of---");
+                    System.out.println("---All Files that the Node contains---");
                     for(String key : keyset) //ga de map af (van de files waar de node eigenaar van is) en put alles in de systemYfiles
                     {
                         System.out.println("File: "+key);
@@ -600,6 +600,7 @@ public class  Node
         try
         {
             Socket socket = new Socket(IPdest, port);
+            System.out.println("SendFile2: Server socket has been set up at port: " + port + ".");
 
             ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
             oos.flush();
@@ -620,6 +621,7 @@ public class  Node
                 bos.flush();
             }
             socket.shutdownOutput(); // Important: output is being terminated
+            System.out.println("SendFile3: Bytes Sent: " + byteLength);
 
             //Receiving ACK from the client
             //ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
@@ -661,16 +663,18 @@ public class  Node
                    // {
                         serverSocket = new ServerSocket(port);
                         Socket socket = serverSocket.accept();
-                        System.out.println("\n receiving file on port " + port);
+                        System.out.println("receiveFiles1: Connected to server on port " + port);
 
                         ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
                         String fileName = (String) ois.readObject();
+                        System.out.println("receiveFiles2: Message from the client: " + fileName);
 
                         //Receiving a file from another node
                         byte[] b = new byte[1024];
                         int length;
                         int byteLength = 1024;
                         FileOutputStream fos = new FileOutputStream(fileDir.getName()+ "/" + fileName); //fixme: als het niet werkt: \\
+                            System.out.println("receiveFiles3: "+fileDir.getName() + "/" + fileName);
                         InputStream is = socket.getInputStream();
                         BufferedInputStream bis = new BufferedInputStream(is, 1024);
                         while ((length = bis.read(b, 0, 1024)) != -1)
@@ -679,6 +683,7 @@ public class  Node
                             byteLength = byteLength + 1024;
                             fos.write(b, 0, length);
                         }
+                        System.out.println("receiveFiles4: Bytes Written: " + byteLength);
 
                         //Laat niet toe om een bestand continu heen en weer te laten sturen
                         File file = new File(fileDir.getName() + "/" + fileName);
@@ -708,6 +713,7 @@ public class  Node
     {
         Random rand = new Random();
         int port = rand.nextInt((30000 - 10000) + 1) + 10000; // return port tussen 10 000 en 30 000
+        System.out.println("negotiatePort: port: "+port);
         if (askedFile)
         {
             File file = getFileFromFilename(filename);
