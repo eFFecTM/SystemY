@@ -64,6 +64,7 @@ public class Main_node
     public static void addFileToTable(String fileName) //todo: bron van files is de filelijst dat de node van de agent krijgt
     {
         gui.tableModel.addRow(new Object[]{fileName,"Open","Delete","Delete Local"});
+        System.out.println("GUI: Row added");
     }
 
 
@@ -78,6 +79,5 @@ public class Main_node
         }
         gui.openPanel();
         node.startUp(name); // bevat sendMC(), getStartupInfoFromNS() en testBootstrapDiscovery()
-
     }
 }
