@@ -457,6 +457,7 @@ public class  Node
         {
             Main_node.addFileToTable(file.getName());
             addFile(file);
+            System.out.println("file added to table");
         }
     }
 

@@ -76,7 +76,8 @@ public class Main_node
         {
             name = gui.setNodeName();
         }
-        node.startUp(name); // bevat sendMC(), getStartupInfoFromNS() en testBootstrapDiscovery()
         gui.openPanel();
+        node.startUp(name); // bevat sendMC(), getStartupInfoFromNS() en testBootstrapDiscovery()
+
     }
 }
