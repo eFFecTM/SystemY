@@ -160,13 +160,13 @@ public class  Node
                     nodeRMIt.updateFileMarkers(fileMarker);
                     fileMarkerMap.remove(fileMarker.fileName);
                 }
-                else if(!fileMarkerMap.contains(fileName) && creatorFiles.contains(fileName)) // Niet owner , wel creator = lokale file
+                else if(!fileMarkerMap.containsKey(fileName) && creatorFiles.contains(fileName)) // Niet owner , wel creator = lokale file
                 {
                     int fileOwnerID = NScommunication.getNodeFromFilename(fileNameHash);
                     Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(NScommunication.getIP(fileOwnerID), this);
                     nodeRMIt.notifyOwner(fileName);
                 }
-                else if(fileMarkerMap.contains(fileName) && creatorFiles.contains(fileName)) // Owner en creator : lokale
+                else if(fileMarkerMap.containsKey(fileName) && creatorFiles.contains(fileName)) // Owner en creator : lokale
                 {
                     if(fileMarkerMap.get(fileName).downloadList.isEmpty()) // als het bestand nooit gedownload is
                     {
