@@ -38,9 +38,9 @@ public class  Node
 
     // Node constructor
     public Node() throws SocketException, UnknownHostException {
-        getIP();
-        NScommunication = new Node_NameServerRMI();
-        bindNodeRMIReceive(); // RMI Node-Node
+//        getIP();
+//        NScommunication = new Node_NameServerRMI();
+//        bindNodeRMIReceive(); // RMI Node-Node
         fileMarkerMap = new ConcurrentHashMap<>();
         removedFiles = new ArrayList<>();
     }
@@ -53,12 +53,25 @@ public class  Node
             switch(column)
             {
                 case 1: // open file action //todo: rekening houden met de agent dat de file eventueel gedownload moet worden
+
+                    boolean isFound = false;
+
                     for(File file : currentFileList)
                     {
                         if(file.getName().equals(fileName))
-                                Desktop.getDesktop().open(file);
+                        {
+                            isFound = true;
+                            Desktop.getDesktop().open(file);
+                        }
+                    }
+                    if(!isFound)
+                    {
+                        downloadFile(fileName);
                     }
                     break;
+
+
+
 
                 case 2: // delete from network
 
@@ -445,7 +458,8 @@ public class  Node
         for (File file : currentFileList)
         {
             Main_node.addFileToTable(file.getName());
-            addFile(file);
+
+            //addFile(file);
         }
     }
 

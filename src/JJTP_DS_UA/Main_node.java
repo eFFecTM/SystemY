@@ -21,9 +21,9 @@ public class Main_node
 
     public static void main(String[] args) throws SocketException, UnknownHostException
     {
-        //node = new Node();
+        node = new Node();
         gui = new GUI(); // Zet dit in commentaar als men de GUI tijdelijk niet nodig heeft
-        //node.loadFiles();
+        node.loadFiles();
         //setNodeName();
         //node.listenMC();
         //node.updateFiles();

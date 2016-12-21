@@ -21,7 +21,7 @@ public class GUI
     public GUI()
     {
         $$$setupUI$$$();
-        setNodeName(); // tijdelijk hier geplaatst om te zetten
+        //setNodeName(); // tijdelijk hier geplaatst om te zetten
         openPanel();
         table.setModel(tableModel);
         DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
