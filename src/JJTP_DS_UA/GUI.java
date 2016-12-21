@@ -56,13 +56,6 @@ public class GUI
 
     public String setNodeName()
     {
-        frame.addWindowsListener(new java.awt.event.WindowAdapter()
-        {
-            public void windowsClosing(java.awt.event.WindowEvent windowEvent)
-            {
-                System.exit(0);
-            }
-        });
         String input = JOptionPane.showInputDialog("Welcome to System Y! Please enter your name.");
         String name;
         if (input!=null)
