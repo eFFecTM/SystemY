@@ -464,6 +464,7 @@ public class  Node
                         {
                             if(!addFile(tempFileList.get(i)))
                             {
+                                isFailed = false;
                                 addFile(tempFileList.get(i));
                             }
                         }
