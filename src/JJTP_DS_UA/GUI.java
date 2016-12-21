@@ -21,7 +21,7 @@ public class GUI
     public GUI()
     {
         $$$setupUI$$$();
-        setNodeName();
+        setNodeName(); // tijdelijk hier geplaatst om te zetten
         openPanel();
         table.setModel(tableModel);
         DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
@@ -56,21 +56,24 @@ public class GUI
 
     public String setNodeName()
     {
-        String name = JOptionPane.showInputDialog("Welcome to System Y! Please enter your name.");
-
-        while (name.equals(""))
+        String input = JOptionPane.showInputDialog("Welcome to System Y! Please enter your name.");
+        String name;
+        if (!input.equals(null))
         {
-            System.out.println("Please enter a name.");
-            JOptionPane.showMessageDialog(null, "Please enter a name.", "Authorization required", JOptionPane.INFORMATION_MESSAGE);
-            name = JOptionPane.showInputDialog("Welcome to System Y! Please enter your name.");
-        }
-
-        if (name.equals(JOptionPane.CANCEL_OPTION))
+            name = input;
+            while (name.equals(""))
+            {
+                System.out.println("Please enter a name.");
+                JOptionPane.showMessageDialog(null, "Please enter a name.", "Authorization required", JOptionPane.INFORMATION_MESSAGE);
+                name = JOptionPane.showInputDialog("Welcome to System Y! Please enter your name.");
+            }
+            return name;
+        } else
+        {
             System.exit(0);
-        return name;
+        }
+        return "noNameEntered";
     }
-
-
 
 
     void logOutButtonActionListener(ActionListener al)
