@@ -74,7 +74,7 @@ public class NameServer
         if(nodeMap.containsKey(hash))
             nodeMap.remove(hash);
         else
-            System.err.println("No such Node.");
+            System.err.println("Delete Node: No such Node.");
     }
 
     /**

@@ -21,7 +21,8 @@ public class Node_nodeRMI_Transmit
             nodeRMIReceive = (Node_nodeRMI_ReceiveInterface) Naming.lookup(location);
         } catch(Exception e)
         {
-            node.failureOtherNode(ipAddr);
+            node.isFailed = true;
+            node.failureOtherNode(ipAddr); // falende node wordt verwijderd, 30sec later wordt de file correct gerepliceerd
             System.err.println("@@@@@@@@@@@@@@$$$$$$$$$$$$$$$ DEES ISSEM @@@@@@@@@@@@@@@@@@$$$$$$$$$$$$$$$$$$$$");
             System.err.println("Failure: NodeSet exception: "+ e.getMessage());
             e.printStackTrace();

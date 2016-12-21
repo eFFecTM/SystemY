@@ -139,7 +139,7 @@ public class ServerRMI extends UnicastRemoteObject implements ServerRMIinterface
         if(ns.nodeMap.containsKey(hash))
             ns.nodeMap.remove(hash);
         else
-            System.err.println("No such Node.");
+            System.err.println("DeleteNode: No such Node."); // @fixme hij komt hier bij failure?
     }
 
     public int getNodeFromFilename(int fileHash)

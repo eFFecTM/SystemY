@@ -27,7 +27,7 @@ public class  Node
     Node_NameServerRMI NScommunication;
     Node_nodeRMI_Receive nodeRMIReceive;
     int ownHash, prevHash, nextHash, newNodeHash, fileNameHash; //newNodeHash = van nieuwe node opgemerkt uit de multicast
-    boolean onlyNode, wasOnlyNode, lowEdge, highEdge, shutdown = false, prevHighEdge;
+    boolean onlyNode, wasOnlyNode, lowEdge, highEdge, shutdown = false, prevHighEdge, isFailed;
     ConcurrentHashMap<String, FileMarker> fileMarkerMap; // markers met key=naam en filemarker object = value: eigenaar
     ConcurrentHashMap<String, Boolean> systemYfiles; // string is filenaam, Boolean = lock op de file
     ArrayList<String> removedFiles;
@@ -514,10 +514,11 @@ public class  Node
                 String ipDest = NScommunication.getIP(prevHash);
                 boolean askFile = false;
                 Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(ipDest, this);
-                int port = nodeRMIt.negotiatePort(fileName, askFile, ipDest);
-                sendFile(file, ipDest, port);
-
-                //fileMarker.addLocalList(prevHash);
+                if(!isFailed)
+                {
+                    int port = nodeRMIt.negotiatePort(fileName, askFile, ipDest);
+                    sendFile(file, ipDest, port);
+                }
             }
         }
         else
@@ -526,12 +527,15 @@ public class  Node
 
             String ipDest = NScommunication.getIP(fileOwnerID);
             boolean askFile = false;
-            Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(ipDest, this);
-            int port = nodeRMIt.negotiatePort(fileName, askFile, ipDest);
-            sendFile(file, ipDest, port);
+            if(!isFailed)
+            {
+                Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(ipDest, this);
+                int port = nodeRMIt.negotiatePort(fileName, askFile, ipDest);
+                sendFile(file, ipDest, port);
 
-            nodeRMIt.updateFileMarkers(fileMarker);
-            fileMarkerMap.remove(fileMarker.fileName);
+                nodeRMIt.updateFileMarkers(fileMarker);
+                fileMarkerMap.remove(fileMarker.fileName);
+            }
         }
     }
 
