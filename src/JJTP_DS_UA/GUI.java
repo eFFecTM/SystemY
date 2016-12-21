@@ -22,14 +22,8 @@ public class GUI
     {
         $$$setupUI$$$();
         //setNodeName(); // tijdelijk hier geplaatst om te zetten
-        openPanel();
-        table.setModel(tableModel);
-        DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
-        tableModel.setColumnCount(4);
-        for (int i = 1; i < 4; i++)
-        {
-            table.getColumnModel().getColumn(i).setPreferredWidth(30);
-        }
+        //openPanel();
+
     }
 
     public void openPanel()
@@ -42,6 +36,14 @@ public class GUI
         frame.pack();
         frame.setVisible(true);
         table.setCellSelectionEnabled(true);
+
+        table.setModel(tableModel);
+        DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
+        tableModel.setColumnCount(4);
+        for (int i = 1; i < 4; i++)
+        {
+            table.getColumnModel().getColumn(i).setPreferredWidth(30);
+        }
     }
 
     DefaultTableModel tableModel = new DefaultTableModel()
@@ -58,7 +60,7 @@ public class GUI
     {
         String input = JOptionPane.showInputDialog("Welcome to System Y! Please enter your name.");
         String name;
-        if (input!=null)
+        if (input != null)
         {
             name = input;
             while (name.equals(""))
