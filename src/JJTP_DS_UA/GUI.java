@@ -21,6 +21,7 @@ public class GUI
     public GUI()
     {
         $$$setupUI$$$();
+        setNodeName();
         openPanel();
         table.setModel(tableModel);
         DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
@@ -29,6 +30,18 @@ public class GUI
         {
             table.getColumnModel().getColumn(i).setPreferredWidth(30);
         }
+    }
+
+    public void openPanel()
+    {
+        JFrame frame = new JFrame("System Y");
+        $$$setupUI$$$(); // generated code bij IntelliJ GUI form (don't edit please!)
+        frame.setContentPane(mainPanel);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        frame.setLocation(700, 300);
+        frame.pack();
+        frame.setVisible(true);
+        table.setCellSelectionEnabled(true);
     }
 
     DefaultTableModel tableModel = new DefaultTableModel()
@@ -52,22 +65,13 @@ public class GUI
             name = JOptionPane.showInputDialog("Welcome to System Y! Please enter your name.");
         }
 
-        //if (name == JOptionPane.CANCEL_OPTION)
+        if (name.equals(JOptionPane.CANCEL_OPTION))
+            System.exit(0);
         return name;
     }
 
 
-    public void openPanel()
-    {
-        JFrame frame = new JFrame("System Y");
-        $$$setupUI$$$(); // generated code bij IntelliJ GUI form (don't edit please!)
-        frame.setContentPane(mainPanel);
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.setLocation(700, 300);
-        frame.pack();
-        frame.setVisible(true);
-        table.setCellSelectionEnabled(true);
-    }
+
 
     void logOutButtonActionListener(ActionListener al)
     {
