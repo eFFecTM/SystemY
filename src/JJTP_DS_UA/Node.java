@@ -462,7 +462,10 @@ public class  Node
                     {
                         for(int i=0;i<tempFileList.size();i++)
                         {
-                            addFile(tempFileList.get(i));
+                            if(!addFile(tempFileList.get(i)))
+                            {
+                                addFile(tempFileList.get(i));
+                            }
                         }
                     }
                     tempFileList.clear();
@@ -482,7 +485,7 @@ public class  Node
         }).start();
     }
 
-    public void addFile(File file)
+    public Boolean addFile(File file)
     {
         String fileName = file.getName();
         int fileNameHash = calcHash(file.getName());
@@ -502,8 +505,11 @@ public class  Node
                 {
                     int port = nodeRMIt.negotiatePort(fileName, askFile, ipDest);
                     sendFile(file, ipDest, port);
+                    return true;
                 }
+                return false;
             }
+            return true;
         }
         else
         {
@@ -511,15 +517,17 @@ public class  Node
 
             String ipDest = NScommunication.getIP(fileOwnerID);
             boolean askFile = false;
+            Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(ipDest, this);
             if(!isFailed)
             {
-                Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(ipDest, this);
                 int port = nodeRMIt.negotiatePort(fileName, askFile, ipDest);
                 sendFile(file, ipDest, port);
 
                 nodeRMIt.updateFileMarkers(fileMarker);
                 fileMarkerMap.remove(fileMarker.fileName);
+                return true;
             }
+            return false;
         }
     }
 
