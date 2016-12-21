@@ -160,7 +160,7 @@ public class  Node
         System.exit(0); //terminate JVM
     }
 
-    // Een andere node heeft een lokaal bestand waarvan ik owner ben, die zal uitgezet worden // todo: hoort bij shutdown, moet getest worden!
+    // Een andere node heeft een lokaal bestand waarvan ik owner ben, die zal uitgezet worden
     public boolean notifyOwner(String fileName, int ownHash)
     {
         boolean isEmpty = fileMarkerMap.get(fileName).downloadList.isEmpty();
@@ -191,7 +191,6 @@ public class  Node
 
         return isEmpty;
     }
-
 
     // Initialisatie: Een naam
     public boolean checkName(String name)
@@ -226,7 +225,6 @@ public class  Node
         } else
             onlyNode = false;
     }
-
 
     // Sturen van een MultiCast
     public void sendMC() {
@@ -423,7 +421,7 @@ public class  Node
         }
     }
 
-    public void loadFiles() // @TODO testen!
+    public void loadFiles()
     {
         fileDir = new File("Files"); // gaat naar de "Files" directory in de locale projectmap
         File[] fileArray = fileDir.listFiles(); //maakt een array van alle files in de directory  !! enkel files geen directories zelf
@@ -433,8 +431,7 @@ public class  Node
         }
     }
 
-    public void updateFiles() //@TODO testen!
-                                //@TODO lijst van gerepliceerde bijhouden; moeten niet terug gerepliceerd worden.
+    public void updateFiles()
     {
         new Thread(new Runnable() {
             public void run()
@@ -485,27 +482,14 @@ public class  Node
         }).start();
     }
 
-    public void addFile(File file) // TODO: testen!
+    public void addFile(File file)
     {
         String fileName = file.getName();
         int fileNameHash = calcHash(file.getName());
         FileMarker fileMarker = new FileMarker(fileName, fileNameHash, ownHash);
         fileMarkerMap.put(fileName, fileMarker); //maak bestandfiche aan en zet in de hashmap
         int fileOwnerID = NScommunication.getNodeFromFilename(fileNameHash);
-/*        if (fileOwnerID >= ownHash && fileOwnerID<nextHash)
-        {
-            fileMarker.setOwnerID(ownHash);
-            sendFile(file, NScommunication.getIP(prevHash));
 
-        }
-        else if(fileOwnerID < ownHash && fileOwnerID > 0)
-        {
-            fileMarker.setOwnerID(prevHash); //update de eigenaar in de filemarker
-            sendFile(file, NScommunication.getIP(prevHash)); //stuur file naar de eigenaar
-            Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(NScommunication.getIP(prevHash), this);
-            nodeRMIt.updateFileMarkers(fileMarker); //update de filemarkermap bij de eigenaar
-            fileMarkerMap.remove(fileMarker.fileName); //verwijder de filemarker uit de eigen map
-        }*/
         if(fileOwnerID == ownHash)
         {
             fileMarker.ownerID = ownHash;
@@ -541,7 +525,7 @@ public class  Node
 
     //controleert wanneer een nieuwe node in het netwerk komt of deze node eigenaar wordt van de bestanden (waar deze node eigenaar van is)
     //hier kom je in als de nieuwe node uw nextNode is.
-    public synchronized void updateFilesOwner() // @todo testen
+    public synchronized void updateFilesOwner()
     {
         try
         {
@@ -677,7 +661,6 @@ public class  Node
     {
         fileMarkerMap.put(fm.fileName, fm);
     }
-
 
     public void receiveFile(int port)
     {
