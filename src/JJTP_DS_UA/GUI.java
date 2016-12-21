@@ -58,7 +58,7 @@ public class GUI
     {
         String input = JOptionPane.showInputDialog("Welcome to System Y! Please enter your name.");
         String name;
-        if (!input.equals(null))
+        if (input!=null)
         {
             name = input;
             while (name.equals(""))
