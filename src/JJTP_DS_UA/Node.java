@@ -455,9 +455,7 @@ public class  Node
         currentFileList = new CopyOnWriteArrayList<>(Arrays.asList(fileArray));
         for (File file : currentFileList)
         {
-            Main_node.addFileToTable(file.getName());
             addFile(file);
-            System.out.println("file added to table");
         }
     }
 
@@ -519,6 +517,9 @@ public class  Node
     public Boolean addFile(File file)
     {
         String fileName = file.getName();
+
+        Main_node.addFileToTable(fileName);
+
         creatorFiles.add(fileName);
         int fileNameHash = calcHash(file.getName());
         FileMarker fileMarker = new FileMarker(fileName, fileNameHash, ownHash);
@@ -713,7 +714,10 @@ public class  Node
                         //Laat niet toe om een bestand continu heen en weer te laten sturen
                         File file = new File(fileDir.getName() + "/" + fileName);
                         if(!currentFileList.contains(file))
+                        {
                             currentFileList.add(file);
+                            Main_node.addFileToTable(fileName);
+                        }
 
                         //Sending an ACK to the server
                         //ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
