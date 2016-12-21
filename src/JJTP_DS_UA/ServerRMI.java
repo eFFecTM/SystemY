@@ -114,17 +114,19 @@ public class ServerRMI extends UnicastRemoteObject implements ServerRMIinterface
     @Override
     public int getID(String ipAddr) throws RemoteException //@fixme /'en in de adresse nakijken (volgens jan ok)
     {
+        Inet4Address ip = null;
         int ID = -1;
         try
         {
-            Inet4Address ip = (Inet4Address) Inet4Address.getByName(ipAddr);
+            ip = (Inet4Address) Inet4Address.getByName(ipAddr);
+            System.out.println("GetID (ServerRMI) : ip = " + ip);
         } catch (UnknownHostException e)
         {
             e.printStackTrace();
         }
         for(Map.Entry<Integer, Inet4Address> entry : ns.nodeMap.entrySet())
         {
-            if(entry.getValue().equals(ipAddr))
+            if(entry.getValue().equals(ip))
                 ID = entry.getKey();
         }
         return ID;
