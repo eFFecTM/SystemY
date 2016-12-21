@@ -7,6 +7,7 @@
 package JJTP_DS_UA;
 
 import javax.xml.crypto.Data;
+import java.awt.*;
 import java.io.*;
 import java.net.*;
 import java.rmi.AlreadyBoundException;
@@ -36,13 +37,61 @@ public class  Node
 
     // Node constructor
     public Node() throws SocketException, UnknownHostException {
-        getIP();
-        NScommunication = new Node_NameServerRMI();
-        bindNodeRMIReceive(); // RMI Node-Node
+//        getIP();
+//        NScommunication = new Node_NameServerRMI();
+//        bindNodeRMIReceive(); // RMI Node-Node
         fileMarkerMap = new ConcurrentHashMap<>();
         removedFiles = new ArrayList<>();
         newFileList = new CopyOnWriteArrayList<File>();
     }
+
+    // Gebruikt door de GUI
+    public void manageFile(String fileName, int column)
+    {
+        try
+        {
+            switch(column)
+            {
+                case 1: // open file action //todo: rekening houden met de agent dat de file eventueel gedownload moet worden
+
+                    boolean isFound = false;
+
+                    for(File file : currentFileList)
+                    {
+                        if(file.getName().equals(fileName))
+                        {
+                            isFound = true;
+                            Desktop.getDesktop().open(file);
+                        }
+                    }
+                    if(!isFound)
+                    {
+                        downloadFile(fileName);
+                    }
+                    break;
+
+
+
+
+                case 2: // delete from network
+
+                    break;
+
+                case 3: // delete local
+
+                    break;
+
+                default:
+                    System.out.println("Column is NOT 1, 2 or 3!");
+                    break;
+            }
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
+    }
+
 
     // Op registerpoort 9876 wordt de Node_nodeRMI_Receive klasse verbonden op een locatie
     public void bindNodeRMIReceive() {
@@ -426,8 +475,11 @@ public class  Node
         fileDir = new File("Files"); // gaat naar de "Files" directory in de locale projectmap
         File[] fileArray = fileDir.listFiles(); //maakt een array van alle files in de directory  !! enkel files geen directories zelf
         currentFileList = new CopyOnWriteArrayList<>(Arrays.asList(fileArray));
-        for (File file : currentFileList) {
-            addFile(file);
+        for (File file : currentFileList)
+        {
+            Main_node.addFileToTable(file.getName());
+
+            //addFile(file);
         }
     }
 

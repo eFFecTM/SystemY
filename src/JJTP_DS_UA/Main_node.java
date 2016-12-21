@@ -4,8 +4,9 @@
  */
 package JJTP_DS_UA;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.event.*;
 import java.net.*;
 import java.lang.String;
 import java.util.Collections;
@@ -22,8 +23,9 @@ public class Main_node
     {
         node = new Node();
         gui = new GUI(); // Zet dit in commentaar als men de GUI tijdelijk niet nodig heeft
-        setNodeName();
-        node.listenMC();
+        node.loadFiles();
+        //setNodeName();
+        //node.listenMC();
         //node.updateFiles();
         //node.receiveFiles();
 
@@ -33,22 +35,41 @@ public class Main_node
             public void actionPerformed(ActionEvent e)
             {
                 node.shutDown();
-
             }
         });
 
-        /*
-        try
+        gui.tableCellMouseListener(new MouseAdapter()
         {
-            Thread.sleep(5000);
-        } catch (InterruptedException e)
-        {
-            e.printStackTrace();
-        }
+            @Override
+            public void mouseClicked(MouseEvent e)
+            {
+                int row,column;
+                String fileName;
+                //logica voor cel
+                if(e.getClickCount() == 2)
+                {
+                    JTable target = (JTable) e.getSource();
+                    row = target.getSelectedRow();
+                    column = target.getSelectedColumn();
+                    System.out.println("Row: "+row+" Column: "+column);
 
-        node.testFailure("192.168.1.2"); // om te testen?
-        */
+                    if(column != 0)
+                    {
+                        fileName = gui.tableModel.getValueAt(row,0).toString();
+                        node.manageFile(fileName, column); // column: 1=open, 2=delete, 3=delete local
+                    }
+                }
+            }
+        });
+
     }
+
+    public static void addFileToTable(String fileName) //todo: bron van files is de filelijst dat de node van de agent krijgt
+    {
+        gui.tableModel.addRow(new Object[]{fileName,"Open","Delete","Delete Local"});
+    }
+
+
 
     private static void setNodeName()
     {
