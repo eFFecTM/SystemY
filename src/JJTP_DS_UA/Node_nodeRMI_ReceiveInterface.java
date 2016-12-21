@@ -14,7 +14,8 @@ public interface Node_nodeRMI_ReceiveInterface extends Remote
     public void updateLeftNeighbour(int hash) throws RemoteException;
     public void updateOnlyNode() throws RemoteException;
     public void updateFileMarkers(FileMarker fm) throws RemoteException;
-    public boolean notifyOwner(String fileName, int ownHash) throws RemoteException;
+    public void notifyOwner(String fileName) throws RemoteException;
+    public void removeFile(String fileName) throws RemoteException;
     public void receiveFileAgent(FileAgent agent) throws RemoteException;
     public int negotiatePort(String filename, Boolean askFile, String ipDest) throws RemoteException;
 }

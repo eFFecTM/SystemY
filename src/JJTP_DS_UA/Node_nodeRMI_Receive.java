@@ -4,6 +4,7 @@
  */
 package JJTP_DS_UA;
 
+import java.io.File;
 import java.net.Inet4Address;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -52,9 +53,20 @@ public class Node_nodeRMI_Receive extends UnicastRemoteObject implements Node_no
     }
 
     @Override
-    public boolean notifyOwner(String fileName, int ownHash) throws RemoteException
+    public void notifyOwner(String fileName) throws RemoteException
     {
-        return myNode.notifyOwner(fileName, ownHash);
+        myNode.notifyOwner(fileName);
+    }
+
+    @Override
+    public void removeFile(String fileName) throws RemoteException
+    {
+        myNode.currentFileList.remove(fileName);
+        for(File file : myNode.currentFileList)
+        {
+            if(file.getName().equals(fileName))
+                file.delete();
+        }
     }
 
     @Override
@@ -72,6 +84,7 @@ public class Node_nodeRMI_Receive extends UnicastRemoteObject implements Node_no
             {
                 agent.setCurrentNode(myNode);
                 agent.run();
+                myNode.transferFileAgent(agent);
             }
         }).start();
     }

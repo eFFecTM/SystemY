@@ -8,6 +8,7 @@ import java.util.Set;
 /**
  * Created by jonas on 7-12-2016.
  */
+//  TODO zorgt voor het updaten van de filemarkers bij het falen van een node
 public class FailureAgent implements Runnable,Serializable
 {
     int failedNode_ID;

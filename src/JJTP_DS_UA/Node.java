@@ -6,7 +6,6 @@
  */
 package JJTP_DS_UA;
 
-import javax.xml.crypto.Data;
 import java.io.*;
 import java.net.*;
 import java.rmi.AlreadyBoundException;
@@ -32,7 +31,8 @@ public class  Node
     ConcurrentHashMap<String, Boolean> systemYfiles; // string is filenaam, Boolean = lock op de file
     ArrayList<String> removedFiles;
     File fileDir;
-    CopyOnWriteArrayList<File> currentFileList, newFileList;
+    CopyOnWriteArrayList<File> currentFileList, newFileList; // = alle files die op het systeemstaan ,
+    CopyOnWriteArrayList<String> creatorFiles; //lijst van filenamen die deze node in het netwerk bracht
 
     // Node constructor
     public Node() throws SocketException, UnknownHostException {
@@ -42,6 +42,7 @@ public class  Node
         fileMarkerMap = new ConcurrentHashMap<>();
         removedFiles = new ArrayList<>();
         newFileList = new CopyOnWriteArrayList<File>();
+        creatorFiles = new CopyOnWriteArrayList<>();
     }
 
     // Op registerpoort 9876 wordt de Node_nodeRMI_Receive klasse verbonden op een locatie
@@ -79,7 +80,7 @@ public class  Node
     public void shutDown() {
         shutdown = true; //overbodig
 
-        if (prevHash == ownHash && nextHash == ownHash) // fixme: kan dit niet veranderd worden naar if(onlyNode)?
+        if(onlyNode)
             NScommunication.deleteNode(ownHash); //delete eigen node uit de map van de server
         else
         {
@@ -98,18 +99,14 @@ public class  Node
                 int fileNameHash = calcHash(fileName);
                 int nodeHash;
 
-                if(fileMarkerMap.containsKey(fileName) && fileNameHash != ownHash) // Node is owner + filehash verwijst niet naar zichzelf -> replicated file
+                if(fileMarkerMap.containsKey(fileName) && !creatorFiles.contains(fileName)) // Node is owner + niet creator -> replicated file
                 {
                     FileMarker fileMarker = fileMarkerMap.get(fileName);
 
                     if(fileMarker.creator == prevHash)
-                    {
                         nodeHash = NScommunication.getNodeFromFilename(prevHash-1); // gebruiken om prev node van jouw prev node te weten te komen
-                    }
                     else
-                    {
                         nodeHash = prevHash;
-                    }
 
                     fileMarker.ownerID = nodeHash;
 
@@ -122,46 +119,38 @@ public class  Node
                     nodeRMIt.updateFileMarkers(fileMarker);
                     fileMarkerMap.remove(fileMarker.fileName);
                 }
-                else // Local file
+                else if(!fileMarkerMap.contains(fileName) && creatorFiles.contains(fileName)) // Niet owner , wel creator = lokale file
                 {
                     int fileOwnerID = NScommunication.getNodeFromFilename(fileNameHash);
                     Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(NScommunication.getIP(fileOwnerID), this);
-
-                    if(fileMarkerMap.containsKey(fileName))
+                    nodeRMIt.notifyOwner(fileName);
+                }
+                else if(fileMarkerMap.contains(fileName) && creatorFiles.contains(fileName)) // Owner en creator : lokale
+                {
+                    if(fileMarkerMap.get(fileName).downloadList.isEmpty()) // als het bestand nooit gedownload is
                     {
-                        if(fileMarkerMap.get(fileName).downloadList.isEmpty()) // als het bestand nooit gedownload is
-                        {
-                            removedFiles.add(fileName);
-                            file.delete();
-                            System.out.println("Creator = Owner -> File deleted.");
-                        }
-                        else if(ownHash == fileMarkerMap.get(fileName).creator) // de node is lokaal maar de creator
-                        {
-                            fileMarkerMap.get(fileName).creator = -1; // verwijdert de shutgedowne local node, local = creator
-                        }
-                        else // de node is lokaal maar geen creator
-                        {
-                            fileMarkerMap.get(fileName).downloadList.remove(ownHash);
-                        }
-
+                        Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(NScommunication.getIP(prevHash), this);
+                        nodeRMIt.removeFile(fileName);
                     }
-                    else if(nodeRMIt.notifyOwner(fileName,ownHash)) // als het bestand nooit gedownload is @fixme uitzondering: bij delete: owner moet naam toeveogenin removedFiles arraylist
+                    else
                     {
-                        file.delete();
-                        System.out.println("File: " + fileName + " has been found and deleted from owner and here!");
+                        String ip = NScommunication.getIP(prevHash);
+                        Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(ip, this);
+                        int port = negotiatePort(fileName, false, NScommunication.getIP(prevHash));
+                        sendFile(file, ip, port);
+                        nodeRMIt.updateFileMarkers(fileMarkerMap.get(fileName));
+                        fileMarkerMap.remove(fileName);
                     }
                 }
             }
-
             updateLeftNeighbour(); //geef zijn linkerbuur aan de rechterbuur
             updateRightNeighbour(); //geeft zijn rechterbuur aan de linkerbuur
-
         }
         System.exit(0); //terminate JVM
     }
 
     // Een andere node heeft een lokaal bestand waarvan ik owner ben, die zal uitgezet worden
-    public boolean notifyOwner(String fileName, int ownHash)
+    public void notifyOwner(String fileName)
     {
         boolean isEmpty = fileMarkerMap.get(fileName).downloadList.isEmpty();
         boolean isDeleted = false;
@@ -169,27 +158,18 @@ public class  Node
         if(isEmpty) // zoja bestand verwijderen
         {
             fileMarkerMap.remove(fileName);
+            removedFiles.add(fileName);
             for (File file : currentFileList)
             {
-                removedFiles.add(fileName);
-                isDeleted = file.delete();
+                if(file.getName().equals(fileName))
+                    file.delete();
             }
 
-            if(!isDeleted)
-            {
-                System.out.println("!!! File: " + fileName + " hasn't been deleted !!!");
-            }
         }
-        else if(ownHash == fileMarkerMap.get(fileName).creator) // de node is lokaal maar de creator
+        else //downloadlijst niet leeg -> creator removen als downloadlocatie (hij shut down)
         {
-            fileMarkerMap.get(fileName).creator = -1; // verwijdert de shutgedowne local node, local = creator
+            fileMarkerMap.get(fileName).creator = -1;
         }
-        else // de node is lokaal maar geen creator
-        {
-            fileMarkerMap.get(fileName).downloadList.remove(ownHash);
-        }
-
-        return isEmpty;
     }
 
     // Initialisatie: Een naam
@@ -290,6 +270,12 @@ public class  Node
         fileAgent.run();
         Node_nodeRMI_Transmit nodeRMITransmit = new Node_nodeRMI_Transmit(NScommunication.getIP(nextHash),this);
         nodeRMITransmit.transferFileAgent(fileAgent);
+    }
+
+    public void transferFileAgent(FileAgent agent)
+    {
+        Node_nodeRMI_Transmit nodeRMITransmit = new Node_nodeRMI_Transmit(NScommunication.getIP(nextHash),this);
+        nodeRMITransmit.transferFileAgent(agent);
     }
 
     // Positie (buren) wordt gehercalculeerd door volgend algoritme
@@ -489,6 +475,7 @@ public class  Node
     public Boolean addFile(File file)
     {
         String fileName = file.getName();
+        creatorFiles.add(fileName);
         int fileNameHash = calcHash(file.getName());
         FileMarker fileMarker = new FileMarker(fileName, fileNameHash, ownHash);
         fileMarkerMap.put(fileName, fileMarker); //maak bestandfiche aan en zet in de hashmap
@@ -587,33 +574,6 @@ public class  Node
             }
 
         }
-    }
-
-    // TEST: gegevens weergeven van de Node
-    public void testBootstrapDiscovery() {
-        new Thread(new Runnable() {
-
-            public void run() {
-                while (true) {
-                    try {
-                        Thread.sleep(10000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    System.out.println("PrevHash: " + prevHash);
-                    System.out.println("NextHash: " + nextHash);
-                    System.out.println("ownHash: " + ownHash);
-                    System.out.println("FirstNode: " + onlyNode);
-                    System.out.println("lowEdge: " + lowEdge);
-                    System.out.println("highEdge: " + highEdge);
-                }
-            }
-        }).start();
-    }
-
-    public void testFailure(String ip) {
-        Node_nodeRMI_Transmit node_rmiObj = new Node_nodeRMI_Transmit(ip, this);
-        node_rmiObj.setNeighbours(1234, 1234);
     }
 
     public void sendFile(File file, String IPdest, int port)
@@ -780,5 +740,32 @@ public class  Node
             }
         }
         return fileToSend;
+    }
+
+    // TEST: gegevens weergeven van de Node
+    public void testBootstrapDiscovery() {
+        new Thread(new Runnable() {
+
+            public void run() {
+                while (true) {
+                    try {
+                        Thread.sleep(10000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    System.out.println("PrevHash: " + prevHash);
+                    System.out.println("NextHash: " + nextHash);
+                    System.out.println("ownHash: " + ownHash);
+                    System.out.println("FirstNode: " + onlyNode);
+                    System.out.println("lowEdge: " + lowEdge);
+                    System.out.println("highEdge: " + highEdge);
+                }
+            }
+        }).start();
+    }
+
+    public void testFailure(String ip) {
+        Node_nodeRMI_Transmit node_rmiObj = new Node_nodeRMI_Transmit(ip, this);
+        node_rmiObj.setNeighbours(1234, 1234);
     }
 }

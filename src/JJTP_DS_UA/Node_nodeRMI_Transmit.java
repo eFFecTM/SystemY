@@ -74,6 +74,17 @@ public class Node_nodeRMI_Transmit
         }
     }
 
+    public void removeFile(String fileName)
+    {
+        try
+        {
+            nodeRMIReceive.removeFile(fileName);
+        } catch (RemoteException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
     public void updateFileMarkers(FileMarker fm)
     {
         try
@@ -85,17 +96,15 @@ public class Node_nodeRMI_Transmit
         }
     }
 
-    public boolean notifyOwner(String fileName, int ownHash)
+    public void notifyOwner(String fileName)
     {
         try
         {
-            return nodeRMIReceive.notifyOwner(fileName, ownHash);
+            nodeRMIReceive.notifyOwner(fileName);
         } catch (RemoteException e)
         {
             e.printStackTrace();
-            return false;
         }
-
     }
 
     public void transferFileAgent(FileAgent agent)
