@@ -37,9 +37,9 @@ public class  Node
 
     // Node constructor
     public Node() throws SocketException, UnknownHostException {
-//        getIP();
-//        NScommunication = new Node_NameServerRMI();
-//        bindNodeRMIReceive(); // RMI Node-Node
+        getIP();
+        NScommunication = new Node_NameServerRMI();
+        bindNodeRMIReceive(); // RMI Node-Node
         fileMarkerMap = new ConcurrentHashMap<>();
         removedFiles = new ArrayList<>();
         newFileList = new CopyOnWriteArrayList<File>();
@@ -478,8 +478,7 @@ public class  Node
         for (File file : currentFileList)
         {
             Main_node.addFileToTable(file.getName());
-
-            //addFile(file);
+            addFile(file);
         }
     }
 

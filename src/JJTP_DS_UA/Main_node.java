@@ -23,11 +23,8 @@ public class Main_node
     {
         node = new Node();
         gui = new GUI(); // Zet dit in commentaar als men de GUI tijdelijk niet nodig heeft
-        node.loadFiles();
-        //setNodeName();
-        //node.listenMC();
-        //node.updateFiles();
-        //node.receiveFiles();
+        setNodeName();
+        node.listenMC();
 
         gui.logOutButtonActionListener(new ActionListener()
         {
