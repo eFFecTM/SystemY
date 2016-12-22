@@ -194,7 +194,6 @@ public class  Node
     public void notifyOwner(String fileName)
     {
         boolean isEmpty = fileMarkerMap.get(fileName).downloadList.isEmpty();
-        boolean isDeleted = false;
 
         if(isEmpty) // zoja bestand verwijderen
         {
@@ -288,8 +287,8 @@ public class  Node
                         String[] info = msg.split(" "); // het ontvangen bericht splitsen in woorden gescheiden door een spatie
                         newNodeHash = calcHash(info[0]);
                         newNodeIP = info[1];
-                        //if(onlyNode)
-                            //startFileAgent();
+                        if(onlyNode)
+                            startFileAgent();
                         recalcPosition();
                         if(newNodeHash == nextHash) //indien de nieuwe node een rechtse buur wordt: update eigenaar van de files.
                             updateFilesOwner();
