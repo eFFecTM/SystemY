@@ -82,7 +82,7 @@ public class Node_nodeRMI_Receive extends UnicastRemoteObject implements Node_no
         {
             public void run()
             {
-                agent.setCurrentNode(myNode);
+                agent.setCurrentNodeMaps(myNode.systemYfiles, myNode.fileMarkerMap);
                 agent.run();
                 myNode.transferFileAgent(agent);
             }

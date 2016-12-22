@@ -307,7 +307,7 @@ public class  Node
     public void startFileAgent()
     {
         FileAgent fileAgent = new FileAgent();
-        fileAgent.setCurrentNode(this);
+        fileAgent.setCurrentNodeMaps(systemYfiles, fileMarkerMap);
         fileAgent.run();
         Node_nodeRMI_Transmit nodeRMITransmit = new Node_nodeRMI_Transmit(NScommunication.getIP(nextHash),this);
         nodeRMITransmit.transferFileAgent(fileAgent);
