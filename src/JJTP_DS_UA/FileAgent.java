@@ -1,6 +1,8 @@
 package JJTP_DS_UA;
 
 import java.io.Serializable;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -15,6 +17,7 @@ public class FileAgent implements Runnable,Serializable
     Map<String, Integer> systemYfiles; //<K = Filename.ext, V = De node ID die een lock heeft (=null als er geen lock is>)
     ConcurrentHashMap<String, Boolean> nodeSystemYfiles;
     ConcurrentHashMap<String, FileMarker> nodeFileMarkerMap;
+    ArrayList<String> nodeRemovedFiles;
 
     public FileAgent()
     {
@@ -25,6 +28,7 @@ public class FileAgent implements Runnable,Serializable
     public void run()
     {
         updateSystemYfiles();
+        removeFiles();
         updateNodeSystemYfiles();
         //checkLocks();
     }
@@ -48,7 +52,28 @@ public class FileAgent implements Runnable,Serializable
             if(!nodeSystemYfiles.containsKey(key))
                 nodeSystemYfiles.put(key, false);
         }
+
+        Set<String> keyset2 = nodeSystemYfiles.keySet();
+        for(String key2 : keyset2)
+        {
+            if(!systemYfiles.containsKey(key2))
+                nodeSystemYfiles.remove(key2);
+        }
     }
+
+    public void removeFiles()
+    {
+        for(int i=0;i<nodeRemovedFiles.size();i++)
+        {
+            if(systemYfiles.containsKey(nodeRemovedFiles.get(i)))
+            {
+                systemYfiles.remove(nodeRemovedFiles.get(i));
+                nodeRemovedFiles.remove(i);
+            }
+
+        }
+    }
+
     public void checkLocks() //@TODO bij het voltooien van download, de locks juist uitwerken
     {
         Set<String> keyset = nodeSystemYfiles.keySet();
@@ -65,9 +90,10 @@ public class FileAgent implements Runnable,Serializable
         }
     }
 
-    public void setCurrentNodeMaps(ConcurrentHashMap<String, Boolean> nodeSystemYfiles, ConcurrentHashMap<String, FileMarker> nodeFileMarkerMap)
+    public void setCurrentNodeMaps(ConcurrentHashMap<String, Boolean> nodeSystemYfiles, ConcurrentHashMap<String, FileMarker> nodeFileMarkerMap, ArrayList<String> nodeRemovedFiles)
     {
         this.nodeSystemYfiles = nodeSystemYfiles;
         this.nodeFileMarkerMap = nodeFileMarkerMap;
+        this.nodeRemovedFiles = nodeRemovedFiles;
     }
 }
