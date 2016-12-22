@@ -107,7 +107,7 @@ public class GUI
         mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout(0, 0));
         mainPanel.setAutoscrolls(false);
-        mainPanel.setBackground(new Color(-15850431));
+        mainPanel.setBackground(new Color(-12828863));
         mainPanel.setForeground(new Color(-15850431));
         mainPanel.setMinimumSize(new Dimension(450, 450));
         mainPanel.setPreferredSize(new Dimension(450, 450));
@@ -121,7 +121,7 @@ public class GUI
         mainPanel.add(logOutButton, BorderLayout.SOUTH);
         label = new JLabel();
         label.setFont(new Font("Segoe UI", Font.BOLD, 26));
-        label.setForeground(new Color(-5653755));
+        label.setForeground(new Color(-7688271));
         label.setHorizontalAlignment(0);
         label.setHorizontalTextPosition(4);
         label.setIcon(new ImageIcon(getClass().getResource("/file-server.png")));
@@ -141,7 +141,7 @@ public class GUI
         table.setOpaque(false);
         table.setPreferredSize(new Dimension(400, 350));
         table.setRowHeight(25);
-        table.setSelectionBackground(new Color(-5298680));
+        table.setSelectionBackground(new Color(-9474193));
         table.setSelectionForeground(new Color(-1));
         table.setShowHorizontalLines(false);
         table.setShowVerticalLines(false);

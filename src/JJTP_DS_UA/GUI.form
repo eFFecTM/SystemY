@@ -6,7 +6,7 @@
     </constraints>
     <properties>
       <autoscrolls value="false"/>
-      <background color="-15850431"/>
+      <background color="-12828863"/>
       <foreground color="-15850431"/>
       <minimumSize width="450" height="450"/>
       <preferredSize width="450" height="450"/>
@@ -28,7 +28,7 @@
         <constraints border-constraint="North"/>
         <properties>
           <font name="Segoe UI" size="26" style="1"/>
-          <foreground color="-5653755"/>
+          <foreground color="-2441684"/>
           <horizontalAlignment value="0"/>
           <horizontalTextPosition value="4"/>
           <icon value="file-server.png"/>
@@ -51,7 +51,7 @@
           <opaque value="false"/>
           <preferredSize width="400" height="350"/>
           <rowHeight value="25"/>
-          <selectionBackground color="-5298680"/>
+          <selectionBackground color="-9474193"/>
           <selectionForeground color="-1"/>
           <showHorizontalLines value="false"/>
           <showVerticalLines value="false"/>
