@@ -117,6 +117,7 @@ public class  Node
         updateFiles();
         //receiveFile();
         //testBootstrapDiscovery();
+        testSystemYfilesMap();
     }
 
     public void shutDown() {
@@ -568,7 +569,6 @@ public class  Node
     //hier kom je in als de nieuwe node uw nextNode is.
     public synchronized void updateFilesOwner()
     {
-        System.out.println("----------------SYstemYFiles size: " + systemYfiles.size() + "----------------");
         try
         {
             Thread.sleep(5000); //geeft de nieuwe node tijd om op te starten
@@ -816,5 +816,22 @@ public class  Node
     public void testFailure(String ip) {
         Node_nodeRMI_Transmit node_rmiObj = new Node_nodeRMI_Transmit(ip, this);
         node_rmiObj.setNeighbours(1234, 1234);
+    }
+
+    public void testSystemYfilesMap()
+    {
+        new Thread(new Runnable() {
+
+            public void run() {
+                while (true) {
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    System.out.println("--------- SysteYfilesize: " + systemYfiles.size() + "----------");
+                }
+            }
+        }).start();
     }
 }
