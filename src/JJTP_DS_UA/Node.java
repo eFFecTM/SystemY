@@ -568,6 +568,7 @@ public class  Node
     //hier kom je in als de nieuwe node uw nextNode is.
     public synchronized void updateFilesOwner()
     {
+        System.out.println("----------------SYstemYFiles size: " + systemYfiles.size() + "----------------");
         try
         {
             Thread.sleep(5000); //geeft de nieuwe node tijd om op te starten
