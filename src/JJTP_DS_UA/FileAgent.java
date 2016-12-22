@@ -24,6 +24,7 @@ public class FileAgent implements Runnable,Serializable
     {
         updateSystemYfiles();
         updateNodeSystemYfiles();
+        currentNode = null;
         //checkLocks();
     }
 
