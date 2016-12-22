@@ -7,6 +7,8 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseListener;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by JJTP on 11/11/2016.
@@ -77,6 +79,25 @@ public class GUI
         return "noNameEntered";
     }
 
+    public void refreshGUI(ConcurrentHashMap<String, Boolean> systemYfiles)
+    {
+        tableModel.getDataVector().removeAllElements();
+        Set<String> keyset = systemYfiles.keySet(); //maak een set van keys van de map van de node van de bestanden waar hij eigenaar van is
+        for(String key : keyset) //ga de map af (van de files waar de node eigenaar van is) en put alles in de systemYfiles
+        {
+            tableModel.addRow(new Object[]{key,"Open","Delete","Delete Local"});
+        }
+    }
+
+    public void showDeleteMessage(String fileName)
+    {
+        JOptionPane.showMessageDialog(null,"You don't have permission to delete "+fileName+".","Error", JOptionPane.ERROR_MESSAGE);
+    }
+
+    public void showDeleteNetworkMessage()
+    {
+        JOptionPane.showMessageDialog(null,"This will be featured in a later version of this program.");
+    }
 
     void logOutButtonActionListener(ActionListener al)
     {
@@ -155,4 +176,7 @@ public class GUI
     {
         return mainPanel;
     }
+
+
+
 }

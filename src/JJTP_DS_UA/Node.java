@@ -72,9 +72,19 @@ public class  Node
                     }
                     break;
                 case 2: // delete from network
-
+                    Main_node.showDeleteNetworkMessage();
                     break;
                 case 3: // delete local
+                    if(!fileMarkerMap.containsKey(fileName))
+                    {
+                        File file = getFileFromFilename(fileName);
+                        file.delete();
+                        Main_node.deleteFileFromTable(fileName);
+                    }
+                    else
+                    {
+                        Main_node.showDeleteMessage(fileName);
+                    }
 
                     break;
                 default:
@@ -330,6 +340,7 @@ public class  Node
         {
             e.printStackTrace();
         }
+        Main_node.refreshGUI(systemYfiles);
         Node_nodeRMI_Transmit nodeRMITransmit = new Node_nodeRMI_Transmit(NScommunication.getIP(nextHash),this);
         nodeRMITransmit.transferFileAgent(agent);
     }
@@ -783,7 +794,8 @@ public class  Node
                 boolean askFile = true;
                 Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(IPdest, thisNode); //TODO: kijken of dit de propere manier is om een reference te sturen in een thread.
 
-                String ipDest = ip.toString();
+                String ipDest = ip.toString().substring(1);
+                System.out.println(ipDest);
                 int port = nodeRMIt.negotiatePort(filename, askFile, ipDest);
                 receiveFile(port);
             }

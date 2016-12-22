@@ -11,6 +11,7 @@ import java.net.*;
 import java.lang.String;
 import java.util.Collections;
 import java.util.Scanner;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 // Onder: Node
@@ -63,10 +64,25 @@ public class Main_node
 
     public static void addFileToTable(String fileName) //todo: bron van files is de filelijst dat de node van de agent krijgt
     {
-        gui.tableModel.addRow(new Object[]{fileName,"Open","Delete","Delete Local"});
+        //gui.tableModel.addRow(new Object[]{fileName,"Open","Delete","Delete Local"});
     }
 
+    public static void deleteFileFromTable(String fileName)
+    {
+//        int i;
+//        for(i=0;i<gui.tableModel.getRowCount();i++)
+//        {
+//            if(fileName == gui.tableModel.getValueAt(i,0))
+//            {
+//                gui.tableModel.removeRow(i);
+//            }
+//        }
+    }
 
+    public static void refreshGUI(ConcurrentHashMap<String, Boolean> systemYfiles)
+    {
+        gui.refreshGUI(systemYfiles);
+    }
 
     private static void setNodeName()
     {
@@ -79,4 +95,15 @@ public class Main_node
         gui.openPanel();
         node.startUp(name); // bevat sendMC(), getStartupInfoFromNS() en testBootstrapDiscovery()
     }
+
+    public static void showDeleteMessage(String fileName)
+    {
+        gui.showDeleteMessage(fileName);
+    }
+
+    public static void showDeleteNetworkMessage()
+    {
+        gui.showDeleteNetworkMessage();
+    }
+
 }
