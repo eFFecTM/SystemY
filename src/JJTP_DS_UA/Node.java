@@ -41,6 +41,7 @@ public class  Node
         NScommunication = new Node_NameServerRMI();
         bindNodeRMIReceive(); // RMI Node-Node
         fileMarkerMap = new ConcurrentHashMap<>();
+        systemYfiles = new ConcurrentHashMap<>();
         removedFiles = new ArrayList<>();
         newFileList = new CopyOnWriteArrayList<File>();
         creatorFiles = new CopyOnWriteArrayList<>();
