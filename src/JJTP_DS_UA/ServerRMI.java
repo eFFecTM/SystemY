@@ -77,6 +77,7 @@ public class ServerRMI extends UnicastRemoteObject implements ServerRMIinterface
     @Override
     public String getIP(int nodeHash)
     {
+        System.out.println("getIP: nodehash: " + nodeHash + "ip: " + ns.nodeMap.get(nodeHash).toString().substring(1));
         return ns.nodeMap.get(nodeHash).toString().substring(1); //returned : /192.168.1.xxx , substring verwijderd eerste char
     }
 

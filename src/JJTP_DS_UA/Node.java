@@ -316,6 +316,13 @@ public class  Node
 
     public void transferFileAgent(FileAgent agent)
     {
+        try
+        {
+            Thread.sleep(1000);
+        } catch (InterruptedException e)
+        {
+            e.printStackTrace();
+        }
         Node_nodeRMI_Transmit nodeRMITransmit = new Node_nodeRMI_Transmit(NScommunication.getIP(nextHash),this);
         nodeRMITransmit.transferFileAgent(agent);
     }
