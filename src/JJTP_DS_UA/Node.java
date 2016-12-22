@@ -307,6 +307,13 @@ public class  Node
 
     public void startFileAgent()
     {
+        try
+        {
+            Thread.sleep(3000);
+        } catch (InterruptedException e)
+        {
+            e.printStackTrace();
+        }
         FileAgent fileAgent = new FileAgent();
         fileAgent.setCurrentNodeMaps(systemYfiles, fileMarkerMap, removedFiles);
         fileAgent.run();
