@@ -118,11 +118,11 @@ public class Node_nodeRMI_Transmit
         }
     }
 
-    public int negotiatePort(String filename,Boolean askFile,String ipDest)
+    public int negotiatePort(String filename,Boolean askFile,String ipDest,int port)
     {
         try
         {
-            return nodeRMIReceive.negotiatePort(filename, askFile, ipDest);
+            return nodeRMIReceive.negotiatePort(filename, askFile, ipDest, port);
         } catch (RemoteException e)
         {
             e.printStackTrace();

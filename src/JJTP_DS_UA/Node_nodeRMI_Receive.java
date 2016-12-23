@@ -74,9 +74,9 @@ public class Node_nodeRMI_Receive extends UnicastRemoteObject implements Node_no
     }
 
     @Override
-    public int negotiatePort(String filename, Boolean askFile, String ipDest) throws RemoteException
+    public int negotiatePort(String filename, Boolean askFile, String ipDest, int port) throws RemoteException
     {
-        return myNode.negotiatePort(filename, askFile, ipDest);
+        return myNode.negotiatePort(filename, askFile, ipDest, port);
     }
 
     @Override

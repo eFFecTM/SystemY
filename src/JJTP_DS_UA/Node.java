@@ -166,7 +166,7 @@ public class  Node
                     boolean askFile = false;
 
                     Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(ipDest, this);
-                    int port = nodeRMIt.negotiatePort(fileName, askFile, ipDest);
+                    int port = nodeRMIt.negotiatePort(fileName, askFile, ipDest, 0);
                     sendFile(file, ipDest, port);
                     nodeRMIt.updateFileMarkers(fileMarker);
                     fileMarkerMap.remove(fileMarker.fileName);
@@ -187,7 +187,7 @@ public class  Node
                     else
                     {
                         Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(prevNodeIP, this);
-                        int port = negotiatePort(fileName, false, prevNodeIP);
+                        int port = negotiatePort(fileName, false, prevNodeIP, 0);
                         sendFile(file, prevNodeIP, port);
                         nodeRMIt.updateFileMarkers(fileMarkerMap.get(fileName));
                         fileMarkerMap.remove(fileName);
@@ -568,7 +568,7 @@ public class  Node
                 Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(prevNodeIP, this);
                 if(!isFailed)
                 {
-                    int port = nodeRMIt.negotiatePort(fileName, askFile, prevNodeIP);
+                    int port = nodeRMIt.negotiatePort(fileName, askFile, prevNodeIP, 0);
                     sendFile(file, prevNodeIP, port);
                     return true;
                 }
@@ -585,7 +585,7 @@ public class  Node
             Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(ipDest, this);
             if(!isFailed)
             {
-                int port = nodeRMIt.negotiatePort(fileName, askFile, ipDest);
+                int port = nodeRMIt.negotiatePort(fileName, askFile, ipDest, 0);
                 sendFile(file, ipDest, port);
 
                 nodeRMIt.updateFileMarkers(fileMarker);
@@ -618,7 +618,7 @@ public class  Node
 
                 boolean askFile = false;
                 Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(newNodeIP, this);
-                int port = nodeRMIt.negotiatePort(file.getName(), askFile, newNodeIP);
+                int port = nodeRMIt.negotiatePort(file.getName(), askFile, newNodeIP, 0);
                 sendFile(file, newNodeIP, port);
                 if(fileMarker.creator != ownHash)
                     fileMarker.downloadList.add(ownHash); // node zal een downloadlocatie worden
@@ -631,7 +631,7 @@ public class  Node
 
                 boolean askFile = false;
                 Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(newNodeIP, this);
-                int port = nodeRMIt.negotiatePort(file.getName(), askFile, newNodeIP);
+                int port = nodeRMIt.negotiatePort(file.getName(), askFile, newNodeIP, 0);
                 sendFile(file, newNodeIP, port);
                 if(fileMarker.creator != ownHash)
                     fileMarker.downloadList.add(ownHash); // node zal een downloadlocatie worden
@@ -644,7 +644,7 @@ public class  Node
 
                 boolean askFile = false;
                 Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(newNodeIP, this);
-                int port = nodeRMIt.negotiatePort(file.getName(), askFile, newNodeIP);
+                int port = nodeRMIt.negotiatePort(file.getName(), askFile, newNodeIP, 0);
 
                 sendFile(file, newNodeIP, port);
             }
@@ -769,10 +769,8 @@ public class  Node
         }).start();
     }
 
-    public int negotiatePort(String filename, boolean askedFile, String ipDest )
+    public int negotiatePort(String filename, boolean askedFile, String ipDest, int port)
     {
-        Random rand = new Random();
-        int port = rand.nextInt((30000 - 10000) + 1) + 10000; // return port tussen 10 000 en 30 000
         if (askedFile)
         {
             File file = getFileFromFilename(filename);
@@ -780,7 +778,10 @@ public class  Node
         }
         else
         {
+            Random rand = new Random();
+            port = rand.nextInt((30000 - 10000) + 1) + 10000; // return port tussen 10 000 en 30 000
             receiveFile(port);
+
         }
         return port;
     }
@@ -793,15 +794,17 @@ public class  Node
             public void run()
             {
                 int fileHash = calcHash(filename);
-                Node_NameServerRMI node_serverRMI = new Node_NameServerRMI();
-                String IPdest = node_serverRMI.getIP(node_serverRMI.getNodeFromFilename(fileHash));
+                String ipSrc = NScommunication.getIP(NScommunication.getNodeFromFilename(fileHash));
                 boolean askFile = true;
-                Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(IPdest, thisNode); //TODO: kijken of dit de propere manier is om een reference te sturen in een thread.
+                Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(ipSrc, thisNode);
 
                 String ipDest = ip.toString().substring(1);
-                System.out.println(ipDest);
-                int port = nodeRMIt.negotiatePort(filename, askFile, ipDest);
+
+                Random rand = new Random();
+                int port = rand.nextInt((30000 - 10000) + 1) + 10000; // return port tussen 10 000 en 30 000
                 receiveFile(port);
+                nodeRMIt.negotiatePort(filename, askFile, ipDest, port);
+
             }
 
         }).start();

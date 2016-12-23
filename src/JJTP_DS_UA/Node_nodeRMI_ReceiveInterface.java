@@ -17,5 +17,5 @@ public interface Node_nodeRMI_ReceiveInterface extends Remote
     public void notifyOwner(String fileName) throws RemoteException;
     public void removeFile(String fileName) throws RemoteException;
     public void receiveFileAgent(FileAgent agent) throws RemoteException;
-    public int negotiatePort(String filename, Boolean askFile, String ipDest) throws RemoteException;
+    public int negotiatePort(String filename, Boolean askFile, String ipDest, int port) throws RemoteException;
 }
