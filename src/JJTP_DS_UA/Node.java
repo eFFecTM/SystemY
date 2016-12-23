@@ -301,9 +301,9 @@ public class  Node
                         String[] info = msg.split(" "); // het ontvangen bericht splitsen in woorden gescheiden door een spatie
                         newNodeHash = calcHash(info[0]);
                         newNodeIP = info[1];
-//                        if(onlyNode)
-//                            startFileAgent();
                         recalcPosition();
+                        if(wasOnlyNode)
+                            startFileAgent();
                         if(newNodeHash == nextHash) //indien de nieuwe node een rechtse buur wordt: update eigenaar van de files.
                             updateFilesOwner();
                         System.out.println("Naam: " + info[0]);

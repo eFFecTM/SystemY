@@ -26,18 +26,22 @@ public class Node_nodeRMI_Receive extends UnicastRemoteObject implements Node_no
     {
         myNode.prevHash=prevHash;
         myNode.nextHash=nextHash;
+        myNode.prevNodeIP = myNode.NScommunication.getIP(prevHash);
+        myNode.nextNodeIP = myNode.NScommunication.getIP(nextHash);
     }
 
     @Override
     public void updateLeftNeighbour(int hash)
     {
         myNode.prevHash=hash;
+        myNode.prevNodeIP = myNode.NScommunication.getIP(hash);
     }
 
     @Override
     public void updateRightNeighbour(int hash) throws RemoteException
     {
-        myNode.nextHash=hash; //rechterbuur van de node wordt geupdate door de huidige rechterbuur die weggaat
+        myNode.nextHash = hash; //rechterbuur van de node wordt geupdate door de huidige rechterbuur die weggaat
+        myNode.nextNodeIP = myNode.NScommunication.getIP(hash);
     }
 
     @Override
