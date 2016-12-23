@@ -69,6 +69,15 @@ public class  Node
                     if(!isFound)
                     {
                         downloadFile(fileName);
+
+                        try {
+                            Thread.sleep(2000); // Belangrijk: Wordt niet gevonden als we direct openen
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+
+                        System.out.println(fileName+" downloaded.");
+
                         File file = getFileFromFilename(fileName);
                         Desktop.getDesktop().open(file);
                     }
