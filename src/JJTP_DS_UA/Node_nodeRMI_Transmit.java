@@ -19,7 +19,8 @@ public class Node_nodeRMI_Transmit
         {
             String location = ("//"+ ipAddr + "/NodeSet"); //  voorbeeld: "//192.168.1.1/FileServer"
             nodeRMIReceive = (Node_nodeRMI_ReceiveInterface) Naming.lookup(location);
-        } catch(Exception e)
+        }
+        catch(Exception e)
         {
             node.isFailed = true;
             node.failureOtherNode(ipAddr); // falende node wordt verwijderd, 30sec later wordt de file correct gerepliceerd
@@ -35,7 +36,8 @@ public class Node_nodeRMI_Transmit
         try
         {
             nodeRMIReceive.setNeighbours(prevHash,nextHash);
-        } catch (RemoteException e)
+        }
+        catch (RemoteException e)
         {
             e.printStackTrace();
         }
@@ -46,7 +48,8 @@ public class Node_nodeRMI_Transmit
         try
         {
             nodeRMIReceive.updateLeftNeighbour(hash);
-        } catch (RemoteException e)
+        }
+        catch (RemoteException e)
         {
             e.printStackTrace();
         }
@@ -57,7 +60,8 @@ public class Node_nodeRMI_Transmit
         try
         {
             nodeRMIReceive.updateRightNeighbour(hash); //update de rechterbuur van de linker waarmee de shutdown node geconnecteerd is
-        } catch (RemoteException e)
+        }
+        catch (RemoteException e)
         {
             e.printStackTrace();
         }
@@ -68,7 +72,8 @@ public class Node_nodeRMI_Transmit
         try
         {
             nodeRMIReceive.updateOnlyNode();
-        } catch (RemoteException e)
+        }
+        catch (RemoteException e)
         {
             e.printStackTrace();
         }
@@ -79,7 +84,8 @@ public class Node_nodeRMI_Transmit
         try
         {
             nodeRMIReceive.removeFile(fileName);
-        } catch (RemoteException e)
+        }
+        catch (RemoteException e)
         {
             e.printStackTrace();
         }
@@ -90,7 +96,8 @@ public class Node_nodeRMI_Transmit
         try
         {
             nodeRMIReceive.updateFileMarkers(fm);
-        } catch (RemoteException e)
+        }
+        catch (RemoteException e)
         {
             e.printStackTrace();
         }
@@ -101,7 +108,8 @@ public class Node_nodeRMI_Transmit
         try
         {
             nodeRMIReceive.notifyOwner(fileName);
-        } catch (RemoteException e)
+        }
+        catch (RemoteException e)
         {
             e.printStackTrace();
         }
@@ -112,7 +120,8 @@ public class Node_nodeRMI_Transmit
         try
         {
             nodeRMIReceive.receiveFileAgent(agent);
-        } catch (RemoteException e)
+        }
+        catch (RemoteException e)
         {
             e.printStackTrace();
         }
@@ -123,7 +132,8 @@ public class Node_nodeRMI_Transmit
         try
         {
             return nodeRMIReceive.negotiatePort(filename, askFile, ipDest, port);
-        } catch (RemoteException e)
+        }
+        catch (RemoteException e)
         {
             e.printStackTrace();
             return -1;

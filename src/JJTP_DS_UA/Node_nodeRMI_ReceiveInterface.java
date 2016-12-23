@@ -9,13 +9,13 @@ import java.rmi.RemoteException;
 
 public interface Node_nodeRMI_ReceiveInterface extends Remote
 {
-    public void setNeighbours(int prevHash, int nextHash) throws RemoteException;
-    public void updateRightNeighbour(int hash) throws RemoteException;
-    public void updateLeftNeighbour(int hash) throws RemoteException;
-    public void updateOnlyNode() throws RemoteException;
-    public void updateFileMarkers(FileMarker fm) throws RemoteException;
-    public void notifyOwner(String fileName) throws RemoteException;
-    public void removeFile(String fileName) throws RemoteException;
-    public void receiveFileAgent(FileAgent agent) throws RemoteException;
-    public int negotiatePort(String filename, Boolean askFile, String ipDest, int port) throws RemoteException;
+    void setNeighbours(int prevHash, int nextHash) throws RemoteException;
+    void updateRightNeighbour(int hash) throws RemoteException;
+    void updateLeftNeighbour(int hash) throws RemoteException;
+    void updateOnlyNode() throws RemoteException;
+    void updateFileMarkers(FileMarker fm) throws RemoteException;
+    void notifyOwner(String fileName) throws RemoteException;
+    void removeFile(String fileName) throws RemoteException;
+    void receiveFileAgent(FileAgent agent) throws RemoteException;
+    int negotiatePort(String filename, Boolean askFile, String ipDest, int port) throws RemoteException;
 }

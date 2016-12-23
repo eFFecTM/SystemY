@@ -48,7 +48,8 @@ public class NameServer
             reg.bind(bindLocation, RMIclass);
             System.out.println("FileServer Server is ready at:" + bindLocation);
             System.out.println("java RMI registry created.");
-        } catch (AlreadyBoundException | RemoteException e)
+        }
+        catch (AlreadyBoundException | RemoteException e)
         {
             System.err.println("java RMI registry already exists.");
         }
@@ -81,14 +82,11 @@ public class NameServer
             FileWriter fileWriter = new FileWriter(file);
             fileWriter.write(xml);
             fileWriter.close();
-        } catch (IOException e)
+        }
+        catch (IOException e)
         {
             e.printStackTrace();
         }
-
-        // Unmarshall: XML naar TreeMap (als het ooit nodig is)
-        //TreeMap<Integer,Inet4Address> map = (TreeMap<Integer,Inet4Address>) xStream.fromXML(xml);
-
         System.out.println("Converted to XML.");
     }
 
@@ -118,7 +116,8 @@ public class NameServer
                         addNode(info[0],(Inet4Address) Inet4Address.getByName(info[1]));
                         saveNodeMapXML();
                     }
-                } catch(IOException e)
+                }
+                catch(IOException e)
                 {
                     e.printStackTrace();
                 }
@@ -139,7 +138,8 @@ public class NameServer
                     try
                     {
                         Thread.sleep(10000);
-                    } catch (InterruptedException e)
+                    }
+                    catch (InterruptedException e)
                     {
                         e.printStackTrace();
                     }

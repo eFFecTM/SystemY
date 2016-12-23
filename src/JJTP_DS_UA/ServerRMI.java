@@ -92,7 +92,8 @@ public class ServerRMI extends UnicastRemoteObject implements ServerRMIinterface
             {
                 if(entry.getValue().equals(Inet4Address.getByName(ipAddr)))
                     ID = entry.getKey();
-            } catch (UnknownHostException e)
+            }
+            catch (UnknownHostException e)
             {
                 e.printStackTrace();
             }
@@ -121,7 +122,8 @@ public class ServerRMI extends UnicastRemoteObject implements ServerRMIinterface
         {
             ip = (Inet4Address) Inet4Address.getByName(ipAddr);
             System.out.println("GetID (ServerRMI) : ip = " + ip);
-        } catch (UnknownHostException e)
+        }
+        catch (UnknownHostException e)
         {
             e.printStackTrace();
         }

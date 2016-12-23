@@ -21,7 +21,8 @@ public class Node_NameServerRMI
         {
             String location = "//192.168.1.1/FileServer"; // @TODO aangepast naar 32 voor thuisgebruik via wifi (jonas)
             NSI = (ServerRMIinterface) Naming.lookup(location);
-        } catch(Exception e)
+        }
+        catch(Exception e)
         {
             System.err.println("FileServer exception: "+ e.getMessage());
         }
@@ -35,7 +36,8 @@ public class Node_NameServerRMI
             Inet4Address IP = NSI.findFile(fileName);
             System.out.println("File is located at: "+IP);
             return IP;
-        } catch(Exception e)
+        }
+        catch(Exception e)
         {
             System.err.println("FileServerexception: " + e.getMessage());
             e.printStackTrace();
@@ -49,7 +51,8 @@ public class Node_NameServerRMI
         try
         {
             return NSI.checkAmountOfNodes();
-        } catch(RemoteException e)
+        }
+        catch(RemoteException e)
         {
             e.printStackTrace();
             return -1;
@@ -63,7 +66,8 @@ public class Node_NameServerRMI
         try
         {
             return NSI.checkIfLowEdge(nameHash);
-        } catch (RemoteException e)
+        }
+        catch (RemoteException e)
         {
             e.printStackTrace();
             return false; // nagevraagd, was in orde
@@ -76,7 +80,8 @@ public class Node_NameServerRMI
         try
         {
             return NSI.checkIfHighEdge(nameHash);
-        } catch (RemoteException e)
+        }
+        catch (RemoteException e)
         {
             e.printStackTrace();
             return false;
@@ -89,7 +94,8 @@ public class Node_NameServerRMI
         try
         {
             return NSI.checkIfNameExists(name);
-        } catch (RemoteException e)
+        }
+        catch (RemoteException e)
         {
             e.printStackTrace();
             return false;
@@ -101,7 +107,8 @@ public class Node_NameServerRMI
         try
         {
             return NSI.getIP(hash);
-        } catch (RemoteException e)
+        }
+        catch (RemoteException e)
         {
             e.printStackTrace();
             return null;
@@ -113,7 +120,8 @@ public class Node_NameServerRMI
         try
         {
             return NSI.getIDs(ipAddr);
-        } catch (RemoteException e)
+        }
+        catch (RemoteException e)
         {
             e.printStackTrace();
             return null;
@@ -125,7 +133,8 @@ public class Node_NameServerRMI
         try
         {
             return NSI.getID(ipAddr);
-        } catch (RemoteException e)
+        }
+        catch (RemoteException e)
         {
             e.printStackTrace();
             return -1;
@@ -137,7 +146,8 @@ public class Node_NameServerRMI
         try
         {
             NSI.deleteNode(hash);
-        } catch (RemoteException e)
+        }
+        catch (RemoteException e)
         {
             e.printStackTrace();
         }
@@ -148,7 +158,8 @@ public class Node_NameServerRMI
         try
         {
             return NSI.getMapsize();
-        } catch (RemoteException e)
+        }
+        catch (RemoteException e)
         {
             e.printStackTrace();
             return -1;
@@ -160,7 +171,8 @@ public class Node_NameServerRMI
         try
         {
             return NSI.getLastNodeIP();
-        } catch (RemoteException e)
+        }
+        catch (RemoteException e)
         {
             e.printStackTrace();
             return null;
@@ -172,7 +184,8 @@ public class Node_NameServerRMI
         try
         {
             return NSI.getNodeFromFilename(fileHash);
-        } catch (RemoteException e)
+        }
+        catch (RemoteException e)
         {
             e.printStackTrace();
             return -1;

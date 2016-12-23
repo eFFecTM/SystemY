@@ -30,7 +30,6 @@ public class FileAgent implements Runnable,Serializable
         updateSystemYfiles();
         removeFiles();
         updateNodeSystemYfiles();
-        //checkLocks();
     }
 
 
@@ -71,22 +70,6 @@ public class FileAgent implements Runnable,Serializable
                 nodeRemovedFiles.remove(i);
             }
 
-        }
-    }
-
-    public void checkLocks() //@TODO bij het voltooien van download, de locks juist uitwerken
-    {
-        Set<String> keyset = nodeSystemYfiles.keySet();
-        for(String key : keyset)
-        {
-            if(nodeSystemYfiles.get(key) == true) //de node heeft een lock
-            {
-                if(systemYfiles.get(key) == null) //er is nog geen lock
-                {
-                    // do something like give permission to download and release their lock
-                    //systemYfiles.put(key, currentNodeHash); //voeg de lock toe in de lijst van de node
-                }
-            }
         }
     }
 

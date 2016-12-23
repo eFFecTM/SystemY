@@ -36,7 +36,8 @@ public class  Node
     CopyOnWriteArrayList<String> creatorFiles; //lijst van filenamen die deze node in het netwerk bracht
 
     // Node constructor
-    public Node() throws SocketException, UnknownHostException {
+    public Node() throws SocketException, UnknownHostException
+    {
         getIP();
         NScommunication = new Node_NameServerRMI();
         bindNodeRMIReceive(); // RMI Node-Node
@@ -70,9 +71,12 @@ public class  Node
                     {
                         downloadFile(fileName);
 
-                        try {
+                        try
+                        {
                             Thread.sleep(2000); // Belangrijk: Wordt niet gevonden als we direct openen
-                        } catch (InterruptedException e) {
+                        }
+                        catch (InterruptedException e)
+                        {
                             e.printStackTrace();
                         }
 
@@ -102,48 +106,55 @@ public class  Node
                     System.out.println("Column is NOT 1, 2 or 3!");
                     break;
             }
-        } catch (IOException e)
+        }
+        catch (IOException e)
         {
             e.printStackTrace();
         }
     }
 
     // Op registerpoort 9876 wordt de Node_nodeRMI_Receive klasse verbonden op een locatie
-    public void bindNodeRMIReceive() {
-        try {
+    public void bindNodeRMIReceive()
+    {
+        try
+        {
             nodeRMIReceive = new Node_nodeRMI_Receive(this); //RMIclass maken + referentie naar zichzelf doorgeven (voor buren te plaatsen)
             String bindLocation = "NodeSet";
             Registry reg = LocateRegistry.createRegistry(1099); // Standaardpoort 1099!
             reg.bind(bindLocation, nodeRMIReceive);
             System.out.println("Node is reachable at" + bindLocation);
             System.out.println("java RMI registry created.");
-        } catch (AlreadyBoundException | RemoteException e) {
+        }
+        catch (AlreadyBoundException | RemoteException e)
+        {
             e.printStackTrace();
             System.err.println("java RMI registry already exists.");
         }
     }
 
     // Opstarten van de Node: Naam instellen, zijn eigen MultiCast sturen (anderen laten weten) en startup info ophalen
-    public void startUp(String name) {
+    public void startUp(String name)
+    {
         this.name = name;
         ownHash = calcHash(name);
         sendMC();
-        try {
+        try
+        {
             Thread.sleep(2000); // Belangrijk: Andere Nodes moeten eerst de MC ontvangen
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e)
+        {
             e.printStackTrace();
         }
         getStartupInfoFromNS();
         loadFiles();
         updateFiles();
-        //receiveFile();
         //testBootstrapDiscovery();
         testSystemYfilesMap();
     }
 
-    public void shutDown() {
-        shutdown = true; //overbodig
-
+    public void shutDown()
+    {
         if(onlyNode)
             NScommunication.deleteNode(ownHash); //delete eigen node uit de map van de server
         else
@@ -156,7 +167,7 @@ public class  Node
                 nRMIt.updateOnlyNode();
             }
 
-            //bestandenregeling todo: SHUTDOWN MOET GETEST WORDEN
+            //bestandenregeling
             for(File file : currentFileList)
             {
                 String fileName = file.getName();
@@ -238,14 +249,10 @@ public class  Node
     public boolean checkName(String name)
     {
         boolean isCorrectName;
-        //System.out.println("Choose a name for the node and press enter.");
-        //Scanner s = new Scanner(System.in);
-        //name = s.nextLine();
+
         if (name.contains(" ") || NScommunication.checkIfNameExists(name))
         {
             isCorrectName = false;
-            //System.out.println("Your name contains a white space or already exists, please choose another name.");
-            //name = s.nextLine();
         }
         else
         {
@@ -255,7 +262,8 @@ public class  Node
     }
 
     // Nakijken of de Node op de laagste en/of hoogste rand zit en is Node de eerste Node in de cirkel?
-    public void getStartupInfoFromNS() {
+    public void getStartupInfoFromNS()
+    {
         lowEdge = NScommunication.checkIfLowEdge(ownHash);
         highEdge = NScommunication.checkIfHighEdge(ownHash);
 
@@ -267,13 +275,16 @@ public class  Node
             System.out.println("UW IP StringVorm = " + prevNodeIP);
             nextHash = ownHash;
             nextNodeIP = ip.toString().substring(1);
-        } else
+        }
+        else
             onlyNode = false;
     }
 
     // Sturen van een MultiCast
-    public void sendMC() {
-        try {
+    public void sendMC()
+    {
+        try
+        {
             int portMC = 12345; // Multicast Port waarop men gaat sturen
             Inet4Address IPMC = (Inet4Address) Inet4Address.getByName("230.0.0.0");
             // Multicast IP range: 224.0.0.0 - 239.255.255.255
@@ -287,16 +298,22 @@ public class  Node
 
             System.out.println("Multicast message send.");
             socket.close();
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             e.printStackTrace();
         }
     }
 
     // Luisteren naar / Ontvangen van een MultiCast
-    public void listenMC() {
-        new Thread(new Runnable() {
-            public void run() {
-                try {
+    public void listenMC()
+    {
+        new Thread(new Runnable()
+        {
+            public void run()
+            {
+                try
+                {
                     int portMC = 12345;
                     Inet4Address IPMC = (Inet4Address) Inet4Address.getByName("230.0.0.0");
                     MulticastSocket mcSocket;
@@ -304,7 +321,8 @@ public class  Node
                     mcSocket.joinGroup(IPMC);
                     DatagramPacket packet;
 
-                    while (!shutdown) {
+                    while (true)
+                    {
                         packet = new DatagramPacket(new byte[1024], 1024);
                         System.out.println("Waiting for a  multicast message...");
                         mcSocket.receive(packet);
@@ -320,8 +338,9 @@ public class  Node
                         System.out.println("Naam: " + info[0]);
                         System.out.println("IP: " + info[1]);
                     }
-                    //shutDown();
-                } catch (IOException e) {
+                }
+                catch (IOException e)
+                {
                     e.printStackTrace();
                 }
             }
@@ -333,7 +352,8 @@ public class  Node
         try
         {
             Thread.sleep(3000);
-        } catch (InterruptedException e)
+        }
+        catch (InterruptedException e)
         {
             e.printStackTrace();
         }
@@ -349,7 +369,8 @@ public class  Node
         try
         {
             Thread.sleep(1000);
-        } catch (InterruptedException e)
+        }
+        catch (InterruptedException e)
         {
             e.printStackTrace();
         }
@@ -359,7 +380,8 @@ public class  Node
     }
 
     // Positie (buren) wordt gehercalculeerd door volgend algoritme
-    public void recalcPosition() {
+    public void recalcPosition()
+    {
         prevHighEdge = false;
         wasOnlyNode = false;
         if (onlyNode) // Enigste Node in de cirkel
@@ -378,20 +400,30 @@ public class  Node
                 highEdge = false;
                 prevHighEdge = true;
             }
-        } else {
-            if (newNodeHash > ownHash && newNodeHash < nextHash) {
+        }
+        else
+        {
+            if (newNodeHash > ownHash && newNodeHash < nextHash)
+            {
                 updateNewNodeNeighbours(newNodeIP);
                 nextHash = newNodeHash;
                 nextNodeIP = newNodeIP;
-            } else if (newNodeHash < ownHash && newNodeHash > prevHash) {
+            }
+            else if (newNodeHash < ownHash && newNodeHash > prevHash)
+            {
                 prevHash = newNodeHash;
                 prevNodeIP = newNodeIP;
-            } else if (lowEdge) {
-                if (newNodeHash < ownHash) {
+            }
+            else if (lowEdge)
+            {
+                if (newNodeHash < ownHash)
+                {
                     prevHash = newNodeHash;
                     prevNodeIP = newNodeIP;
                     lowEdge = false;
-                } else if (newNodeHash > prevHash) {
+                }
+                else if (newNodeHash > prevHash)
+                {
                     prevHash = newNodeHash;
                     prevNodeIP = newNodeIP;
                 }
@@ -417,17 +449,20 @@ public class  Node
     }
 
     // Buren van de Nieuwe Node updaten
-    public void updateNewNodeNeighbours(String ipAddr) {
+    public void updateNewNodeNeighbours(String ipAddr)
+    {
         Node_nodeRMI_Transmit nodeRMITransmit = new Node_nodeRMI_Transmit(ipAddr, this);
         nodeRMITransmit.setNeighbours(ownHash, nextHash);
     }
 
-    public void updateLeftNeighbour() {
+    public void updateLeftNeighbour()
+    {
         Node_nodeRMI_Transmit nodeRMITransmit = new Node_nodeRMI_Transmit(prevNodeIP, this);
         nodeRMITransmit.updateLeftNeighbour(nextHash); //maak connectie met de linkerbuur en geef rechterbuur door
     }
 
-    public void updateRightNeighbour() {
+    public void updateRightNeighbour()
+    {
         Node_nodeRMI_Transmit nodeRMITransmit = new Node_nodeRMI_Transmit(nextNodeIP, this);
         nodeRMITransmit.updateRightNeighbour(prevHash);
     }
@@ -445,18 +480,22 @@ public class  Node
             prevNodeIP = ip.toString().substring(1);
             nextHash = ownHash;
             nextNodeIP = ip.toString().substring(1);
-        } else if (neighbours[0] == ownHash) //deze node is de linkse buur van de gefaalde node
+        }
+        else if (neighbours[0] == ownHash) //deze node is de linkse buur van de gefaalde node
         {
             Node_nodeRMI_Transmit nodeRMITransmitR = new Node_nodeRMI_Transmit(NScommunication.getIP(neighbours[1]), this);
             nodeRMITransmitR.updateLeftNeighbour(neighbours[0]); //verbind met de RECHTSEbuur van de GEFAALDE node en update ZIJN LINKSE buur met de linkse van de gefaalde
             nextHash = neighbours[1]; //update jezelf
 
-        } else if (neighbours[1] == ownHash) //deze node is de rechtse buur van de gefaalde node
+        }
+        else if (neighbours[1] == ownHash) //deze node is de rechtse buur van de gefaalde node
         {
             Node_nodeRMI_Transmit nodeRMITransmitL = new Node_nodeRMI_Transmit(NScommunication.getIP(neighbours[0]), this);
             nodeRMITransmitL.updateRightNeighbour(neighbours[1]); //verbind met de LINKSE node van de GEFAALDE node, en update ZIJN RECHTSE buur met de RECHTSE van de gefaalde node
             prevHash = neighbours[0];
-        } else {
+        }
+        else
+        {
             System.out.println("failureOtherNode: laatste else");
             Node_nodeRMI_Transmit nodeRMITransmitL = new Node_nodeRMI_Transmit(NScommunication.getIP(neighbours[0]), this);
             nodeRMITransmitL.updateRightNeighbour(neighbours[1]); //verbind met de LINKSE node van de GEFAALDE node, en update ZIJN RECHTSE buur met de RECHTSE van de gefaalde node
@@ -467,27 +506,35 @@ public class  Node
     }
 
     // Berekenen van een hash van een naam (of filenaam)
-    public int calcHash(String name) {
+    public int calcHash(String name)
+    {
         return Math.abs(name.hashCode() % 32768);
     }
 
-    public void getIP() throws UnknownHostException, SocketException {
+    public void getIP() throws UnknownHostException, SocketException
+    {
         boolean hasIP = false;
         Inet4Address IP = null;
-        for (NetworkInterface netint : Collections.list(NetworkInterface.getNetworkInterfaces())) {
-            for (InetAddress inetAddress : Collections.list(netint.getInetAddresses())) {
+        for (NetworkInterface netint : Collections.list(NetworkInterface.getNetworkInterfaces()))
+        {
+            for (InetAddress inetAddress : Collections.list(netint.getInetAddresses()))
+            {
                 System.out.println("Found IP's: " + inetAddress);
-                if (inetAddress.toString().contains("192.168.1.")) {
+                if (inetAddress.toString().contains("192.168.1."))
+                {
                     hasIP = true;
                     System.out.println("IP Adres: " + inetAddress);
                     IP = (Inet4Address) inetAddress;
                 }
             }
         }
-        if (hasIP) {
+        if (hasIP)
+        {
             ip = IP;
 
-        } else {
+        }
+        else
+        {
             System.out.println("IP not found! Type your local IP manually:");
             //Scanner s = new Scanner(System.in);
             //String ipString = s.nextLine();
@@ -508,7 +555,8 @@ public class  Node
 
     public void updateFiles()
     {
-        new Thread(new Runnable() {
+        new Thread(new Runnable()
+        {
             public void run()
             {
                 while(true)
@@ -516,7 +564,8 @@ public class  Node
                     try
                     {
                         Thread.sleep(30000); // Update na elke 30 seconden
-                    } catch (InterruptedException e)
+                    }
+                    catch (InterruptedException e)
                     {
                         e.printStackTrace();
                     }
@@ -615,7 +664,8 @@ public class  Node
         try
         {
             Thread.sleep(5000); //geeft de nieuwe node tijd om op te starten
-        } catch (InterruptedException e)
+        }
+        catch (InterruptedException e)
         {
             e.printStackTrace();
         }
@@ -731,49 +781,40 @@ public class  Node
                 {
                     ServerSocket serverSocket;
 
-                   // while(true)
-                   // {
-                        serverSocket = new ServerSocket(port);
-                        Socket socket = serverSocket.accept();
+                    serverSocket = new ServerSocket(port);
+                    Socket socket = serverSocket.accept();
+                    ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
+                    String fileName = (String) ois.readObject();
 
-                        ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
-                        String fileName = (String) ois.readObject();
+                    //Receiving a file from another node
+                    byte[] b = new byte[1024];
+                    int length;
+                    int byteLength = 1024;
+                    FileOutputStream fos = new FileOutputStream(fileDir.getName()+ "/" + fileName); //fixme: als het niet werkt: \\
+                    System.out.println("\n receiving file: "+fileDir.getName() + "/" + fileName);
+                    InputStream is = socket.getInputStream();
+                    BufferedInputStream bis = new BufferedInputStream(is, 1024);
+                    while ((length = bis.read(b, 0, 1024)) != -1)
+                    {
+                        //System.out.println("Receiving file... " + byteLength + " bytes received");
+                        byteLength = byteLength + 1024;
+                        fos.write(b, 0, length);
+                    }
 
-                        //Receiving a file from another node
-                        byte[] b = new byte[1024];
-                        int length;
-                        int byteLength = 1024;
-                        FileOutputStream fos = new FileOutputStream(fileDir.getName()+ "/" + fileName); //fixme: als het niet werkt: \\
-                        System.out.println("\n receiving file: "+fileDir.getName() + "/" + fileName);
-                        InputStream is = socket.getInputStream();
-                        BufferedInputStream bis = new BufferedInputStream(is, 1024);
-                        while ((length = bis.read(b, 0, 1024)) != -1)
-                        {
-                            //System.out.println("Receiving file... " + byteLength + " bytes received");
-                            byteLength = byteLength + 1024;
-                            fos.write(b, 0, length);
-                        }
+                    //Laat niet toe om een bestand continu heen en weer te laten sturen
+                    File file = new File(fileDir.getName() + "/" + fileName);
+                    if(!currentFileList.contains(file))
+                    {
+                        currentFileList.add(file);
+                    }
 
-                        //Laat niet toe om een bestand continu heen en weer te laten sturen
-                        File file = new File(fileDir.getName() + "/" + fileName);
-                        if(!currentFileList.contains(file))
-                        {
-                            currentFileList.add(file);
-                        }
-
-                        //Sending an ACK to the server
-                        //ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-                        //oos.flush();
-                        //oos.writeObject("ACKNOWLEDGE");
-
-                        bis.close();
-                        fos.close();
-                        ois.close();
-                        //oos.close();
-                        socket.close();
-                        serverSocket.close();
-                    //}
-                } catch (IOException | ClassNotFoundException e)
+                    bis.close();
+                    fos.close();
+                    ois.close();
+                    socket.close();
+                    serverSocket.close();
+                }
+                catch (IOException | ClassNotFoundException e)
                 {
                     e.printStackTrace();
                 }
@@ -837,14 +878,20 @@ public class  Node
     }
 
     // TEST: gegevens weergeven van de Node
-    public void testBootstrapDiscovery() {
-        new Thread(new Runnable() {
-
-            public void run() {
-                while (true) {
-                    try {
+    public void testBootstrapDiscovery()
+    {
+        new Thread(new Runnable()
+        {
+            public void run()
+            {
+                while (true)
+                {
+                    try
+                    {
                         Thread.sleep(10000);
-                    } catch (InterruptedException e) {
+                    }
+                    catch (InterruptedException e)
+                    {
                         e.printStackTrace();
                     }
                     System.out.println("PrevHash: " + prevHash);
@@ -858,20 +905,26 @@ public class  Node
         }).start();
     }
 
-    public void testFailure(String ip) {
+    public void testFailure(String ip)
+    {
         Node_nodeRMI_Transmit node_rmiObj = new Node_nodeRMI_Transmit(ip, this);
         node_rmiObj.setNeighbours(1234, 1234);
     }
 
     public void testSystemYfilesMap()
     {
-        new Thread(new Runnable() {
-
-            public void run() {
-                while (true) {
-                    try {
+        new Thread(new Runnable()
+        {
+            public void run()
+            {
+                while (true)
+                {
+                    try
+                    {
                         Thread.sleep(5000);
-                    } catch (InterruptedException e) {
+                    }
+                    catch (InterruptedException e)
+                    {
                         e.printStackTrace();
                     }
                     System.out.println("--------- SysteYfilesize: " + systemYfiles.size() + "----------");
