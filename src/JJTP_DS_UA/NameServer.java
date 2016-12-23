@@ -67,16 +67,6 @@ public class NameServer
         nodeMap.put(hash,IP);
     }
 
-    // Verwijderen van een node
-    public void deleteNode(String name)
-    {
-        int hash = calcHash(name);
-        if(nodeMap.containsKey(hash))
-            nodeMap.remove(hash);
-        else
-            System.err.println("Delete Node: No such Node.");
-    }
-
     /**
      * Save the TreeMap of hashvalues and IP-addresses using XML.
      */

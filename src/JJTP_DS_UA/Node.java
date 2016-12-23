@@ -79,7 +79,6 @@ public class  Node
                     {
                         File file = getFileFromFilename(fileName);
                         file.delete();
-                        Main_node.deleteFileFromTable(fileName);
                     }
                     else
                     {
@@ -554,8 +553,6 @@ public class  Node
     {
         String fileName = file.getName();
 
-        Main_node.addFileToTable(fileName);
-
         creatorFiles.add(fileName);
         int fileNameHash = calcHash(file.getName());
         FileMarker fileMarker = new FileMarker(fileName, fileNameHash, ownHash);
@@ -750,7 +747,6 @@ public class  Node
                         if(!currentFileList.contains(file))
                         {
                             currentFileList.add(file);
-                            Main_node.addFileToTable(fileName);
                         }
 
                         //Sending an ACK to the server

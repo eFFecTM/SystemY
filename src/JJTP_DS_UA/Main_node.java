@@ -62,23 +62,6 @@ public class Main_node
 
     }
 
-    public static void addFileToTable(String fileName) //todo: bron van files is de filelijst dat de node van de agent krijgt
-    {
-        //gui.tableModel.addRow(new Object[]{fileName,"Open","Delete","Delete Local"});
-    }
-
-    public static void deleteFileFromTable(String fileName)
-    {
-//        int i;
-//        for(i=0;i<gui.tableModel.getRowCount();i++)
-//        {
-//            if(fileName == gui.tableModel.getValueAt(i,0))
-//            {
-//                gui.tableModel.removeRow(i);
-//            }
-//        }
-    }
-
     public static void refreshGUI(ConcurrentHashMap<String, Boolean> systemYfiles)
     {
         gui.refreshGUI(systemYfiles);
