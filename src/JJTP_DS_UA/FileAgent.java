@@ -1,7 +1,6 @@
 package JJTP_DS_UA;
 
 import java.io.Serializable;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -9,7 +8,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Created by jonas on 7-12-2016.
+ * Created by JJTP on 7-12-2016.
  */
 
 public class FileAgent implements Runnable,Serializable

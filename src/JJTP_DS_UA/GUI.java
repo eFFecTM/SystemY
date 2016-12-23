@@ -1,12 +1,10 @@
 package JJTP_DS_UA;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
-import java.awt.event.MouseListener;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -21,12 +19,7 @@ public class GUI
     private JLabel label;
 
     public GUI()
-    {
-        //$$$setupUI$$$();
-        //setNodeName(); // tijdelijk hier geplaatst om te zetten
-        //openPanel();
-
-    }
+    {}
 
     public void openPanel()
     {
@@ -42,10 +35,6 @@ public class GUI
         table.setModel(tableModel);
         DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
         tableModel.setColumnCount(4);
-//        for (int i = 1; i < 4; i++)
-//        {
-//            table.getColumnModel().getColumn(i).setPreferredWidth(30);
-//        }
     }
 
     DefaultTableModel tableModel = new DefaultTableModel()
@@ -72,7 +61,8 @@ public class GUI
                 name = JOptionPane.showInputDialog("Welcome to System Y! Please enter your name.");
             }
             return name;
-        } else
+        }
+        else
         {
             System.exit(0);
         }

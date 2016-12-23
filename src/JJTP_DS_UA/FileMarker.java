@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
- * Created by jonas on 19-11-2016.
+ * Created by JJTP on 19-11-2016.
  */
 public class FileMarker implements Serializable
 {

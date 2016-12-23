@@ -5,7 +5,6 @@
 package JJTP_DS_UA;
 
 import java.io.File;
-import java.net.Inet4Address;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 

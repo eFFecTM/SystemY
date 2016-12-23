@@ -9,7 +9,6 @@ import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Map;
-import java.util.Objects;
 
 // Boven: NameServer
 // Implementeert Interface ServerRMIinterface

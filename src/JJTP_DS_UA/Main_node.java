@@ -5,12 +5,9 @@
 package JJTP_DS_UA;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.event.*;
 import java.net.*;
 import java.lang.String;
-import java.util.Collections;
-import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 
 
