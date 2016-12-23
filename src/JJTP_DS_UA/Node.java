@@ -22,7 +22,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class  Node
 {
     Node thisNode = this;
-    String name, newNodeIP;
+    String name, newNodeIP, prevNodeIP, nextNodeIP;
     Inet4Address ip;
     Node_NameServerRMI NScommunication;
     Node_nodeRMI_Receive nodeRMIReceive;
@@ -182,15 +182,14 @@ public class  Node
                 {
                     if(fileMarkerMap.get(fileName).downloadList.isEmpty()) // als het bestand nooit gedownload is
                     {
-                        Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(NScommunication.getIP(prevHash), this);
+                        Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(prevNodeIP, this);
                         nodeRMIt.removeFile(fileName);
                     }
                     else
                     {
-                        String ip = NScommunication.getIP(prevHash);
-                        Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(ip, this);
-                        int port = negotiatePort(fileName, false, NScommunication.getIP(prevHash));
-                        sendFile(file, ip, port);
+                        Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(prevNodeIP, this);
+                        int port = negotiatePort(fileName, false, prevNodeIP);
+                        sendFile(file, prevNodeIP, port);
                         nodeRMIt.updateFileMarkers(fileMarkerMap.get(fileName));
                         fileMarkerMap.remove(fileName);
                     }
@@ -253,7 +252,10 @@ public class  Node
         {
             onlyNode = true;
             prevHash = ownHash;
+            prevNodeIP = ip.toString().substring(1);
+            System.out.println("UW IP StringVorm = " + prevNodeIP);
             nextHash = ownHash;
+            nextNodeIP = ip.toString().substring(1);
         } else
             onlyNode = false;
     }
@@ -299,8 +301,8 @@ public class  Node
                         String[] info = msg.split(" "); // het ontvangen bericht splitsen in woorden gescheiden door een spatie
                         newNodeHash = calcHash(info[0]);
                         newNodeIP = info[1];
-                        if(onlyNode)
-                            startFileAgent();
+//                        if(onlyNode)
+//                            startFileAgent();
                         recalcPosition();
                         if(newNodeHash == nextHash) //indien de nieuwe node een rechtse buur wordt: update eigenaar van de files.
                             updateFilesOwner();
@@ -327,7 +329,7 @@ public class  Node
         FileAgent fileAgent = new FileAgent();
         fileAgent.setCurrentNodeMaps(systemYfiles, fileMarkerMap, removedFiles);
         fileAgent.run();
-        Node_nodeRMI_Transmit nodeRMITransmit = new Node_nodeRMI_Transmit(NScommunication.getIP(nextHash),this);
+        Node_nodeRMI_Transmit nodeRMITransmit = new Node_nodeRMI_Transmit(nextNodeIP,this);
         nodeRMITransmit.transferFileAgent(fileAgent);
     }
 
@@ -341,7 +343,7 @@ public class  Node
             e.printStackTrace();
         }
         Main_node.refreshGUI(systemYfiles);
-        Node_nodeRMI_Transmit nodeRMITransmit = new Node_nodeRMI_Transmit(NScommunication.getIP(nextHash),this);
+        Node_nodeRMI_Transmit nodeRMITransmit = new Node_nodeRMI_Transmit(nextNodeIP,this);
         nodeRMITransmit.transferFileAgent(agent);
     }
 
@@ -355,7 +357,9 @@ public class  Node
             wasOnlyNode = true;
             updateNewNodeNeighbours(newNodeIP);
             prevHash = newNodeHash;
+            prevNodeIP = newNodeIP;
             nextHash = newNodeHash;
+            nextNodeIP = newNodeIP;
             if (newNodeHash < ownHash)
                 lowEdge = false;
             else
@@ -367,14 +371,18 @@ public class  Node
             if (newNodeHash > ownHash && newNodeHash < nextHash) {
                 updateNewNodeNeighbours(newNodeIP);
                 nextHash = newNodeHash;
+                nextNodeIP = newNodeIP;
             } else if (newNodeHash < ownHash && newNodeHash > prevHash) {
                 prevHash = newNodeHash;
+                prevNodeIP = newNodeIP;
             } else if (lowEdge) {
                 if (newNodeHash < ownHash) {
                     prevHash = newNodeHash;
+                    prevNodeIP = newNodeIP;
                     lowEdge = false;
                 } else if (newNodeHash > prevHash) {
                     prevHash = newNodeHash;
+                    prevNodeIP = newNodeIP;
                 }
             }
             else if (highEdge)
@@ -383,11 +391,13 @@ public class  Node
                 {
                     updateNewNodeNeighbours(newNodeIP);
                     nextHash = newNodeHash;
+                    nextNodeIP = newNodeIP;
                 }
                 else if (newNodeHash > ownHash)
                 {
                     updateNewNodeNeighbours(newNodeIP);
                     nextHash = newNodeHash;
+                    nextNodeIP = newNodeIP;
                     highEdge = false;
                     prevHighEdge = true;
                 }
@@ -402,14 +412,12 @@ public class  Node
     }
 
     public void updateLeftNeighbour() {
-        String ip = NScommunication.getIP(prevHash);
-        Node_nodeRMI_Transmit nodeRMITransmit = new Node_nodeRMI_Transmit(ip, this);
+        Node_nodeRMI_Transmit nodeRMITransmit = new Node_nodeRMI_Transmit(prevNodeIP, this);
         nodeRMITransmit.updateLeftNeighbour(nextHash); //maak connectie met de linkerbuur en geef rechterbuur door
     }
 
     public void updateRightNeighbour() {
-        String ip = NScommunication.getIP(nextHash);
-        Node_nodeRMI_Transmit nodeRMITransmit = new Node_nodeRMI_Transmit(ip, this);
+        Node_nodeRMI_Transmit nodeRMITransmit = new Node_nodeRMI_Transmit(nextNodeIP, this);
         nodeRMITransmit.updateRightNeighbour(prevHash);
     }
 
@@ -423,7 +431,9 @@ public class  Node
             onlyNode = true;
             wasOnlyNode = false;
             prevHash = ownHash;
+            prevNodeIP = ip.toString().substring(1);
             nextHash = ownHash;
+            nextNodeIP = ip.toString().substring(1);
         } else if (neighbours[0] == ownHash) //deze node is de linkse buur van de gefaalde node
         {
             Node_nodeRMI_Transmit nodeRMITransmitR = new Node_nodeRMI_Transmit(NScommunication.getIP(neighbours[1]), this);
@@ -557,13 +567,12 @@ public class  Node
             fileMarker.ownerID = ownHash;
             if(!onlyNode)
             {
-                String ipDest = NScommunication.getIP(prevHash);
                 boolean askFile = false;
-                Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(ipDest, this);
+                Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(prevNodeIP, this);
                 if(!isFailed)
                 {
-                    int port = nodeRMIt.negotiatePort(fileName, askFile, ipDest);
-                    sendFile(file, ipDest, port);
+                    int port = nodeRMIt.negotiatePort(fileName, askFile, prevNodeIP);
+                    sendFile(file, prevNodeIP, port);
                     return true;
                 }
                 return false;
@@ -592,7 +601,7 @@ public class  Node
 
     //controleert wanneer een nieuwe node in het netwerk komt of deze node eigenaar wordt van de bestanden (waar deze node eigenaar van is)
     //hier kom je in als de nieuwe node uw nextNode is.
-    public synchronized void updateFilesOwner()
+    public void updateFilesOwner()
     {
         try
         {
@@ -636,7 +645,6 @@ public class  Node
             {
                 File file = new File("\\Files\\" + fileMarkerMap.get(str).fileName);
 
-                String ipDest = NScommunication.getIP(prevHash);
                 boolean askFile = false;
                 Node_nodeRMI_Transmit nodeRMIt = new Node_nodeRMI_Transmit(newNodeIP, this);
                 int port = nodeRMIt.negotiatePort(file.getName(), askFile, newNodeIP);
@@ -697,7 +705,7 @@ public class  Node
         }
     }
 
-    public synchronized void updateFileMarker(FileMarker fm)
+    public void updateFileMarker(FileMarker fm)
     {
         fileMarkerMap.put(fm.fileName, fm);
     }
