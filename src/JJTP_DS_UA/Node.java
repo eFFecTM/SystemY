@@ -89,6 +89,7 @@ public class  Node
                     if(!fileMarkerMap.containsKey(fileName))
                     {
                         File file = getFileFromFilename(fileName);
+                        currentFileList.remove(currentFileList.indexOf(file));
                         file.delete();
                     }
                     else
