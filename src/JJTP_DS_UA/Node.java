@@ -69,6 +69,8 @@ public class  Node
                     if(!isFound)
                     {
                         downloadFile(fileName);
+                        File file = getFileFromFilename(fileName);
+                        Desktop.getDesktop().open(file);
                     }
                     break;
                 case 2: // delete from network
